@@ -4,11 +4,11 @@ const mongoose = require('mongoose')
 const cors = require('cors')
 const connectDB = require('./database/db')
 const reqLogMiddleware = require('./middlewares/request-log-middleware')
+require('dotenv').config()
+
 // ============================
 // Router
 const userRouter = require('./router/userRouter')
-
-const port = 8080
 
 // ============================
 // CORS Access - Origin
@@ -36,13 +36,12 @@ app.use(express.urlencoded({ extended: false }))
 app.use(reqLogMiddleware)
 app.use(cors(corsOption))
 
-// 라우터 등록
+// 최상위 URL
 app.get('/', (req, res) => {
     res.send('Backend Server')
 })
 
+// 라우터 연결
 app.use('/users', userRouter)
 
-app.listen(port, () => {
-    console.log(port, '포트로 서버가 켜졌어요!')
-})
+module.exports = app //모듈로 httpServer를 내보냄
