@@ -1,12 +1,12 @@
-const mongoose = require('mongoose');
+const mongoose = require('mongoose')
 
-require('dotenv').config();
+require('dotenv').config()
 
 function connectDB() {
     return mongoose.connect(process.env.MONGODB, {
         useNewUrlParser: true,
         useUnifiedTopology: true,
-    });
+    })
 }
 
-module.exports = connectDB;
+module.exports = connectDB

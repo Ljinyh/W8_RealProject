@@ -4,6 +4,7 @@
   "description": "",
   "main": "app.js",
   "scripts": {
+    "prettify": "prettier --write *.js **/*.js",
     "test": "echo \"Error: no test specified\" && exit 1",
     "start": "node server.js"
   },
@@ -26,5 +27,8 @@
     "node": "^18.4.0",
     "nodemon": "^2.0.18",
     "socketio": "^1.0.0"
+  },
+  "devDependencies": {
+    "prettier": "^2.7.1"
   }
 }
