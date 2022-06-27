@@ -8,6 +8,9 @@ const router = express.Router();
 // 회원가입 API.
 router.post('/signup', userController.signUp);
 
+//sending Email
+router.post('/mail', userController.sendMail);
+
 // 로그인 API
 router.post('/login', userController.login);
 
