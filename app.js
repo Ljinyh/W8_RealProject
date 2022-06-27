@@ -13,7 +13,10 @@ const userRouter = require('./router/userRouter')
 // ============================
 // CORS Access - Origin
 const corsOption = {
-    origin: ['http://localhost:3000', ''],
+    origin: [
+        'http://localhost:3000',
+        'https://d3p8bgs7s0qr62.cloudfront.net'
+    ],
     credentials: true,
 }
 
@@ -21,27 +24,28 @@ const corsOption = {
 // DB 연결 - log
 connectDB()
 
-const db = mongoose.connection
-db.on('error', console.error.bind(console, 'connection error:'))
+const db = mongoose.connection;
+db.on('error', console.error.bind(console, 'connection error:'));
 
 // ============================
 // 서버 어플리케이션
-const app = express()
+const app = express();
 
 // body parser
-app.use(express.json())
-app.use(express.urlencoded({ extended: false }))
+app.use(express.json());
+app.use(express.urlencoded({ extended: false }));
 
 // 미들웨어
-app.use(reqLogMiddleware)
-app.use(cors(corsOption))
+app.use(reqLogMiddleware);
+app.use(cors(corsOption));
 
 // 최상위 URL
 app.get('/', (req, res) => {
     res.send('Backend Server')
-})
+});
 
 // 라우터 연결
-app.use('/users', userRouter)
+app.use('/api/users', userRouter);
+
 
 module.exports = app //모듈로 httpServer를 내보냄
