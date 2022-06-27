@@ -47,7 +47,7 @@ exports.signUp = async(req, res) => {
                 .send({
                     errorMessage: '비밀번호와 비밀번호 확인의 내용이 일치하지 않습니다.',
                 })
-        }
+        };
 
         const existUsers = await userDB.findOne({ userId });
         if (existUsers) {
@@ -63,12 +63,6 @@ exports.signUp = async(req, res) => {
                 .send({ errorMessage: '중복된 닉네임입니다.' })
         };
 
-        const existUsersEmail = await userDB.findOne({ email })
-        if (existUsersEmail) {
-            return res
-                .status(400)
-                .send({ errorMessage: '중복된 이메일입니다.' });
-        };
 
         res.status(201).send({ message: '회원가입에 성공했습니다.' });
 
@@ -83,27 +77,34 @@ exports.signUp = async(req, res) => {
 
 // 인증번호 메일로 보내기
 exports.sendMail = async(req, res) => {
-    const { email, nickName } = req.body; //회원가입시 입력한 정보 가져오기
-    let authNum = Math.random().toString().substring(2, 6); //랜덤한 숫자 4자리 생성
+    const { email } = req.body; //회원가입시 입력한 정보 가져오기
+    const authNum = Math.random().toString().substring(2, 6); //랜덤한 숫자 4자리 생성
 
-    let emailParam = {
+    const existUsersEmail = await userDB.findOne({ email });
+
+    const emailParam = {
         toEmail: email,
-
         subject: '어디냥 인증번호 발급',
-
         text: `
-        안녕하세요 ${nickName}님! 어디냥에서 인증번호 발급을 도와드릴게요!
+                안녕하세요 어디냥에서 인증번호 발급을 도와드릴게요!
 
-        ${nickName}님의 인증번호는 <  ${authNum}  > 입니다.
+                인증번호는 <  ${authNum}  > 입니다.
 
-        인증번호 입력란에 입력해 주세요! :)`
-
+                인증번호 입력란에 입력해 주세요! :)`
     };
 
     try {
-        mailer.sendEmail(emailParam);
+        if (existUsersEmail) {
+            return res
+                .status(400)
+                .send({ errorMessage: '중복된 이메일입니다.' });
+        };
 
-        res.status(200).send({ msg: `${nickName}님에게 메일 보내기 성공!`, authNum });
+        if (!existUsersEmail) {
+            mailer.sendEmail(emailParam);
+
+            res.status(200).send({ msg: `메일 보내기 성공!`, authNum });
+        }
     } catch (error) {
         res.status(500).send({ errorMessage: '메세지 전송 싪패!' });
     };
