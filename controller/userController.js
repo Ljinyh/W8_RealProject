@@ -37,8 +37,11 @@ const UserSchema = Joi.object({
 //회원가입
 exports.signUp = async(req, res) => {
     try {
-        const { userId, email, nickName, phoneNum, userLocation, favorability, password, confirmPassword } =
+        const { userId, email, nickName, phoneNum, password, confirmPassword } =
         await UserSchema.validateAsync(req.body);
+
+        //회원가입시 기본 이미지
+        const userImageURL = "https://kr.seaicons.com/wp-content/uploads/2015/06/person-icon.png";
 
         if (password !== confirmPassword) {
             return res
@@ -64,7 +67,7 @@ exports.signUp = async(req, res) => {
 
         res.status(201).send({ message: '회원가입에 성공했습니다.' });
 
-        const users = new userDB({ userId, email, nickName, userLocation, favorability, password, phoneNum });
+        const users = new userDB({ userId, email, nickName, password, phoneNum, userImageURL });
 
         await users.save();
     } catch (err) {
