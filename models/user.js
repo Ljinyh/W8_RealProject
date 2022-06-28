@@ -9,8 +9,6 @@ const UserSchema = new mongoose.Schema({
     phoneNum: Number,
     password: String,
     confirmPassword: String,
-    userLocation: String,
-    favorability: Number,
     userImageURL: String,
 });
 
