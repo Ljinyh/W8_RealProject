@@ -36,7 +36,6 @@ const UserSchema = Joi.object({
 
 //회원가입
 exports.signUp = async(req, res) => {
-
     try {
         const { userId, email, nickName, phoneNum, userLocation, favorability, password, confirmPassword } =
         await UserSchema.validateAsync(req.body);
@@ -46,7 +45,7 @@ exports.signUp = async(req, res) => {
                 .status(400)
                 .send({
                     errorMessage: '비밀번호와 비밀번호 확인의 내용이 일치하지 않습니다.',
-                })
+                });
         };
 
         const existUsers = await userDB.findOne({ userId });
@@ -56,18 +55,18 @@ exports.signUp = async(req, res) => {
                 .send({ errorMessage: '중복된 아이디입니다.' });
         };
 
-        const existNickname = await userDB.findOne({ nickName })
+        const existNickname = await userDB.findOne({ nickName });
         if (existNickname) {
             return res
                 .status(400)
-                .send({ errorMessage: '중복된 닉네임입니다.' })
+                .send({ errorMessage: '중복된 닉네임입니다.' });
         };
-
 
         res.status(201).send({ message: '회원가입에 성공했습니다.' });
 
-        const users = new userDB({ userId, email, nickName, userLocation, favorability, password, phoneNum })
-        await users.save()
+        const users = new userDB({ userId, email, nickName, userLocation, favorability, password, phoneNum });
+
+        await users.save();
     } catch (err) {
         res.status(400).send({
             errorMessage: '요청한 데이터 형식이 올바르지 않습니다.',
@@ -139,6 +138,61 @@ exports.login = async(req, res) => {
         });
     };
 };
+
+//아이디 찾기
+exports.findUserId = async(req, res) => {
+    const { email } = req.body;
+
+    const existUsersEmail = await userDB.findOne({ email });
+    if (existUsersEmail) {
+        const userId = existUsersEmail.userId;
+        return res.status(200).json({ msg: '아이디 찾기 성공!', userId })
+    }
+    return res.status(400).send({ errorMessage: '아이디 찾기 실패!' })
+};
+
+//비밀번호 찾기
+exports.findPass = async(req, res) => {
+    const { email, userId } = req.body;
+    let tempPassword = Math.random().toString(36).slice(2);
+
+    const existUserPass = await userDB.findOne({ email, userId });
+
+    //임시비밀번호 이메일로 전송
+    const emailParam = {
+        toEmail: email,
+        subject: '어디냥 임시비밀번호 발급',
+        text: `
+                안녕하세요 ${userId}님! 임시비밀번호를 보내드려요!
+        
+                임시비밀번호는 <  ${tempPassword}  > 입니다.
+        
+                입력 후 회원정보란에서 꼭 변경해주시길 바랍니다! :)`
+    };
+
+    try {
+        //메일 보내기
+        mailer.sendEmail(emailParam);
+
+        res.status(200).send({ msg: `메일 보내기 성공!` });
+    } catch (error) {
+        res.status(500).send({ errorMessage: '메세지 전송 싪패!' });
+    };
+
+    if (existUserPass) {
+        //임시로 발급된 비밀번호 암호화
+        tempPassword = bcrypt.hashSync(tempPassword, 10);
+
+        //등록된 비밀번호를 임시비밀번호로 수정
+        await userDB.findByIdAndUpdate(existUserPass, {
+            $set: { password: tempPassword },
+        });
+
+    } else {
+        return res.status(400).send({ errorMessage: '비밀번호 찾기 실패!' });
+    };
+};
+
 
 //카카오 로그인
 exports.kakaoLogin = (req, res, next) => {
