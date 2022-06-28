@@ -8,13 +8,19 @@ const router = express.Router();
 // 회원가입 API.
 router.post('/signup', userController.signUp);
 
-//sending Email
+//인증번호 이메일 발송 API
 router.post('/mail', userController.sendMail);
 
 // 로그인 API
 router.post('/login', userController.login);
 
-// 내 정보 조회 API, 로그인 시 사용
+//아이디 찾기 API
+router.post('/findUserId', userController.findUserId);
+
+//비밀번호 찾기
+router.post('/findPass', userController.findPass);
+
+// 사용자 정보 조회 API, 로그인 시 사용
 router.get('/me', authMiddleware, userController.userInfo);
 
 // passport-kakao Login
