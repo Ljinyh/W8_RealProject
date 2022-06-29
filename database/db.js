@@ -1,12 +1,11 @@
-const mongoose = require('mongoose')
-
-require('dotenv').config()
+const mongoose = require('mongoose');
+const Mongo = require('../config/mongodb.json');
 
 function connectDB() {
-    return mongoose.connect(process.env.MONGODB, {
+    return mongoose.connect(Mongo.MONGODB, {
         useNewUrlParser: true,
         useUnifiedTopology: true,
-    })
+    });
 }
 
-module.exports = connectDB
+module.exports = connectDB;
