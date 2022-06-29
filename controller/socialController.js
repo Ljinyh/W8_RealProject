@@ -8,8 +8,8 @@ exports.kakaoLogin = (req, res, next) => {
         'kakao', { failureRedirect: '/' },
         (err, user, info) => {
             if (err) return next(err);
-            const { email, nickName } = user;
-            const token = jwt.sign({ email }, KEY.SECRET_KEY, {
+            const { snsId, nickName } = user;
+            const token = jwt.sign({ snsId }, KEY.SECRET_KEY, {
                 expiresIn: '7d',
             });
 
@@ -48,8 +48,8 @@ exports.naverLogin = (req, res, next) => {
         'naver', { failureRedirect: '/' },
         (err, user, info) => {
             if (err) return next(err);
-            const { email, nickName } = user;
-            const token = jwt.sign({ email }, KEY.SECRET_KEY, {
+            const { snsId, nickName } = user;
+            const token = jwt.sign({ snsId }, KEY.SECRET_KEY, {
                 expiresIn: '7d',
             });
 

@@ -22,6 +22,7 @@ module.exports = () => {
                         const newUser = await User.create({
                             nickName: profile.displayName,
                             snsId: profile.id,
+                            email: profile._json.email,
                             userImageURL: profile._json.picture,
                             provider: 'google',
                         });
