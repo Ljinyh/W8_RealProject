@@ -10,6 +10,11 @@ const UserSchema = new mongoose.Schema({
     password: String,
     confirmPassword: String,
     userImageURL: String,
+    userInfo: String,
+    position: {
+        type: String,
+        default: 'nomal',
+    },
 });
 
 //비밀번호 암호화
@@ -31,7 +36,7 @@ UserSchema.pre('save', function(next) {
                 next();
             });
         });
-    };
+    }
 });
 
 UserSchema.virtual('authorId').get(function() {
