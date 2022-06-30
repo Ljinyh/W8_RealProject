@@ -23,6 +23,6 @@ router.get('/google/callback', socialController.googleLogin);
 // passport-naver Login
 router.get('/naver', passport.authenticate('naver', null));
 
-router.get('naver/callback', socialController.naverLogin);
+router.get('/naver/callback', socialController.naverLogin);
 
 module.exports = router;
