@@ -23,9 +23,4 @@ router.post('/findPass', userController.findPass);
 // 사용자 정보 조회 API, 로그인 시 사용
 router.get('/me', authMiddleware, userController.userInfo);
 
-// passport-kakao Login
-router.get('/kakao', passport.authenticate('kakao'));
-
-router.get('/auth/kakao/callback', userController.kakaoLogin);
-
 module.exports = router;
