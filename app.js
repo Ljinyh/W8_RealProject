@@ -4,12 +4,12 @@ const mongoose = require('mongoose');
 const cors = require('cors');
 const connectDB = require('./database/db');
 const reqLogMiddleware = require('./middlewares/request-log-middleware');
-require('dotenv').config();
 
 // ============================
 // Router
-const userRouter = require('./router/userRouter');
-const kakaoRouter = require('./router/socialRouter');
+const indexRouter = require('./router/index');
+
+// Passport
 const kakaoPassport = require('./passport/kakao'); //이애 연결해주고
 const googlePassport = require('./passport/google');
 const naverPassort = require('./passport/naver');
@@ -49,7 +49,6 @@ app.get('/', (req, res) => {
 });
 
 // 라우터 연결
-app.use('/api/users', userRouter);
-app.use('/api/auth', kakaoRouter);
+app.use('/api', indexRouter);
 
 module.exports = app; //모듈로 httpServer를 내보냄
