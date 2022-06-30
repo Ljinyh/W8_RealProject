@@ -13,7 +13,7 @@ const UserSchema = new mongoose.Schema({
     userInfo: String,
     position: {
         type: String,
-        default: 'nomal',
+        default: 'normal',
     },
 });
 
