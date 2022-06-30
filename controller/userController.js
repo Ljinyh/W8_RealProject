@@ -152,19 +152,29 @@ exports.findUserId = async(req, res) => {
     const { email } = req.body;
 
     const existUsersEmail = await userDB.findOne({ email });
-    if (existUsersEmail) {
-        const userId = existUsersEmail.userId;
-        return res.status(200).json({ msg: '아이디 찾기 성공!', userId });
+
+    if (!existUsersEmail || existUsersEmail === null) {
+        return res.status(400).send({ errorMessage: '아이디 찾기 실패!' });
     }
-    return res.status(400).send({ errorMessage: '아이디 찾기 실패!' });
+    const userId = existUsersEmail.userId;
+
+    return res.status(200).json({ msg: '아이디 찾기 성공!', userId });
 };
 
 //비밀번호 찾기
 exports.findPass = async(req, res) => {
     const { email, userId } = req.body;
+
+    //랜덤으로 36진수의 값 만들기(소숫점 뒤부터)
     let tempPassword = Math.random().toString(36).slice(2);
 
     const existUserPass = await userDB.findOne({ email, userId });
+
+    if (!existUserPass || existUserPass === null) {
+        return res.status(400).send({
+            errorMessage: '작성란이 비어있거나 회원등록이 되어있지 않는 사용자입니다.',
+        });
+    }
 
     //임시비밀번호 이메일로 전송
     const emailParam = {
@@ -179,10 +189,10 @@ exports.findPass = async(req, res) => {
     };
 
     try {
-        //메일 보내기
         mailer.sendEmail(emailParam);
 
         res.status(200).send({ msg: `메일 보내기 성공!` });
+        //메일 보내기
     } catch (error) {
         res.status(500).send({ errorMessage: '메세지 전송 싪패!' });
     }
