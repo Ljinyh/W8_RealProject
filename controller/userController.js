@@ -3,6 +3,7 @@ const userDB = require('../models/user');
 const Joi = require('joi');
 const bcrypt = require('bcrypt');
 const mailer = require('../models/mail');
+const secret = require('../config/secret.json');
 
 require('dotenv').config();
 
@@ -134,7 +135,7 @@ exports.login = async(req, res) => {
 
         //비밀번호까지 맞다면 토큰을 생성하기.
         const token = jwt.sign({ authorId: user.authorId },
-            process.env.SECRET_KEY, { expiresIn: '24h' } //토큰 24으로 유효시간 지정
+            secret.SECRET_KEY, { expiresIn: '24h' } //토큰 24으로 유효시간 지정
         );
         res.status(200).send({
             message: `${userId}님이 로그인하셨습니다.`,
