@@ -16,7 +16,7 @@ router.get('/exhibit/:postId/intro', postController.introPost);
 router.get('/exhibit/:postId/information', postController.infoPost);
 
 // 전시회 게시글 작성 API
-router.post('/exhibit', postController.writePost);
+router.post('/exhibit', authMiddleware, postController.writePost);
 
 // 전시회 게시글 수정 API
 router.put('/exhibit/:postId', postController.rewritePost);
