@@ -7,7 +7,11 @@ module.exports = {
         const existPost = await Exhibit.find().exec();
         res.send({
             result: 'success',
-            posts: existPost,
+            posts: existPost.map((a) => ({
+                title: a.title,
+                subtitle: a.subtitle,
+                thumbnailImg: a.thumbnailImg,
+            })),
         });
     },
 
@@ -15,8 +19,8 @@ module.exports = {
     introPost: async (req, res) => {
         const { postId } = req.params;
         try {
-            const existPost = await Exhibit.findById(postId);
-            const postUser = await User.findById(existPost.userId); //게시글 작성자의 유저 정보 불러오기
+            const existPost = await Exhibit.findById({ _id: postId });
+            const postUser = await User.findOne({ userId: existPost.userId }); //게시글 작성자의 유저 정보 불러오기
             res.status(200).json({
                 result: 'success',
                 postIntro: {
@@ -39,7 +43,7 @@ module.exports = {
         const { postId } = req.params;
         try {
             const existPost = await Exhibit.findById(postId);
-            const postUser = await User.findById(existPost.userId); //게시글 작성자의 유저 정보 불러오기
+            const postUser = await User.findOne({ userId: existPost.userId }); //게시글 작성자의 유저 정보 불러오기
             res.status(200).json({
                 result: 'success',
                 postInfo: {
