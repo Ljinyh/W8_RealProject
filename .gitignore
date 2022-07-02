@@ -99,3 +99,4 @@ dist
 .tern-port
 
 # email config
+/config
