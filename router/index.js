@@ -9,7 +9,7 @@ router.get('/', function (req, res, next) {
 router.use('/users', require('./userRouter'));
 router.use('/auth', require('./socialRouter'));
 router.use('/post', require('./postRouter'));
-router.use('/image', require('./imageRouter'));
+router.use('/upload', require('./uploadRouter'));
 
 
 module.exports = router;
