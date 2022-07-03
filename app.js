@@ -9,6 +9,7 @@ const reqLogMiddleware = require('./middlewares/request-log-middleware');
 // Router
 const indexRouter = require('./router/index');
 
+// ============================
 // Passport
 const kakaoPassport = require('./passport/kakao'); //이애 연결해주고
 const googlePassport = require('./passport/google');
@@ -43,11 +44,13 @@ naverPassort();
 app.use(reqLogMiddleware);
 app.use(cors(corsOption));
 
+// ============================
 // 최상위 URL
 app.get('/', (req, res) => {
     res.send('Backend Server');
 });
 
+// ============================
 // 라우터 연결
 app.use('/api', indexRouter);
 
