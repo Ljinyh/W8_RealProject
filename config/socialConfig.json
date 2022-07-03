@@ -1,10 +1,10 @@
 {
     "GOOGLE_ID": "223845972715-hqd6uqt5t2vv951kdv864gsjt6ca4n7a.apps.googleusercontent.com",
     "GOOGLE_PASS": "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",
-    "GOOGLE_CALLBACK_URL": "http://localhost:3000/api/auth/google/callback",
+    "GOOGLE_CALLBACK_URL": "/api/auth/google/callback",
     "KAKAO_ID": "2771b333a0566c183aa6acaac0347520",
-    "KAKAO_CALLBACK_URL": "http://localhost:3000/api/auth/kakao/callback",
+    "KAKAO_CALLBACK_URL": "/api/auth/kakao/callback",
     "NAVER_ID": "KJzlE_oEdjnN1_ysh7Fz",
     "NAVER_PASS": "aqDUahiWqh",
-    "NAVER_CALLBACK_URL": "http://localhost:3000/api/auth/naver/callback"
+    "NAVER_CALLBACK_URL": "/api/auth/naver/callback"
 }
