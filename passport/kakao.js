@@ -1,6 +1,6 @@
 const passport = require('passport');
 const KakaoStrategy = require('passport-kakao').Strategy;
-const User = require('../models/socialUser');
+const User = require('../models/user');
 const KAKAO = require('../config/socialConfig.json');
 
 module.exports = () => {
