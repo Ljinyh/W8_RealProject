@@ -1,6 +1,6 @@
 const passport = require('passport');
 const GoogleStrategy = require('passport-google-oauth20').Strategy;
-const User = require('../models/socialUser');
+const User = require('../models/user');
 const googleinfo = require('../config/socialConfig.json');
 
 module.exports = () => {
@@ -20,10 +20,9 @@ module.exports = () => {
                         done(null, exUser);
                     } else {
                         const newUser = await User.create({
-                            nickName: profile.displayName,
+                            nickname: profile.displayName,
                             snsId: profile.id,
                             email: profile._json.email,
-                            userImageURL: profile._json.picture,
                             provider: 'google',
                         });
                         done(null, newUser); // 회원가입하고 로그인 인증 완료
