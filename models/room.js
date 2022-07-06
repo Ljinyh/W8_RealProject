@@ -6,7 +6,7 @@ const RoomSchema = new mongoose.Schema({
     ownerId: String,
     guestId: String,
     emoji: String,
-    roomcode: String,
+    roomCode: String,
 });
 RoomSchema.virtual('roomId').get(function () {
     return this._id.toHexString();
