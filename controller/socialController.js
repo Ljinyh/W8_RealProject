@@ -8,16 +8,14 @@ exports.kakaoLogin = (req, res, next) => {
         'kakao', { failureRedirect: '/' },
         (err, user, info) => {
             if (err) return next(err);
-            const { snsId, nickName } = user;
+            const { snsId } = user;
             const token = jwt.sign({ snsId }, KEY.SECRET_KEY, {
                 expiresIn: '7d',
             });
 
-            res.send({
-                token,
-                nickName,
-                message: '로그인 되었습니다.',
-            });
+            res.redirect(
+                `https://d3p8bgs7s0qr62.cloudfront.net?token=${token}`
+            );
         }
     )(req, res, next);
 };
@@ -28,16 +26,14 @@ exports.googleLogin = (req, res, next) => {
         'google', { failureRedirect: '/' },
         (err, user, info) => {
             if (err) return next(err);
-            const { snsId, nickName } = user;
+            const { snsId } = user;
             const token = jwt.sign({ snsId }, KEY.SECRET_KEY, {
                 expiresIn: '7d',
             });
 
-            res.send({
-                token,
-                nickName,
-                message: '로그인 되었습니다.',
-            });
+            res.redirect(
+                `https://d3p8bgs7s0qr62.cloudfront.net?token=${token}`
+            );
         }
     )(req, res, next);
 };
@@ -48,16 +44,14 @@ exports.naverLogin = (req, res, next) => {
         'naver', { failureRedirect: '/' },
         (err, user, info) => {
             if (err) return next(err);
-            const { snsId, nickName } = user;
+            const { snsId } = user;
             const token = jwt.sign({ snsId }, KEY.SECRET_KEY, {
                 expiresIn: '7d',
             });
 
-            res.send({
-                token,
-                nickName,
-                message: '로그인 되었습니다.',
-            });
+            res.redirect(
+                `https://d3p8bgs7s0qr62.cloudfront.net?token=${token}`
+            );
         }
     )(req, res, next);
 };
