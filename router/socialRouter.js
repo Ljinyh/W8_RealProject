@@ -15,7 +15,7 @@ router.get('/kakao/callback', socialController.kakaoLogin);
 router.get(
     '/google',
     passport.authenticate('google', { scope: ['email', 'profile'] })
-    //scope를 profile로만 줬을때는 email이 안들어옴(반대는 nickName이 안들어옴)
+    //scope를 profile로만 줬을때는 email이 안들어옴(반대는 nickname이 안들어옴)
 );
 
 router.get('/google/callback', socialController.googleLogin);

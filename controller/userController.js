@@ -8,13 +8,13 @@ const secret = require('../config/secret.json');
 require('dotenv').config();
 
 const UserSchema = Joi.object({
-    userId: Joi.string().required().min(3),
+    name: Joi.string().required(),
 
     email: Joi.string()
         .required()
         .pattern(new RegExp('^[0-9a-zA-Z]+@+[0-9a-zA-Z]+.+[a-zA-Z]$')),
 
-    nickName: Joi.string()
+    nickname: Joi.string()
         .required()
         .pattern(new RegExp('^[ㄱ-ㅎ가-힣0-9a-zA-Z]{3,10}$')),
 
@@ -26,20 +26,24 @@ const UserSchema = Joi.object({
 
     phoneNum: Joi.number().min(8),
 
-    userLocation: Joi.string(),
+    faceColor: Joi.string(),
 
-    favorability: Joi.number(),
+    eyes: Joi.string(),
 });
 
 //회원가입
 exports.signUp = async(req, res) => {
     try {
-        const { userId, email, nickName, phoneNum, password, confirmPassword } =
-        await UserSchema.validateAsync(req.body);
-
-        //회원가입시 기본 이미지
-        const userImageURL =
-            'https://kr.seaicons.com/wp-content/uploads/2015/06/person-icon.png';
+        let {
+            name,
+            email,
+            nickname,
+            phoneNum,
+            password,
+            confirmPassword,
+            faceColor,
+            eyes,
+        } = await UserSchema.validateAsync(req.body);
 
         if (password !== confirmPassword) {
             return res.status(400).send({
@@ -47,32 +51,40 @@ exports.signUp = async(req, res) => {
             });
         }
 
-        const existUsers = await userDB.findOne({ userId });
-        if (existUsers) {
+        const existUsersEmail = await userDB.findOne({ email });
+        if (existUsersEmail) {
             return res
                 .status(400)
-                .send({ errorMessage: '중복된 아이디입니다.' });
+                .send({ errorMessage: '중복된 이메일입니다.' });
         }
 
-        const existNickname = await userDB.findOne({ nickName });
+        // const existUsers = await userDB.findOne({ userId });
+        // if (existUsers) {
+        //     return res.status(400).send({ errorMessage: '중복된 아이디입니다.' });
+        // }
+
+        const existNickname = await userDB.findOne({ nickname });
         if (existNickname) {
             return res
                 .status(400)
                 .send({ errorMessage: '중복된 닉네임입니다.' });
         }
 
-        res.status(201).send({ message: '회원가입에 성공했습니다.' });
+        password = bcrypt.hashSync(password, 10);
 
         const users = new userDB({
-            userId,
+            name,
             email,
-            nickName,
+            nickname,
             password,
             phoneNum,
-            userImageURL,
+            faceColor,
+            eyes,
         });
 
         await users.save();
+
+        res.status(201).send({ message: '회원가입에 성공했습니다.' });
     } catch (err) {
         res.status(400).send({
             errorMessage: '요청한 데이터 형식이 올바르지 않습니다.',
@@ -89,9 +101,9 @@ exports.sendMail = async(req, res) => {
 
     const emailParam = {
         toEmail: email,
-        subject: '어디냥 인증번호 발급',
+        subject: '위잇 인증번호 발급',
         text: `
-                안녕하세요 어디냥에서 인증번호 발급을 도와드릴게요!
+                안녕하세요 위잇에서 인증번호 발급을 도와드릴게요!
 
                 인증번호는 <  ${authNum}  > 입니다.
 
@@ -117,9 +129,15 @@ exports.sendMail = async(req, res) => {
 
 //로그인
 exports.login = async(req, res) => {
-    const { userId, password } = req.body;
-    const user = await userDB.findOne({ userId });
+    const { email, password } = req.body;
+    const user = await userDB.findOne({ email });
     try {
+        if (!email || !password) {
+            return res
+                .status(400)
+                .send({ errorMessage: '입력칸을 채워주세요!' });
+        }
+
         if (!user) {
             return res
                 .status(400)
@@ -134,11 +152,11 @@ exports.login = async(req, res) => {
         }
 
         //비밀번호까지 맞다면 토큰을 생성하기.
-        const token = jwt.sign({ authorId: user.authorId },
-            secret.SECRET_KEY, { expiresIn: '24h' } //토큰 24으로 유효시간 지정
-        );
+        const token = jwt.sign({ userId: user.userId }, secret.SECRET_KEY, {
+            expiresIn: '3d',
+        });
         res.status(200).send({
-            message: `${userId}님이 로그인하셨습니다.`,
+            message: `${email}님이 로그인하셨습니다.`,
             token,
         });
     } catch (err) {
@@ -148,7 +166,7 @@ exports.login = async(req, res) => {
     }
 };
 
-//아이디 찾기
+//아이디 찾기 - 핸드폰 인증번호 구현할 시 email => phoneNum으로 바꾸기
 exports.findUserId = async(req, res) => {
     const { email } = req.body;
 
@@ -157,19 +175,19 @@ exports.findUserId = async(req, res) => {
     if (!existUsersEmail || existUsersEmail === null) {
         return res.status(400).send({ errorMessage: '아이디 찾기 실패!' });
     }
-    const userId = existUsersEmail.userId;
+    const name = existUsersEmail.name;
 
-    return res.status(200).json({ msg: '아이디 찾기 성공!', userId });
+    return res.status(200).json({ msg: '아이디 찾기 성공!', name });
 };
 
 //비밀번호 찾기
 exports.findPass = async(req, res) => {
-    const { email, userId } = req.body;
+    const { email, name } = req.body;
 
     //랜덤으로 36진수의 값 만들기(소숫점 뒤부터)
     let tempPassword = Math.random().toString(36).slice(2);
 
-    const existUserPass = await userDB.findOne({ email, userId });
+    const existUserPass = await userDB.findOne({ email, name });
 
     if (!existUserPass || existUserPass === null) {
         return res.status(400).send({
@@ -180,9 +198,9 @@ exports.findPass = async(req, res) => {
     //임시비밀번호 이메일로 전송
     const emailParam = {
         toEmail: email,
-        subject: '어디냥 임시비밀번호 발급',
+        subject: '위잇 임시비밀번호 발급',
         text: `
-                안녕하세요 ${userId}님! 임시비밀번호를 보내드려요!
+                안녕하세요 ${name}님! 임시비밀번호를 보내드려요!
         
                 임시비밀번호는 <  ${tempPassword}  > 입니다.
         
@@ -211,14 +229,66 @@ exports.findPass = async(req, res) => {
     }
 };
 
+//프로필 수정
+exports.userinfoEdit = async(req, res) => {
+    const { email } = res.locals.user;
+    const { nickname, userImageURL, userInfo, password } = req.body;
+
+    const existNickname = await userDB.findOne({ nickname });
+    const users = await userDB.findOne({ email });
+
+    try {
+        if (existNickname) {
+            return res
+                .status(400)
+                .send({ errorMessage: '중복된 닉네임입니다.' });
+        }
+
+        if (users.email === email && !password && !existNickname) {
+            await userDB.findByIdAndUpdate({ _id: users._id }, {
+                $set: {
+                    userImageURL: userImageURL,
+                    userInfo: userInfo,
+                    nickname: nickname,
+                },
+            });
+            return res.status(201).json({
+                msg: '회원정보가 수정되었습니다.',
+            });
+        }
+
+        if (users.email === email && password && !existNickname) {
+            await userDB.findByIdAndUpdate({ _id: users._id }, {
+                $set: {
+                    userImageURL: userImageURL,
+                    userInfo: userInfo,
+                    nickname: nickname,
+                    password: bcrypt.hashSync(password, 10),
+                },
+            });
+
+            return res.status(201).json({
+                msg: '회원정보가 수정되었습니다.',
+            });
+        }
+
+        res.status(400).send({ errorMessage: '회원정보 수정 실패!' });
+    } catch (error) {
+        res.status(500).send({ errorMessage: '예외처리 에러' });
+    }
+};
+
 //사용자 인증
 exports.userInfo = async(req, res) => {
     const { user } = res.locals;
     res.send({
         user: {
             userId: user.userId,
-            nickName: user.nickName,
-            userImageURL: user.userImageURL,
+            email: user.email,
+            name: user.name,
+            nickname: user.nickname,
+            faceColor: user.faceColor,
+            eyes: user.eyes,
         },
     });
 };
