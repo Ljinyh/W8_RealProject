@@ -25,6 +25,9 @@ router.post('/findUserId', userController.findUserId);
 //비밀번호 찾기
 router.post('/findPass', userController.findPass);
 
+//사용자 정보 수정
+router.put('/edit', authMiddleware, userController.userinfoEdit);
+
 // 사용자 정보 조회 API, 로그인 시 사용
 router.get('/me', authMiddleware, userController.userInfo);
 
