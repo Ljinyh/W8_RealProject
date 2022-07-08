@@ -4,6 +4,7 @@ const Joi = require('joi');
 const bcrypt = require('bcrypt');
 const mailer = require('../models/mail');
 const secret = require('../config/secret.json');
+const send_message = require('../module/sms'); //sms module
 
 require('dotenv').config();
 
@@ -25,38 +26,13 @@ const UserSchema = Joi.object({
     confirmPassword: Joi.string().required().min(3),
 
     phoneNum: Joi.number().min(8),
-
-    faceColor: Joi.string(),
-
-    eyes: Joi.string(),
-});
+}).unknown(); // 정의되지 않은 key도 허용
 
 //회원가입
 exports.signUp = async(req, res) => {
     try {
-        let {
-            name,
-            email,
-            nickname,
-            phoneNum,
-            password,
-            confirmPassword,
-            faceColor,
-            eyes,
-        } = await UserSchema.validateAsync(req.body);
-
-        if (password !== confirmPassword) {
-            return res.status(400).send({
-                errorMessage: '비밀번호와 비밀번호 확인의 내용이 일치하지 않습니다.',
-            });
-        }
-
-        const existUsersEmail = await userDB.findOne({ email });
-        if (existUsersEmail) {
-            return res
-                .status(400)
-                .send({ errorMessage: '중복된 이메일입니다.' });
-        }
+        let { name, email, nickname, phoneNum, password, faceColor, eyes } =
+        await UserSchema.validateAsync(req.body);
 
         // const existUsers = await userDB.findOne({ userId });
         // if (existUsers) {
@@ -89,6 +65,32 @@ exports.signUp = async(req, res) => {
         res.status(400).send({
             errorMessage: '요청한 데이터 형식이 올바르지 않습니다.',
         });
+    }
+};
+
+//이메일, 비밀번호 중복확인API
+exports.check = async(req, res) => {
+    const { email, password, confirmPassword } = await UserSchema.validateAsync(
+        req.body
+    );
+
+    const existUsersEmail = await userDB.findOne({ email });
+    try {
+        if (existUsersEmail) {
+            return res
+                .status(400)
+                .send({ errorMessage: '중복된 이메일입니다.' });
+        }
+
+        if (password !== confirmPassword) {
+            return res.status(400).send({
+                errorMessage: '비밀번호와 비밀번호 확인의 내용이 일치하지 않습니다.',
+            });
+        }
+        res.status(200).send({ result: success });
+    } catch (err) {
+        console.log(err);
+        res.send({ result: false });
     }
 };
 
@@ -226,6 +228,22 @@ exports.findPass = async(req, res) => {
         });
     } else {
         return res.status(400).send({ errorMessage: '비밀번호 찾기 실패!' });
+    }
+};
+
+//SMS 문자 인증
+exports.sendSMS = (req, res) => {
+    const { phoneNum } = req.body;
+    const authNum = Math.random().toString().substring(2, 6);
+
+    try {
+        if (phoneNum) {
+            send_message(authNum, phoneNum);
+            res.status(200).send({ msg: '문자보내기 성공!', authNum });
+        }
+    } catch (error) {
+        res.status(500).send({ errorMessage: '문자보내기 실패' });
+        console.log(error);
     }
 };
 

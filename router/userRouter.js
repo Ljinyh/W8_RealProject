@@ -1,15 +1,20 @@
 const express = require('express');
 const authMiddleware = require('../middlewares/auth-middleware');
 const userController = require('../controller/userController');
-const passport = require('passport');
 
 const router = express.Router();
 
 // 회원가입 API.
 router.post('/signup', userController.signUp);
 
+// 이메일, 비밀번호 중복확인
+router.post('/check', userController.check);
+
 //인증번호 이메일 발송 API
 router.post('/mail', userController.sendMail);
+
+//인증번호 문자 발송 API
+router.post('/sms', userController.sendSMS);
 
 // 로그인 API
 router.post('/login', userController.login);
