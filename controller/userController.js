@@ -232,20 +232,20 @@ exports.findPass = async(req, res) => {
 };
 
 //SMS 문자 인증
-exports.sendSMS = (req, res) => {
-    const { phoneNum } = req.body;
-    const authNum = Math.random().toString().substring(2, 6);
+// exports.sendSMS = (req, res) => {
+//     const { phoneNum } = req.body;
+//     const authNum = Math.random().toString().substring(2, 6);
 
-    try {
-        if (phoneNum) {
-            send_message(authNum, phoneNum);
-            res.status(200).send({ msg: '문자보내기 성공!', authNum });
-        }
-    } catch (error) {
-        res.status(500).send({ errorMessage: '문자보내기 실패' });
-        console.log(error);
-    }
-};
+//     try {
+//         if (phoneNum) {
+//             send_message(authNum, phoneNum);
+//             res.status(200).send({ msg: '문자보내기 성공!', authNum });
+//         }
+//     } catch (error) {
+//         res.status(500).send({ errorMessage: '문자보내기 실패' });
+//         console.log(error);
+//     }
+// };
 
 //프로필 수정
 exports.userinfoEdit = async(req, res) => {
