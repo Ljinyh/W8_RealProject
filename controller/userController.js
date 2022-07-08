@@ -4,7 +4,7 @@ const Joi = require('joi');
 const bcrypt = require('bcrypt');
 const mailer = require('../models/mail');
 const secret = require('../config/secret.json');
-const send_message = require('../module/sms'); //sms module
+// const send_message = require('../module/sms'); //sms module
 
 require('dotenv').config();
 
