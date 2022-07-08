@@ -13,8 +13,8 @@ router.post('/check', userController.check);
 //인증번호 이메일 발송 API
 router.post('/mail', userController.sendMail);
 
-//인증번호 문자 발송 API
-router.post('/sms', userController.sendSMS);
+// //인증번호 문자 발송 API
+// router.post('/sms', userController.sendSMS);
 
 // 로그인 API
 router.post('/login', userController.login);
