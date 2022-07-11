@@ -1,12 +1,13 @@
 const mongoose = require('mongoose');
 
-const UsersRoomSchema = new mongoose.Schema({
+const UserRoomSchema = new mongoose.Schema({
     userId: String,
-    roomSeq : [String],
-});
-UsersRoomSchema.virtual('usersRoomId').get(function () {
+    roomSeq: [String],
+}, { timestamps: true });
+
+UserRoomSchema.virtual('userRoomId').get(function() {
     return this._id.toHexString();
 });
-UsersRoomSchema.set('toJSON', { virtuals: true });
+UserRoomSchema.set('toJSON', { virtuals: true });
 
-module.exports = mongoose.model('usersRoom', UsersRoomSchema);
+module.exports = mongoose.model('UsersRoom', UserRoomSchema);

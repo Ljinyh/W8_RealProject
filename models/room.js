@@ -13,4 +13,4 @@ RoomSchema.virtual('roomId').get(function () {
 });
 RoomSchema.set('toJSON', { virtuals: true });
 
-module.exports = mongoose.model('room', RoomSchema);
+module.exports = mongoose.model('Room', RoomSchema);
