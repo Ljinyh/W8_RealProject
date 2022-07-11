@@ -24,22 +24,23 @@ const UserSchema = Joi.object({
         .required()
         .pattern(new RegExp('^[ㄱ-ㅎ가-힣0-9a-zA-Z@$!%#?&]{4,10}$')),
 
-    confirmPassword: Joi.string().required().min(3),
+    birthDay: Joi.string().min(8),
 }).unknown(); // 정의되지 않은 key도 허용
 
 //================================================================================
 //회원가입
-exports.signUp = async(req, res) => {
+exports.signUp = async (req, res) => {
     try {
-        let { customerId, email, nickname, password, faceColor, eyes } =
-        await UserSchema.validateAsync(req.body);
-
-        const existUsers = await userDB.findOne({ customerId });
-        if (existUsers) {
-            return res
-                .status(400)
-                .send({ errorMessage: '중복된 아이디입니다.' });
-        }
+        let {
+            customerId,
+            email,
+            name,
+            birthDay,
+            nickname,
+            password,
+            faceColor,
+            eyes,
+        } = await UserSchema.validateAsync(req.body);
 
         const existNickname = await userDB.findOne({ nickname });
         if (existNickname) {
@@ -54,6 +55,8 @@ exports.signUp = async(req, res) => {
             customerId,
             email,
             nickname,
+            name,
+            birthDay,
             password,
             faceColor,
             eyes,
@@ -73,30 +76,33 @@ exports.signUp = async(req, res) => {
 //================================================================================
 //이메일, 비밀번호 중복확인API
 const checkUser = Joi.object({
-    email: Joi.string()
+    customerId: Joi.string()
         .required()
-        .pattern(new RegExp('^[0-9a-zA-Z]+@+[0-9a-zA-Z]+.+[a-zA-Z]$')),
+        .pattern(new RegExp('^[ㄱ-ㅎ가-힣0-9a-zA-Z]{3,11}$')),
 
     password: Joi.string()
         .required()
         .pattern(new RegExp('^[ㄱ-ㅎ가-힣0-9a-zA-Z@$!%#?&]{4,10}$')),
+        
+    confirmPassword: Joi.string().required().min(3),
 }).unknown();
 
-exports.check = async(req, res) => {
-    const { email, password, confirmPassword } = await checkUser.validateAsync(
-        req.body
-    );
+exports.check = async (req, res) => {
+    const { customerId, password, confirmPassword } =
+        await checkUser.validateAsync(req.body);
 
-    const existUsersEmail = await userDB.findOne({ email });
+    const existUsers = await userDB.findOne({ customerId });
+
     try {
-        if (existUsersEmail) {
+        if (existUsers) {
             return res
                 .status(400)
-                .send({ errorMessage: '중복된 이메일입니다.' });
+                .send({ errorMessage: '중복된 아이디입니다.' });
         }
         if (password !== confirmPassword) {
             return res.status(400).send({
-                errorMessage: '비밀번호와 비밀번호 확인의 내용이 일치하지 않습니다.',
+                errorMessage:
+                    '비밀번호와 비밀번호 확인의 내용이 일치하지 않습니다.',
             });
         }
         res.status(200).send({ result: 'success' });
@@ -107,21 +113,30 @@ exports.check = async(req, res) => {
 };
 
 //================================================================================
-// 인증번호 메일로 보내기
-exports.sendMail = async(req, res) => {
-    const { email } = req.body; //회원가입시 입력한 정보 가져오기
+// 이메일 중복확인 및 인증번호 메일로 보내기
+const emailValidation = Joi.object({
+    email: Joi.string()
+        .required()
+        .pattern(new RegExp('^[0-9a-zA-Z]+@+[0-9a-zA-Z]+.+[a-zA-Z]$')),
+}).unknown();
+
+exports.sendMail = async (req, res) => {
+    const { email } = await emailValidation.validateAsync(req.body);
+
     const authNum = Math.random().toString().substring(2, 6); //랜덤한 숫자 4자리 생성
 
     const existUsersEmail = await userDB.findOne({ email });
 
+    if (existUsersEmail) {
+        return res.status(400).send({ errorMessage: '중복된 이메일입니다.' });
+    }
+
     const emailParam = {
         toEmail: email,
-        subject: '위잇 인증번호 발급',
+        subject: 'Weat 인증번호 발급',
         text: `
-                안녕하세요 위잇에서 인증번호 발급을 도와드릴게요!
-
+                안녕하세요 Weat에서 인증번호 발급을 도와드릴게요!
                 인증번호는 <  ${authNum}  > 입니다.
-                
                 인증번호 입력란에 입력해 주세요! :)`,
     };
 
@@ -144,7 +159,7 @@ exports.sendMail = async(req, res) => {
 
 //================================================================================
 //로그인
-exports.login = async(req, res) => {
+exports.login = async (req, res) => {
     const { customerId, password } = req.body;
     const user = await userDB.findOne({ customerId });
     try {
@@ -184,7 +199,7 @@ exports.login = async(req, res) => {
 
 //================================================================================
 //아이디 찾기 - 핸드폰 인증번호 구현할 시 email => phoneNum으로 바꾸기
-exports.findUserId = async(req, res) => {
+exports.findUserId = async (req, res) => {
     const { email } = req.body;
 
     const existUsersEmail = await userDB.findOne({ email });
@@ -199,7 +214,7 @@ exports.findUserId = async(req, res) => {
 
 //================================================================================
 //비밀번호 찾기
-exports.findPass = async(req, res) => {
+exports.findPass = async (req, res) => {
     const { email, customerId } = req.body;
 
     //랜덤으로 36진수의 값 만들기(소숫점 뒤부터)
@@ -209,14 +224,15 @@ exports.findPass = async(req, res) => {
 
     if (!existUserPass || existUserPass === null) {
         return res.status(400).send({
-            errorMessage: '작성란이 비어있거나 회원등록이 되어있지 않는 사용자입니다.',
+            errorMessage:
+                '작성란이 비어있거나 회원등록이 되어있지 않는 사용자입니다.',
         });
     }
 
     //임시비밀번호 이메일로 전송
     const emailParam = {
         toEmail: email,
-        subject: '위잇 임시비밀번호 발급',
+        subject: 'Weat 임시비밀번호 발급',
         text: `
                 안녕하세요 ${existUserPass.nickname}님! 임시비밀번호를 보내드려요!
         
@@ -249,24 +265,24 @@ exports.findPass = async(req, res) => {
 
 //================================================================================
 //SMS 문자 인증
-// exports.sendSMS = (req, res) => {
-//     const { phoneNum } = req.body;
-//     const authNum = Math.random().toString().substring(2, 6);
-
-//     try {
-//         if (phoneNum) {
-//             send_message(authNum, phoneNum);
-//             res.status(200).send({ msg: '문자보내기 성공!', authNum });
-//         }
-//     } catch (error) {
-//         res.status(500).send({ errorMessage: '문자보내기 실패' });
-//         console.log(error);
-//     }
-// };
-
+/*
+exports.sendSMS = (req, res) => {
+    const { phoneNum } = req.body;
+    const authNum = Math.random().toString().substring(2, 6);
+    try {
+        if (phoneNum) {
+            send_message(authNum, phoneNum);
+            res.status(200).send({ msg: '문자보내기 성공!', authNum });
+        }
+    } catch (error) {
+        res.status(500).send({ errorMessage: '문자보내기 실패' });
+        console.log(error);
+    }
+};
+*/
 //================================================================================
 //유저 정보 수정
-exports.userinfoEdit = async(req, res) => {
+exports.userinfoEdit = async (req, res) => {
     const { customerId } = res.locals.user;
     const { nickname, password, faceColor, eyes } = req.body;
 
@@ -282,27 +298,33 @@ exports.userinfoEdit = async(req, res) => {
         }
 
         if (users.customerId === customerId && !password && !existNickname) {
-            await userDB.findByIdAndUpdate({ _id: users._id }, {
-                $set: {
-                    nickname: nickname,
-                    faceColor: faceColor,
-                    eyes: eyes,
-                },
-            });
+            await userDB.findByIdAndUpdate(
+                { _id: users._id },
+                {
+                    $set: {
+                        nickname: nickname,
+                        faceColor: faceColor,
+                        eyes: eyes,
+                    },
+                }
+            );
             return res.status(201).json({
                 msg: '회원정보가 수정되었습니다.',
             });
         }
 
         if (users.customerId === customerId && password && !existNickname) {
-            await userDB.findByIdAndUpdate({ _id: users._id }, {
-                $set: {
-                    nickname: nickname,
-                    faceColor: faceColor,
-                    eyes: eyes,
-                    password: bcrypt.hashSync(password, 10),
-                },
-            });
+            await userDB.findByIdAndUpdate(
+                { _id: users._id },
+                {
+                    $set: {
+                        nickname: nickname,
+                        faceColor: faceColor,
+                        eyes: eyes,
+                        password: bcrypt.hashSync(password, 10),
+                    },
+                }
+            );
 
             return res.status(201).json({
                 msg: '회원정보가 수정되었습니다.',
@@ -318,7 +340,7 @@ exports.userinfoEdit = async(req, res) => {
 
 //================================================================================
 //사용자 인증
-exports.userInfo = async(req, res) => {
+exports.userInfo = async (req, res) => {
     const { user } = res.locals;
     res.send({
         user: {
