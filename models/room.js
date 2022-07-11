@@ -4,11 +4,12 @@ const RoomSchema = new mongoose.Schema({
     roomName: String,
     status: String,
     ownerId: String,
-    guestId: String,
+    guestId: [String],
     emoji: String,
     roomCode: String,
+    createdAt: Date,
 });
-RoomSchema.virtual('roomId').get(function () {
+RoomSchema.virtual('roomId').get(function() {
     return this._id.toHexString();
 });
 RoomSchema.set('toJSON', { virtuals: true });
