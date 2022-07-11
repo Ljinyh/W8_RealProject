@@ -22,7 +22,7 @@ module.exports = () => {
                     } else {
                         // 가입되지 않는 유저면 회원가입 시키고 로그인을 시킨다
                         const newUser = await User.create({
-                            nickname: profile.username,
+                            name: profile.username,
                             snsId: profile.id,
                             email: profile._json.kakao_account.email,
                             provider: 'kakao',
