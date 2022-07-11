@@ -203,7 +203,7 @@ module.exports = {
     detailRoomSave: async(req, res) => {
         const { roomId } = req.params;
         const { userId } = res.locals.user;
-        const { storeId, comment, tag, imgURL } = req.body;
+        const { storeId, comment, tag, imgURL, price, star } = req.body;
 
         const theRoom = await Room.findById(roomId).exec();
         const theStore = await Store.findById(storeId).exec();
@@ -215,6 +215,8 @@ module.exports = {
                     roomId,
                     storeId: theStore.storeId,
                     comment,
+                    star,
+                    price,
                     tag,
                     imgURL,
                     createdAt: Date.now(),
@@ -459,7 +461,16 @@ module.exports = {
     firstMapSave: async(req, res) => {
         const { userId } = res.locals.user;
         const { roomId } = req.params;
-        const { storeName, address, LatLon, comment, imgURL, tag } = req.body;
+        const {
+            storeName,
+            address,
+            LatLon,
+            comment,
+            imgURL,
+            tag,
+            star,
+            price,
+        } = req.body;
 
         const theRoom = await Room.findById(roomId).exec();
         const theStore = await Store.findOne({ storeName: storeName }).exec();
@@ -490,6 +501,8 @@ module.exports = {
                     storeId,
                     comment,
                     imgURL,
+                    star,
+                    price,
                     tag,
                     createdAt: Date.now(),
                 });
