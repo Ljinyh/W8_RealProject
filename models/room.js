@@ -2,7 +2,6 @@ const mongoose = require('mongoose');
 
 const RoomSchema = new mongoose.Schema({
     roomName: String,
-    status: String,
     ownerId: String,
     guestId: [String],
     emoji: String,
@@ -14,4 +13,4 @@ RoomSchema.virtual('roomId').get(function() {
 });
 RoomSchema.set('toJSON', { virtuals: true });
 
-module.exports = mongoose.model('room', RoomSchema);
+module.exports = mongoose.model('Room', RoomSchema);

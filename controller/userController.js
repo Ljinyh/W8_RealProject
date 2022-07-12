@@ -136,9 +136,7 @@ exports.sendMail = async (req, res) => {
         subject: 'Weat 인증번호 발급',
         text: `
                 안녕하세요 Weat에서 인증번호 발급을 도와드릴게요!
-
                 인증번호는 <  ${authNum}  > 입니다.
-
                 인증번호 입력란에 입력해 주세요! :)`,
     };
 
