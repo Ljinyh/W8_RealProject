@@ -74,7 +74,7 @@ exports.signUp = async (req, res) => {
 };
 
 //================================================================================
-//이메일, 비밀번호 중복확인API
+//아이디, 비밀번호 중복확인API
 const checkUser = Joi.object({
     customerId: Joi.string()
         .required()
@@ -153,7 +153,10 @@ exports.sendMail = async (req, res) => {
             res.status(200).send({ msg: `메일 보내기 성공!`, authNum });
         }
     } catch (error) {
-        res.status(500).send({ errorMessage: '메세지 전송 싪패!' });
+        console.log(error);
+        res.status(500).send({
+            errorMessage: '메세지 전송 실패!',
+        });
     }
 };
 
@@ -191,6 +194,7 @@ exports.login = async (req, res) => {
             token,
         });
     } catch (err) {
+        console.log(err);
         res.status(400).json({
             fail: '입력창을 확인 해주세요.',
         });
@@ -204,12 +208,16 @@ exports.findUserId = async (req, res) => {
 
     const existUsersEmail = await userDB.findOne({ email });
 
-    if (!existUsersEmail || existUsersEmail === null) {
-        return res.status(400).send({ errorMessage: '아이디 찾기 실패!' });
-    }
-    const name = existUsersEmail.customerId;
+    try {
+        if (!existUsersEmail || existUsersEmail === null) {
+            return res.status(400).send({ errorMessage: '아이디 찾기 실패!' });
+        }
+        const name = existUsersEmail.customerId;
 
-    return res.status(200).json({ msg: '아이디 찾기 성공!', name });
+        return res.status(200).json({ msg: '아이디 찾기 성공!', name });
+    } catch (err) {
+        res.send(console.log(err));
+    }
 };
 
 //================================================================================
@@ -247,6 +255,7 @@ exports.findPass = async (req, res) => {
         res.status(200).send({ msg: `메일 보내기 성공!` });
         //메일 보내기
     } catch (error) {
+        console.log(error);
         res.status(500).send({ errorMessage: '메세지 전송 싪패!' });
     }
 
@@ -266,20 +275,21 @@ exports.findPass = async (req, res) => {
 //================================================================================
 //SMS 문자 인증
 /*
-exports.sendSMS = (req, res) => {
-    const { phoneNum } = req.body;
-    const authNum = Math.random().toString().substring(2, 6);
-    try {
-        if (phoneNum) {
-            send_message(authNum, phoneNum);
-            res.status(200).send({ msg: '문자보내기 성공!', authNum });
-        }
-    } catch (error) {
-        res.status(500).send({ errorMessage: '문자보내기 실패' });
-        console.log(error);
-    }
-};
-*/
+        exports.sendSMS = (req, res) => {
+            const { phoneNum } = req.body;
+            const authNum = Math.random().toString().substring(2, 6);
+
+            try {
+                if (phoneNum) {
+                    send_message(authNum, phoneNum);
+                    res.status(200).send({ msg: '문자보내기 성공!', authNum });
+                }
+            } catch (error) {
+                res.status(500).send({ errorMessage: '문자보내기 실패' });
+                console.log(error);
+            }
+        };
+        */
 //================================================================================
 //유저 정보 수정
 exports.userinfoEdit = async (req, res) => {
@@ -345,6 +355,8 @@ exports.userInfo = async (req, res) => {
     res.send({
         user: {
             userId: user.userId,
+            name: user.name,
+            birthDay: user.birthDay,
             email: user.email,
             customerId: user.customerId,
             nickname: user.nickname,

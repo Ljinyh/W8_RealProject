@@ -20,7 +20,7 @@ module.exports = () => {
                         done(null, exUser);
                     } else {
                         const newUser = await User.create({
-                            nickname: profile.displayName,
+                            name: profile.displayName,
                             snsId: profile.id,
                             email: profile._json.email,
                             provider: 'google',
