@@ -44,7 +44,7 @@ module.exports = {
                 const findRoom = await Room.findById(rooms[i]).exec();
                 arrTheRoom.push(findRoom);
             }
-            console.log(arrTheRoom);
+
             //status값 지정하기
             let myroom = [];
 
@@ -95,6 +95,7 @@ module.exports = {
 
         if (findUser) {
             const result = {
+                userId: findUser.userId,
                 nickname: findUser.nickname,
                 name: findUser.name,
                 faceColor: findUser.faceColor,
@@ -112,7 +113,6 @@ module.exports = {
         const { roomId } = req.params;
 
         const findRoom = await Room.findById(roomId);
-        console.log(findRoom);
 
         try {
             if (findRoom) {
@@ -154,44 +154,47 @@ module.exports = {
 
         const Guests = await Room.findById(roomId);
 
-        const ownerId = Guests.ownerId;
-        const guestId = Guests.guestId;
-
         try {
-            if (ownerId === nickname || guestId.includes(userId)) {
-                const ownerInfo = await User.findOne({ ownerId: ownerId });
+            if (Guests) {
+                const ownerId = Guests.ownerId;
+                const guestId = Guests.guestId;
 
-                let guestInfo = [];
-                for (let i = 0; i < guestId.length; i++) {
-                    const users = await User.findOne({
-                        userId: guestId[i],
-                    }).exec();
-                    guestInfo.push({
-                        userId: users.userId,
-                        nickname: users.nickname,
-                        faceColor: users.faceColor,
-                        eyes: users.eyes,
+                if (ownerId === nickname || guestId.includes(userId)) {
+                    const ownerInfo = await User.findOne({ ownerId: ownerId });
+
+                    let guestInfo = [];
+                    for (let i = 0; i < guestId.length; i++) {
+                        const users = await User.findOne({
+                            userId: guestId[i],
+                        }).exec();
+
+                        guestInfo.push({
+                            userId: users.userId,
+                            nickname: users.nickname,
+                            faceColor: users.faceColor,
+                            eyes: users.eyes,
+                        });
+                    }
+
+                    const userInfo = {
+                        owner: {
+                            ownerId: ownerId,
+                            faceColor: ownerInfo.faceColor,
+                            eyes: ownerInfo.eyes,
+                        },
+                        guestInfo,
+                        memberCount: guestId.length + 1,
+                    };
+
+                    return res.status(200).send({
+                        msg: '멤버 리스트 가져오기 성공',
+                        userInfo,
                     });
                 }
-
-                const userInfo = {
-                    owner: {
-                        ownerId: ownerId,
-                        faceColor: ownerInfo.faceColor,
-                        eyes: ownerInfo.eyes,
-                    },
-                    guestInfo,
-                    memberCount: guestId.length + 1,
-                };
-
-                return res.status(200).send({
-                    msg: '멤버 리스트 가져오기 성공',
-                    userInfo,
+                res.status(400).send({
+                    errorMessage: '회원님이 포함되어있지 않은 방입니다.',
                 });
             }
-            res.status(400).send({
-                errorMessage: '회원님이 포함되어있지 않은 방입니다.',
-            });
         } catch (err) {
             console.log(err);
             res.send({ result: false, msg: '서버측에 문의하세요' });
@@ -288,32 +291,39 @@ module.exports = {
         const roomCode = Math.random().toString().substring(2, 8);
 
         try {
-            if (userId) {
-                const createdAt = Date.now();
-                const result = await Room.create({
-                    roomCode,
-                    ownerId: userId,
-                    roomName,
-                    emoji,
-                    guestId,
-                    createdAt,
-                });
-                //user
-                await UserRoom.findOneAndUpdate({ userId: userId }, {
-                    $push: { roomSeq: result.roomId },
-                }, { upsert: true });
+            if (guestId.length < 20) {
+                if (userId) {
+                    const createdAt = Date.now();
+                    const result = await Room.create({
+                        roomCode,
+                        ownerId: userId,
+                        roomName,
+                        emoji,
+                        guestId,
+                        createdAt,
+                    });
 
-                //guest
-                if (result.guestId.length !== 0) {
-                    for (let i = 0; i < result.guestId.length; i++) {
-                        await UserRoom.findOneAndUpdate({ userId: result.guestId[i] }, {
-                            $push: { roomSeq: result.roomId },
-                        }, { upsert: true });
+                    //user
+                    await UserRoom.findOneAndUpdate({ userId: userId }, {
+                        $push: { roomSeq: result.roomId },
+                    }, { upsert: true });
+
+                    //guest
+                    if (result.guestId.length !== 0) {
+                        for (let i = 0; i < result.guestId.length; i++) {
+                            await UserRoom.findOneAndUpdate({ userId: result.guestId[i] }, {
+                                $push: { roomSeq: result.roomId },
+                            }, { upsert: true });
+                        }
                     }
+                    return res
+                        .status(200)
+                        .send({ msg: '맛방만들기 성공!', result });
                 }
+            } else {
                 return res
-                    .status(200)
-                    .send({ msg: '맛방만들기 성공!', result });
+                    .status(400)
+                    .send({ errorMessage: '인원이 꽉 찼습니다!' });
             }
             res.status(400).send({ errorMessage: '맛방만들기 실패' });
         } catch (err) {
@@ -325,31 +335,38 @@ module.exports = {
     //==============================================================
     //맛방 초대 (공유하기)
     inviteRoom: async(req, res) => {
-        const { userId } = req.body;
+        const { guestId } = req.body;
         const { roomId } = req.params;
 
         try {
             const theRoom = await Room.findById(roomId);
             const inviteUser = await User.find({
-                $or: [{ userId: userId }],
+                $or: [{ userId: guestId }],
             });
 
             //공유코드로 입장시..?
-            for (let i = 0; i < userId.length; i++) {
+            if (guestId.length > 20) {
+                return res
+                    .status(400)
+                    .send({ errorMessage: '초대인원이 꽉 찼습니다.' });
+            }
+
+            for (let i = 0; i < guestId.length; i++) {
                 if (
                     theRoom &&
                     inviteUser &&
-                    theRoom.ownerId !== userId[i] &&
-                    !theRoom.guestId.includes(userId[i])
+                    theRoom.ownerId !== guestId[i] &&
+                    !theRoom.guestId.includes(guestId[i])
                 ) {
                     await theRoom.updateOne({
                         $push: {
-                            guestId: userId,
+                            guestId: guestId,
                         },
                     });
                     return res.status(200).send({ msg: `초대성공!` });
                 }
             }
+
             res.status(400).send({
                 errorMessage: '이미 초대된 사람이거나 회원정보가 없거나 방이 없습니다!',
             });
@@ -399,6 +416,7 @@ module.exports = {
                     .status(400)
                     .send({ errorMessage: '맛방이 존재하지 않습니다!' });
             }
+
             if (existRoom.ownerId !== userId) {
                 return res.status(400).send({
                     errorMessage: '사용자가 만든 맛방이 아닙니다!',
@@ -425,6 +443,7 @@ module.exports = {
                     $pull: { roomSeq: roomId },
                 });
             }
+
             //맛방 삭제
             await Room.findByIdAndDelete(existRoom);
 
@@ -450,65 +469,6 @@ module.exports = {
             }
 
             res.status(400).send({ errorMessage: '맛방 순서 변경 실패!' });
-        } catch (err) {
-            console.log(err);
-            res.send({ result: false });
-        }
-    },
-
-    //==============================================================
-    //맛집 지도에 첫 기록하기
-    firstMapSave: async(req, res) => {
-        const { userId } = res.locals.user;
-        const { roomId } = req.params;
-        const {
-            storeName,
-            address,
-            LatLon,
-            comment,
-            imgURL,
-            tag,
-            star,
-            price,
-        } = req.body;
-
-        const theRoom = await Room.findById(roomId).exec();
-        const theStore = await Store.findOne({ storeName: storeName }).exec();
-
-        try {
-            if (theRoom) {
-                if (theStore) {
-                    return res.status(400).send({
-                        errorMessage: '이미 지도에 등록되어 있는 맛집입니다.',
-                    });
-                } else {
-                    await Store.create({
-                        userId,
-                        storeName,
-                        address,
-                        LatLon,
-                        createdAt: Date.now(),
-                    });
-                    console.log('맛집 등록 성공!');
-                }
-
-                let theStoreId = await Store.findOne({ storeName: storeName });
-                const storeId = theStoreId.storeId;
-
-                await SaveList.create({
-                    userId,
-                    roomId,
-                    storeId,
-                    comment,
-                    imgURL,
-                    star,
-                    price,
-                    tag,
-                    createdAt: Date.now(),
-                });
-
-                return res.status(200).send({ msg: '맛집 등록 완료' });
-            }
         } catch (err) {
             console.log(err);
             res.send({ result: false });
