@@ -32,8 +32,6 @@ router.put('/:roomId/invite', authMiddleware, roomController.inviteRoom);
 router.put('/:roomId/kickUser', authMiddleware, roomController.kickRoom);
 
 // 맛방 순서 변경
-// 맛방 수정 API보다 아래에 위치하면 roomset을 params로 먼저 인식하기 때문에 맛방 수정보다 위에 위치해야한다.
-// 더 좋은 방법은 ? URL을 수정하는 것
 router.put('/roomset', authMiddleware, roomController.setSequenceRoom);
 
 // 맛방 수정

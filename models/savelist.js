@@ -1,15 +1,19 @@
 const mongoose = require('mongoose');
 
-const SavelistSchema = new mongoose.Schema({
+const SaveListSchema = new mongoose.Schema({
+    userId: String,
     roomId: String,
     storeId: String,
-    comment : String,
-    imgURL : [String],
-    tag : [String],
+    comment: String,
+    imgURL: [String],
+    star: String,
+    price: String,
+    tag: [String],
+    createdAt: Date,
 });
-SavelistSchema.virtual('saveId').get(function () {
+SaveListSchema.virtual('saveId').get(function() {
     return this._id.toHexString();
 });
-SavelistSchema.set('toJSON', { virtuals: true });
+SaveListSchema.set('toJSON', { virtuals: true });
 
-module.exports = mongoose.model('savelist', SavelistSchema);
+module.exports = mongoose.model('saveList', SaveListSchema);
