@@ -3,6 +3,7 @@ const User = require('../models/user');
 const Savelist = require('../models/savelist');
 const Store = require('../models/store');
 const UsersRoom = require('../models/UsersRoom');
+const { find } = require('../models/room');
 
 module.exports = {
     // 사용자 맛방 전체조회
@@ -23,7 +24,7 @@ module.exports = {
                 //반복문으로 순서대로 roomId 데이터 찾기
                 seqRoom = await Room.findById(Sequence[i]);
 
-                //내가 방 주인이고, 게스트 인원이 있음.
+                //내가 방 주인이고, 게스트 인원이 있음 === 방장인 공개방 'publicOwner'
                 if (seqRoom.guestId.length && seqRoom.ownerId === currentUser) {
                     rooms.push({
                         roomId: seqRoom._id,
@@ -35,7 +36,7 @@ module.exports = {
                         status: 'publicOwner',
                     });
                 } else if (
-                    // 내가 방 주인이 아니고 게스트 인원이 있음 === 게스트로 참여한 공개방
+                    // 내가 방 주인이 아니고 게스트 인원이 있음 === 게스트로 참여한 공개방 'publicGuest'
                     seqRoom.guestId.includes(currentUser) &&
                     seqRoom.ownerId !== currentUser
                 ) {
@@ -49,7 +50,7 @@ module.exports = {
                         status: 'publicGuest',
                     });
                 } else {
-                    // 내가 방 주인이고 게스트가 없음 === 비밀방
+                    // 내가 방 주인이고 게스트가 없음 === 비밀방 'private'
                     rooms.push({
                         roomId: seqRoom._id,
                         ownerId: seqRoom.ownerId,
@@ -85,6 +86,7 @@ module.exports = {
                 $or: [{ nickname: text }, { name: text }, { email: text }],
             });
 
+            // DB에서 찾은 정보를 필요한 정보만 가공해서 출력
             const searchResult = findUser.map((a) => ({
                 userId: a.id,
                 nickname: a.nickname,
@@ -92,15 +94,25 @@ module.exports = {
                 faceColor: a.faceColor,
                 eyes: a.eyes,
             }));
-            return res.status(200).send({
-                message: '회원 찾기 성공',
-                result: searchResult,
-            });
+
+            // 찾은 정보가 빈 배열일 때 메세지
+            if (Array.isArray(findUser) && findUser.length === 0) {
+                return res.status(400).send({
+                    result: false,
+                    message: '존재하지 않는 사용자입니다.',
+                });
+            } else {
+                // 찾은 정보가 있을 때 정보 출력 & 메세지
+                return res.status(200).send({
+                    message: '사용자 찾기 성공',
+                    result: searchResult,
+                });
+            }
         } catch (err) {
             console.log(err);
             res.status(400).send({
                 result: false,
-                message: '존재하지 않는 회원입니다.',
+                message: '사용자 검색 실패',
             });
         }
     },
