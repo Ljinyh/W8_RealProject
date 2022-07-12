@@ -4,9 +4,8 @@ const Savelist = require('../models/savelist');
 const Store = require('../models/store');
 
 module.exports = {
-
     // 맛집 생성 (첫 기록하기), 방장의 맛방에 맛집 추가까지
-    createStore: async (req, res) => {
+    createStore: async(req, res) => {
         const { user } = res.locals; // JWT 인증 정보
         const { storeName, comment, address, LatLon, imgURL } = req.body;
         const { roomId } = req.params;
@@ -19,17 +18,17 @@ module.exports = {
                 address,
                 imgURL,
                 LatLon,
-                tag: '',
-                star: '',
-                price: '',
-                recommendMenu: '',
-            })
+                tag,
+                star,
+                price,
+                recommendMenu,
+            });
 
             // 방장이 보고있던 roomId를 가져와서 savelist에 저장
             await Savelist.create({
                 userId: user.userId,
                 storeId: save.storeId,
-                imgURL : imgURL,
+                imgURL: imgURL,
                 roomId,
                 comment,
             });
@@ -41,5 +40,4 @@ module.exports = {
             res.send({ result: false, message: '맛집 기록 실패' });
         }
     },
-    
 };

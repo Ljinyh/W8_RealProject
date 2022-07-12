@@ -8,7 +8,7 @@ const RoomSchema = new mongoose.Schema({
     roomCode: String,
     createdAt: Date,
 });
-RoomSchema.virtual('roomId').get(function () {
+RoomSchema.virtual('roomId').get(function() {
     return this._id.toHexString();
 });
 RoomSchema.set('toJSON', { virtuals: true });

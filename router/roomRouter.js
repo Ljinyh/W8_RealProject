@@ -6,14 +6,14 @@ const roomController = require('../controller/roomController');
 // 사용자 맛방 전체조회
 router.get('/', authMiddleware, roomController.allRoom);
 
-// 사용자 검색
-router.post('/findUser', authMiddleware, roomController.findUser);
+//맛방 detail - 멤버 리스트
+router.get('/:roomId/users', authMiddleware, roomController.detailRoomMember);
+
+//사용자 찾기 API
+router.get('/findUser', authMiddleware, roomController.findUser);
 
 //맛방 detail - 방 정보
 router.get('/:roomId', authMiddleware, roomController.detailRoomInfo);
-
-//맛방 detail - 멤버 리스트
-router.get('/:roomId/users', authMiddleware, roomController.detailRoomMember);
 
 //맛방 detail - 맛집 리스트
 router.get(
@@ -31,9 +31,7 @@ router.put('/:roomId/invite', authMiddleware, roomController.inviteRoom);
 // 맛방 강퇴
 router.put('/:roomId/kickUser', authMiddleware, roomController.kickRoom);
 
-// 맛방 순서 변경 
-// 맛방 수정 API보다 아래에 위치하면 roomset을 params로 먼저 인식하기 때문에 맛방 수정보다 위에 위치해야한다. 
-// 더 좋은 방법은 ? URL을 수정하는 것
+// 맛방 순서 변경
 router.put('/roomset', authMiddleware, roomController.setSequenceRoom);
 
 // 맛방 수정
@@ -41,7 +39,6 @@ router.put('/:roomId', authMiddleware, roomController.rewriteRoom);
 
 // 맛방 삭제
 router.delete('/:roomId', authMiddleware, roomController.deleteRoom);
-
 
 // 맛방에 저장
 router.post('/:roomId/storeList', authMiddleware, roomController.saveStore);

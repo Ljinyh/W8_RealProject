@@ -12,5 +12,4 @@ router.use('/rooms', require('./roomRouter'));
 router.use('/store', require('./storeRouter'));
 router.use('/upload', require('./uploadRouter'));
 
-
 module.exports = router;
