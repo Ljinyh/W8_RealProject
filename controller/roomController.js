@@ -152,49 +152,53 @@ module.exports = {
         const { roomId } = req.params;
         const { userId } = res.locals.user;
 
-        const Guests = await Room.findById(roomId);
-
         try {
-            if (Guests) {
-                const ownerId = Guests.ownerId;
-                const guestId = Guests.guestId;
+            const Guests = await Room.findById(roomId);
 
-                if (ownerId === nickname || guestId.includes(userId)) {
-                    const ownerInfo = await User.findOne({ ownerId: ownerId });
+            if (!Guests) {
+                return res
+                    .status(400)
+                    .send({ errorMessage: '방이 존재하지 않습니다' });
+            }
+            const ownerId = Guests.ownerId;
+            const guestId = Guests.guestId;
 
-                    let guestInfo = [];
-                    for (let i = 0; i < guestId.length; i++) {
-                        const users = await User.findOne({
-                            userId: guestId[i],
-                        }).exec();
+            if (ownerId === userId || guestId.includes(userId)) {
+                const ownerInfo = await User.findOne({ ownerId: ownerId });
 
-                        guestInfo.push({
-                            userId: users.userId,
-                            nickname: users.nickname,
-                            faceColor: users.faceColor,
-                            eyes: users.eyes,
-                        });
-                    }
+                let guestInfo = [];
+                for (let i = 0; i < guestId.length; i++) {
+                    const users = await User.findOne({
+                        userId: guestId[i],
+                    }).exec();
 
-                    const userInfo = {
-                        owner: {
-                            ownerId: ownerId,
-                            faceColor: ownerInfo.faceColor,
-                            eyes: ownerInfo.eyes,
-                        },
-                        guestInfo,
-                        memberCount: guestId.length + 1,
-                    };
-
-                    return res.status(200).send({
-                        msg: '멤버 리스트 가져오기 성공',
-                        userInfo,
+                    guestInfo.push({
+                        userId: users.userId,
+                        nickname: users.nickname,
+                        faceColor: users.faceColor,
+                        eyes: users.eyes,
                     });
                 }
-                res.status(400).send({
-                    errorMessage: '회원님이 포함되어있지 않은 방입니다.',
+
+                const userInfo = {
+                    owner: {
+                        ownerId: ownerId,
+                        nickname: ownerInfo.nickname,
+                        faceColor: ownerInfo.faceColor,
+                        eyes: ownerInfo.eyes,
+                    },
+                    guestInfo,
+                    memberCount: guestId.length + 1,
+                };
+
+                return res.status(200).send({
+                    msg: '멤버 리스트 가져오기 성공',
+                    userInfo,
                 });
             }
+            res.status(400).send({
+                errorMessage: '회원님이 포함되어있지 않은 방입니다.',
+            });
         } catch (err) {
             console.log(err);
             res.send({ result: false, msg: '서버측에 문의하세요' });
@@ -483,8 +487,14 @@ module.exports = {
         const { guestId } = req.body;
 
         const existRoom = await Room.findById(roomId).exec();
-        console.log(existRoom);
+
         try {
+            if (existRoom.guestId.length === 0) {
+                return res
+                    .status(400)
+                    .send({ errorMessage: '방에 guest가 존재하지 않습니다' });
+            }
+
             if (existRoom && existRoom.ownerId === userId) {
                 await UserRoom.findOneAndUpdate({ userId: guestId }, {
                     $pull: { roomSeq: roomId },

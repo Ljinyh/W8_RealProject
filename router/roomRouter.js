@@ -6,11 +6,11 @@ const roomController = require('../controller/roomController');
 // 사용자 맛방 전체조회
 router.get('/', authMiddleware, roomController.allRoom);
 
-//사용자 찾기 API
-router.get('/findUser', authMiddleware, roomController.findUser);
-
 //맛방 detail - 멤버 리스트
 router.get('/users/:roomId', authMiddleware, roomController.detailRoomMember);
+
+//사용자 찾기 API
+router.get('/findUser', authMiddleware, roomController.findUser);
 
 //맛방 detail - 방 정보
 router.get('/:roomId', authMiddleware, roomController.detailRoomInfo);
