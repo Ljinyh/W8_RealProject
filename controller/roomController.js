@@ -117,7 +117,7 @@ module.exports = {
         }
     },
 
-    //맛방 detail - 방 정보. 김상선!
+    //맛방 detail - 방 정보
     detailRoomInfo: async (req, res) => {
         const { user } = res.locals; // JWT 인증 정보
         const { roomId } = req.params;
@@ -297,9 +297,10 @@ module.exports = {
         const { userId } = req.body; //userId = [{userId1, userId2, userId}]
 
         try {
-            const existRoom = await Room.findById(roomId).exec(); //roomId에 해당하는 방 찾기
-            console.log(existRoom);
-            //guestId가 배열이라면. 배열을 뜯어서 중복인원이 있는지 검사
+            //roomId에 해당하는 방 찾기
+            const existRoom = await Room.findById(roomId).exec(); 
+
+            //배열을 뜯어서 중복인원이 있는지 검사
             for (i = 0; i < userId.length; i++) {
                 if (existRoom.guestId.some((a) => a === userId[i])) {
                     return res.send({
@@ -307,11 +308,6 @@ module.exports = {
                     });
                 }
             }
-
-            // if (existRoom.guestId.includes(userId)) {
-            //     // 맛방에 이미 존재하는 게스트라면 요청 거절
-            //     return res.send({ message: '이미 맛방에 있는 멤버입니다.22' });
-            // }
 
             // 사용자가 방장이 아닐 때 초대 기능 동작 불가
             if (user.userId !== existRoom.ownerId) {
@@ -372,7 +368,6 @@ module.exports = {
                 { userId: guestId },
                 { $pull: { roomSeq: roomId } }
             );
-            console.log('유저룸', outedMember);
 
             // 강퇴할 guestId를 맛방DB에서 제거
             for (i = 0; i < guestId.length; i++) {
@@ -380,7 +375,6 @@ module.exports = {
                     $pull: { guestId: guestId[i] },
                 });
             }
-            console.log('지우고', existRoom);
             return res.status(200).json({
                 result: true,
                 message: '일부 멤버가 맛방에서 제외되었습니다.',
