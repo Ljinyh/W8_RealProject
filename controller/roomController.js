@@ -252,6 +252,12 @@ module.exports = {
         try {
             const roomCode = Math.random().toString().substring(2, 8);
 
+            if(roomName===undefined){
+                return res.status(400).send({
+                    result: false,
+                    message: '방 이름을 입력하세요.',
+                });
+            }
             // guestId 배열 안에 사용자가 있는지 확인
             if (guestId.some((v) => v === user.userId)) {
                 return res.status(400).send({
