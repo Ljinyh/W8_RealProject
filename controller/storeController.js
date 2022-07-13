@@ -13,6 +13,7 @@ module.exports = {
             for (i = 0; i < allStore.length; i++) {
                 findUser = await User.findById(allStore[i].userId);
                 storeMap.push({
+                    storeId : allStore[i].storeId,
                     storeName: allStore[i].storeName,
                     address: allStore[i].address,
                     LatLon: allStore[i].LatLon,
