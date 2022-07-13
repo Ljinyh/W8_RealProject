@@ -252,8 +252,8 @@ module.exports = {
         try {
             const roomCode = Math.random().toString().substring(2, 8);
 
-            // guestId 배열 안에 사용자가 있는지 확인 
-            if (guestId.some(v => v === user.userId)) {
+            // guestId 배열 안에 사용자가 있는지 확인
+            if (guestId.some((v) => v === user.userId)) {
                 return res.status(400).send({
                     result: false,
                     message: '멤버로 나 자신을 추가할 수 없습니다.',
