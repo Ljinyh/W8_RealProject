@@ -3,6 +3,7 @@ const User = require('../models/user');
 const Savelist = require('../models/savelist');
 const Store = require('../models/store');
 const UsersRoom = require('../models/usersRoom');
+const { exist } = require('joi');
 
 module.exports = {
     //===================================================================================
@@ -309,7 +310,9 @@ module.exports = {
     //===================================================================================
     // 맛방 초대 (공유하기)
     // roomCode를 활용하려면 맛방 입장하기 API도 별도로 필요함. (roomId 일치 && roomCode 일치)
-    inviteRoom: async (req, res) => {
+    inviteRoom: async(req, res) => {
+        const { userId } = res.locals.user;
+
         const { guestId } = req.body;
         const { roomId } = req.params;
 
@@ -323,6 +326,12 @@ module.exports = {
                 return res
                     .status(400)
                     .send({ errorMessage: '초대인원이 꽉 찼습니다.' });
+            }
+
+            if (guestId.includes(userId)) {
+                return res
+                    .status(400)
+                    .send({ errorMessage: '자기 자신은 초대할 수 없습니다!' });
             }
 
             for (let i = 0; i < guestId.length; i++) {
@@ -487,6 +496,43 @@ module.exports = {
                 result: false,
                 errMessage: '맛방 삭제 실패',
             });
+        }
+    },
+
+    //==============================================================
+    // 맛방 나가기
+    exitRoom: async(req, res) => {
+        const { userId } = res.locals.user;
+        const { roomId } = req.params;
+
+        const existRoom = await Room.findById(roomId).exec();
+
+        try {
+            if (existRoom.ownerId === userId) {
+                return res
+                    .status(400)
+                    .send({ errorMessage: '방장은 나갈 수 없습니다.' });
+            }
+
+            if (
+                existRoom &&
+                existRoom.ownerId !== userId &&
+                existRoom.guestId.includes(userId)
+            ) {
+                await Room.findByIdAndUpdate(roomId, {
+                    $pull: { guestId: userId },
+                });
+
+                await UsersRoom.findOneAndUpdate({ userId: userId }, {
+                    $pull: { roomSeq: roomId },
+                });
+
+                return res.status(200).send({ msg: '맛방 나가기 성공' });
+            }
+            res.status(400).send({ errorMessage: '맛방 나가기 실패' });
+        } catch (err) {
+            console.log(err);
+            res.send({ result: false });
         }
     },
 
