@@ -10,7 +10,7 @@ module.exports = {
     allRoom: async(req, res) => {
         const { user } = res.locals; // JWT 인증 정보
         try {
-            //userRoom 데이터 테이블에서 찾기
+            //usersRoom 데이터 테이블에서 찾기
             const existRoom = await UsersRoom.findOne({
                 userId: user.userId,
             }).exec();
@@ -45,6 +45,7 @@ module.exports = {
                     status = 'publicOwner';
                 }
                 myroom.push(status);
+                console.log(arrTheRoom[i].roomName, status, "내가 방장?", ownerCheck, "내가 게스트?", guestCheck, "게스트 인원수", guestNumCheck,)
             }
 
             const result = arrTheRoom.map((room, idx) => ({
@@ -102,13 +103,13 @@ module.exports = {
         const { userId } = res.locals.user;
         const { roomId } = req.params;
 
-        const findRoom = await Room.findById(roomId);
+        const findSavelist = await Room.findById(roomId);
 
         try {
-            if (findRoom) {
-                const ownerCheck = findRoom.ownerId === userId;
-                const guestCheck = findRoom.guestId.includes(userId);
-                const guestNumCheck = findRoom.guestId.length;
+            if (findSavelist) {
+                const ownerCheck = findSavelist.ownerId === userId;
+                const guestCheck = findSavelist.guestId.includes(userId);
+                const guestNumCheck = findSavelist.guestId.length;
 
                 let status = '';
                 if (ownerCheck && guestNumCheck === 0) {
@@ -120,9 +121,9 @@ module.exports = {
                 }
 
                 const result = {
-                    roomName: findRoom.roomName,
-                    roomCode: findRoom.roomCode,
-                    emoji: findRoom.emoji,
+                    roomName: findSavelist.roomName,
+                    roomCode: findSavelist.roomCode,
+                    emoji: findSavelist.emoji,
                     status: status,
                 };
                 return res
@@ -252,6 +253,16 @@ module.exports = {
         try {
             const roomCode = Math.random().toString().substring(2, 8);
 
+            if (guestId === undefined) {
+                guestId = [];
+            }
+            if (guestId.length > 19) {
+                //맛방 멤버 총 인원 20명으로 제한
+                return res.status(400).send({
+                    result: false,
+                    message: '맛방의 최대 인원은 20명입니다.',
+                });
+            }
             const createdRoom = await Room.create({
                 roomName,
                 ownerId: user.userId,
@@ -260,13 +271,6 @@ module.exports = {
                 roomCode,
             });
 
-            if (createdRoom.guestId.length > 19) {
-                //맛방 멤버 총 인원 20명으로 제한
-                return res.status(400).send({
-                    result: false,
-                    message: '맛방의 최대 인원은 20명입니다.',
-                });
-            }
             //UsersRoom DB에 userId에 해당하는 목록 수정, 없으면 생성
             await UsersRoom.findOneAndUpdate({ userId: user.userId }, { $push: { roomSeq: createdRoom.roomId } }, { upsert: true });
 
@@ -277,7 +281,11 @@ module.exports = {
             }
             return res
                 .status(200)
-                .json({ result: true, message: '맛방 만들기 성공' });
+                .json({
+                    result: true,
+                    message: '맛방 만들기 성공',
+                    roomCode: createdRoom.roomCode,
+                });
         } catch (err) {
             console.log(err);
             res.status(400).send({
@@ -419,18 +427,17 @@ module.exports = {
                     .send({ errorMessage: '맛방이 존재하지 않습니다!' });
             }
 
-            if (existRoom.ownerId !== userId) {
+            if (existRoom.ownerId !== user.userId) {
                 return res.status(400).send({
                     errorMessage: '사용자가 만든 맛방이 아닙니다!',
                 });
             }
-
             // 방이 삭제되면 추가된 맛집리스트들도 같이 삭제
-            const findRoom = await Savelist.find({ roomId: roomId });
+            const findSavelist = await Savelist.find({ roomId: roomId });
+            if (findSavelist) {
+                for (let i = 0; i < findSavelist.length; i++) {
+                    await Savelist.deleteOne(findSavelist[i]);
 
-            if (findRoom) {
-                for (let i = 0; i < findRoom.length; i++) {
-                    await Savelist.deleteOne(findRoom[i]);
                 }
             }
 
@@ -448,10 +455,11 @@ module.exports = {
 
             // 맛방 삭제
             await Room.findByIdAndDelete(roomId);
-            res.status(200).json({ result: true });
+
+            res.status(200).json({ result: true, message : "맛방 삭제 성공"});
         } catch (err) {
             console.log(err);
-            res.status(400).send({ result: false, message: '맛방 삭제 실패' });
+            res.status(400).send({ result: false, errMessage: '맛방 삭제 실패' });
         }
     },
 
