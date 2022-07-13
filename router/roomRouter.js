@@ -10,7 +10,7 @@ router.get('/', authMiddleware, roomController.allRoom);
 router.get('/:roomId/users', authMiddleware, roomController.detailRoomMember);
 
 //사용자 찾기 API
-router.get('/findUser', authMiddleware, roomController.findUser);
+router.post('/findUser', authMiddleware, roomController.findUser);
 
 //맛방 detail - 방 정보
 router.get('/:roomId', authMiddleware, roomController.detailRoomInfo);
