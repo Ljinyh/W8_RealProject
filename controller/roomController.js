@@ -3,7 +3,6 @@ const User = require('../models/user');
 const Savelist = require('../models/savelist');
 const Store = require('../models/store');
 const UsersRoom = require('../models/usersRoom');
-const { exist } = require('joi');
 
 module.exports = {
     //===================================================================================
