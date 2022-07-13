@@ -472,6 +472,12 @@ module.exports = {
         const existRoom = await Room.findById(roomId).exec();
 
         try {
+            if (existRoom.ownerId === userId) {
+                return res
+                    .status(400)
+                    .send({ errorMessage: '방장은 나갈 수 없습니다.' });
+            }
+
             if (
                 existRoom &&
                 existRoom.ownerId !== userId &&
