@@ -74,22 +74,46 @@ module.exports = {
     findUser: async(req, res) => {
         const { value } = req.body;
 
-        const findUser = await User.findOne({
-            $or: [{ nickname: value }, { name: value }, { email: value }],
-        }).exec();
+        // const findUser = await User.findOne({
+        //     $or: [
+        //         { customerId: value },
+        //         { nickname: value },
+        //         { name: value },
+        //         { email: value },
+        //     ],
+        // }).exec();
+
+        const findUser = await User.find({
+            $or: [
+                { customerId: new RegExp(value) },
+                { nickname: new RegExp(value) },
+                { name: new RegExp(value) },
+                { email: new RegExp(value) },
+            ],
+        });
 
         try {
+            if (findUser.length === 0) {
+                return res
+                    .status(400)
+                    .send({ errorMessage: '회원이 없습니다!' });
+            }
+
             if (findUser) {
-                const result = {
-                    userId: findUser.userId,
-                    nickname: findUser.nickname,
-                    name: findUser.name,
-                    faceColor: findUser.faceColor,
-                    eyes: findUser.eyes,
-                };
+                const result = [];
+
+                for (let i = 0; i < findUser.length; i++) {
+                    const userArray = {
+                        userId: findUser[i].userId,
+                        nickname: findUser[i].nickname,
+                        name: findUser[i].name,
+                        faceColor: findUser[i].faceColor,
+                        eyes: findUser[i].eyes,
+                    };
+                    result.push(userArray);
+                }
                 return res.status(200).send({ msg: '회원 찾기 성공', result });
             }
-            res.status(400).send({ errorMessage: '회원이 없습니다!' });
         } catch (err) {
             console.log(err);
             res.send({ result: false });
