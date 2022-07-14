@@ -104,22 +104,27 @@ exports.check = async(req, res) => {
 const checkUserPass = Joi.object({
     password: Joi.string()
         .required()
-        .pattern(new RegExp('^[ㄱ-ㅎ가-힣0-9a-zA-Z@$!%#?&]{4,10}$')),
+        .pattern(new RegExp('^(?=.*[@$!%*#?&])[A-Za-z0-9@$!%*#?&]{6,}$')),
 
     confirmPassword: Joi.string().required().min(3),
 }).unknown();
 
 exports.PassCehck = async(req, res) => {
-    const { password, confirmPassword } = await checkUserPass.validateAsync(
-        req.body
-    );
+    try {
+        const { password, confirmPassword } = await checkUserPass.validateAsync(
+            req.body
+        );
 
-    if (password !== confirmPassword) {
-        return res.status(400).send({
-            errorMessage: '비밀번호와 비밀번호 확인의 내용이 일치하지 않습니다.',
-        });
+        if (password !== confirmPassword) {
+            return res.status(400).send({
+                errorMessage: '비밀번호와 비밀번호 확인의 내용이 일치하지 않습니다.',
+            });
+        }
+        res.status(200).send({ result: 'success' });
+    } catch (err) {
+        console.log(err);
+        res.send({ errorMessage: 'error' });
     }
-    res.status(200).send({ result: 'success' });
 };
 
 //================================================================================
