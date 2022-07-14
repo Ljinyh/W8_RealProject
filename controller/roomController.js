@@ -3,14 +3,15 @@ const User = require('../models/user');
 const Savelist = require('../models/savelist');
 const Store = require('../models/store');
 const UsersRoom = require('../models/usersRoom');
+const usersRoom = require('../models/usersRoom');
 
 module.exports = {
     //===================================================================================
     // 사용자 맛방 전체조회
-    allRoom: async (req, res) => {
+    allRoom: async(req, res) => {
         const { user } = res.locals; // JWT 인증 정보
         try {
-            //usersRoom 데이터 테이블에서 찾기
+            //userRoom 데이터 테이블에서 찾기
             const existRoom = await UsersRoom.findOne({
                 userId: user.userId,
             }).exec();
@@ -71,17 +72,8 @@ module.exports = {
 
     //===================================================================================
     // 사용자 검색
-    findUser: async (req, res) => {
+    findUser: async(req, res) => {
         const { value } = req.body;
-
-        // const findUser = await User.findOne({
-        //     $or: [
-        //         { customerId: value },
-        //         { nickname: value },
-        //         { name: value },
-        //         { email: value },
-        //     ],
-        // }).exec();
 
         const findUser = await User.find({
             $or: [
@@ -122,17 +114,17 @@ module.exports = {
 
     //===================================================================================
     //맛방 detail - 방 정보
-    detailRoomInfo: async (req, res) => {
+    detailRoomInfo: async(req, res) => {
         const { userId } = res.locals.user;
         const { roomId } = req.params;
 
-        const findSavelist = await Room.findById(roomId);
+        const findRoom = await Room.findById(roomId);
 
         try {
-            if (findSavelist) {
-                const ownerCheck = findSavelist.ownerId === userId;
-                const guestCheck = findSavelist.guestId.includes(userId);
-                const guestNumCheck = findSavelist.guestId.length;
+            if (findRoom) {
+                const ownerCheck = findRoom.ownerId === userId;
+                const guestCheck = findRoom.guestId.includes(userId);
+                const guestNumCheck = findRoom.guestId.length;
 
                 let status = '';
                 if (ownerCheck && guestNumCheck === 0) {
@@ -144,9 +136,9 @@ module.exports = {
                 }
 
                 const result = {
-                    roomName: findSavelist.roomName,
-                    roomCode: findSavelist.roomCode,
-                    emoji: findSavelist.emoji,
+                    roomName: findRoom.roomName,
+                    roomCode: findRoom.roomCode,
+                    emoji: findRoom.emoji,
                     status: status,
                 };
                 return res
@@ -162,7 +154,7 @@ module.exports = {
 
     //===================================================================================
     //맛방 detail - 멤버 리스트
-    detailRoomMember: async (req, res) => {
+    detailRoomMember: async(req, res) => {
         const { roomId } = req.params;
         const { userId } = res.locals.user;
 
@@ -221,7 +213,7 @@ module.exports = {
 
     //===================================================================================
     // 맛방 detail - 맛집 리스트
-    detailRoomStoreList: async (req, res) => {
+    detailRoomStoreList: async(req, res) => {
         const { roomId } = req.params;
 
         const existRoom = await Room.findById(roomId)
@@ -270,32 +262,11 @@ module.exports = {
     //===================================================================================
     //맛방 만들기
     // roomName은 8글자, 방 초대인원 20명으로 제한 (게스트 19명)
-    writeRoom: async (req, res) => {
+    writeRoom: async(req, res) => {
         const { user } = res.locals; // JWT 인증 정보
         const { roomName, guestId, emoji } = req.body;
         try {
             const roomCode = Math.random().toString().substring(2, 8);
-
-            if(roomName===undefined){
-                return res.status(400).send({
-                    result: false,
-                    message: '방 이름을 입력하세요.',
-                });
-            }
-            // guestId 배열 안에 사용자가 있는지 확인
-            if (guestId.some((v) => v === user.userId)) {
-                return res.status(400).send({
-                    result: false,
-                    message: '멤버로 나 자신을 추가할 수 없습니다.',
-                });
-            }
-            if (guestId.length > 19) {
-                //맛방 멤버 총 인원 20명으로 제한
-                return res.status(400).send({
-                    result: false,
-                    message: '맛방의 최대 인원은 20명입니다.',
-                });
-            }
 
             const createdRoom = await Room.create({
                 roomName,
@@ -305,28 +276,24 @@ module.exports = {
                 roomCode,
             });
 
-            // UsersRoom DB에 userId에 해당하는 목록 수정, 없으면 생성
-            await UsersRoom.findOneAndUpdate(
-                { userId: user.userId },
-                { $push: { roomSeq: createdRoom.roomId } },
-                { upsert: true }
-            );
+            if (createdRoom.guestId.length > 19) {
+                //맛방 멤버 총 인원 20명으로 제한
+                return res.status(400).send({
+                    result: false,
+                    message: '맛방의 최대 인원은 20명입니다.',
+                });
+            }
+            //UsersRoom DB에 userId에 해당하는 목록 수정, 없으면 생성
+            await UsersRoom.findOneAndUpdate({ userId: user.userId }, { $push: { roomSeq: createdRoom.roomId } }, { upsert: true });
 
-            // UserRoom DB에 guestId 배열에 해당하는 목록 수정, 없으면 생성
             if (!!guestId) {
                 for (i = 0; i < guestId.length; i++) {
-                    await UsersRoom.findOneAndUpdate(
-                        { userId: guestId[i] },
-                        { $push: { roomSeq: createdRoom.roomId } },
-                        { upsert: true }
-                    );
+                    await UsersRoom.findOneAndUpdate({ userId: guestId[i] }, { $push: { roomSeq: createdRoom.roomId } }, { upsert: true });
                 }
             }
-            return res.status(200).json({
-                result: true,
-                message: '맛방 만들기 성공',
-                roomCode: createdRoom.roomCode,
-            });
+            return res
+                .status(200)
+                .json({ result: true, message: '맛방 만들기 성공' });
         } catch (err) {
             console.log(err);
             res.status(400).send({
@@ -341,7 +308,6 @@ module.exports = {
     // roomCode를 활용하려면 맛방 입장하기 API도 별도로 필요함. (roomId 일치 && roomCode 일치)
     inviteRoom: async(req, res) => {
         const { userId } = res.locals.user;
-
         const { guestId } = req.body;
         const { roomId } = req.params;
 
@@ -376,21 +342,16 @@ module.exports = {
                         },
                     });
 
-                    await UsersRoom.findOneAndUpdate(
-                        { userId: guestId },
-                        {
-                            $push: { roomSeq: roomId },
-                        },
-                        { upsert: true }
-                    );
+                    await UsersRoom.findOneAndUpdate({ userId: guestId }, {
+                        $push: { roomSeq: roomId },
+                    }, { upsert: true });
 
                     return res.status(200).send({ msg: `초대성공!` });
                 }
             }
 
             res.status(400).send({
-                errorMessage:
-                    '이미 초대된 사람이거나 회원정보가 없거나 방이 없습니다!',
+                errorMessage: '이미 초대된 사람이거나 회원정보가 없거나 방이 없습니다!',
             });
         } catch (err) {
             console.log(err);
@@ -400,7 +361,7 @@ module.exports = {
 
     //===================================================================================
     // 맛방에서 게스트 강퇴
-    kickRoom: async (req, res) => {
+    kickRoom: async(req, res) => {
         const { userId } = res.locals.user;
         const { roomId } = req.params;
         const { guestId } = req.body;
@@ -415,12 +376,9 @@ module.exports = {
             }
 
             if (existRoom && existRoom.ownerId === userId) {
-                await UsersRoom.findOneAndUpdate(
-                    { userId: guestId },
-                    {
-                        $pull: { roomSeq: roomId },
-                    }
-                );
+                await UsersRoom.findOneAndUpdate({ userId: guestId }, {
+                    $pull: { roomSeq: roomId },
+                });
 
                 await existRoom.updateOne({ $pull: { guestId: guestId } });
                 return res.status(200).send({ result: 'success' });
@@ -434,7 +392,7 @@ module.exports = {
 
     //===================================================================================
     // 맛방 정보 수정
-    rewriteRoom: async (req, res) => {
+    rewriteRoom: async(req, res) => {
         const { user } = res.locals;
         const { roomId } = req.params;
         const { roomName, emoji } = req.body;
@@ -471,7 +429,7 @@ module.exports = {
 
     //==============================================================
     //맛방 삭제
-    deleteRoom: async (req, res) => {
+    deleteRoom: async(req, res) => {
         const { user } = res.locals;
         const { roomId } = req.params;
 
@@ -484,47 +442,39 @@ module.exports = {
                     .send({ errorMessage: '맛방이 존재하지 않습니다!' });
             }
 
-            if (existRoom.ownerId !== user.userId) {
+            if (existRoom.ownerId !== userId) {
                 return res.status(400).send({
                     errorMessage: '사용자가 만든 맛방이 아닙니다!',
                 });
             }
+
             // 방이 삭제되면 추가된 맛집리스트들도 같이 삭제
-            const findSavelist = await Savelist.find({ roomId: roomId });
-            if (findSavelist) {
-                for (let i = 0; i < findSavelist.length; i++) {
-                    await Savelist.deleteOne(findSavelist[i]);
+            const findRoom = await Savelist.find({ roomId: roomId });
+
+            if (findRoom) {
+                for (let i = 0; i < findRoom.length; i++) {
+                    await Savelist.deleteOne(findRoom[i]);
                 }
             }
 
             // 게스트 멤버들의 맛방목록 DB에서 맛방 삭제해주기.
             for (let i = 0; i < existRoom.guestId.length; i++) {
-                await UsersRoom.findOneAndUpdate(
-                    { userId: existRoom.guestId[i] },
-                    {
-                        $pull: { roomSeq: roomId },
-                    }
-                );
+                await UsersRoom.findOneAndUpdate({ userId: existRoom.guestId[i] }, {
+                    $pull: { roomSeq: roomId },
+                });
             }
 
             // 방장의 맛방목록 DB에서 맛방 삭제
-            await UsersRoom.findOneAndUpdate(
-                { userId: user.userId },
-                {
-                    $pull: { roomSeq: roomId },
-                }
-            );
+            await UsersRoom.findOneAndUpdate({ userId: user.userId }, {
+                $pull: { roomSeq: roomId },
+            });
 
             // 맛방 삭제
             await Room.findByIdAndDelete(roomId);
-
-            res.status(200).json({ result: true, message: '맛방 삭제 성공' });
+            res.status(200).json({ result: true });
         } catch (err) {
             console.log(err);
-            res.status(400).send({
-                result: false,
-                errMessage: '맛방 삭제 실패',
-            });
+            res.status(400).send({ result: false, message: '맛방 삭제 실패' });
         }
     },
 
@@ -567,7 +517,7 @@ module.exports = {
 
     //==============================================================
     //맛방 순서 변경
-    setSequenceRoom: async (req, res) => {
+    setSequenceRoom: async(req, res) => {
         const { user } = res.locals; // JWT 인증 정보
         const { roomSeq } = req.body;
         try {
@@ -581,10 +531,7 @@ module.exports = {
                 });
             }
 
-            await UsersRoom.findOneAndUpdate(
-                { userId: user.userId },
-                { $set: { roomSeq: roomSeq } }
-            );
+            await UsersRoom.findOneAndUpdate({ userId: user.userId }, { $set: { roomSeq: roomSeq } });
             res.status(200).send({ result: true, message: '순서 변경 완료' });
         } catch (err) {
             console.log(err);
@@ -597,7 +544,7 @@ module.exports = {
 
     //==============================================================
     // 맛방에 맛집 저장
-    saveStore: async (req, res) => {
+    saveStore: async(req, res) => {
         const { roomId } = req.params;
         const { userId } = res.locals.user;
         const { storeId, comment, tag, imgURL, price, star } = req.body;
@@ -626,6 +573,86 @@ module.exports = {
         } catch (err) {
             console.log(err);
             res.send({ result: false });
+        }
+    },
+
+    //==============================================================
+    //룸코드로 검색
+    searchRoomCode: async(req, res) => {
+        const { roomCode } = req.body;
+
+        const findRoom = await Room.findOne({ roomCode: roomCode });
+
+        try {
+            // 룸코드 검증
+            if (findRoom) {
+                // 방주인 정보 찾기
+                const ownerInfo = await User.findById(findRoom.ownerId);
+                const ownerNickname = ownerInfo.nickname;
+
+                // 방상태 체크 (privae / public)
+                let status = '';
+
+                if (findRoom.guestId.length === 0) {
+                    status = 'private';
+                } else if (findRoom.guestId.length !== 0) {
+                    status = 'public';
+                }
+
+                const theRoom = {
+                    roomName: findRoom.roomName,
+                    emoji: findRoom.emoji,
+                    owner: ownerNickname,
+                    ownerFaceColor: ownerInfo.faceColor,
+                    ownerEyes: ownerInfo.eyes,
+                    memberNum: findRoom.guestId.length + 1,
+                    status: status,
+                };
+                return res.status(200).send({ result: 'success', theRoom });
+            } else {
+                return res
+                    .status(400)
+                    .send({ errorMessage: '방이 존재하지 않습니다!' });
+            }
+        } catch (err) {
+            console.log(err);
+            res.send({ errorMessage: 'error' });
+        }
+    },
+
+    //==============================================================
+    //룸코드로 맛방입장
+    roomCode: async(req, res) => {
+        const { userId } = res.locals.user;
+        const { roomCode } = req.body;
+
+        const findRoom = await Room.findOne({ roomCode: roomCode });
+        try {
+            // 룸코드 검증
+            if (findRoom) {
+                if (findRoom.guestId.includes(userId)) {
+                    return res
+                        .status(400)
+                        .send({ errorMessage: '이미 방에 들어가 있습니다.' });
+                }
+
+                // 유저가 guest에 없다면 방 입장
+                await Room.findByIdAndUpdate({ _id: findRoom.roomId }, {
+                    $push: { guestId: userId },
+                });
+
+                await usersRoom.findOneAndUpdate({ userId: userId }, {
+                    $push: { roomSeq: findRoom.roomId },
+                });
+                return res.status(200).send({ result: 'success' });
+            } else {
+                return res
+                    .status(400)
+                    .send({ erroMessage: '방이 존재하지 않습니다!' });
+            }
+        } catch (err) {
+            console.log(err);
+            res.send({ errorMessage: 'error' });
         }
     },
 };
