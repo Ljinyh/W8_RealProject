@@ -22,7 +22,7 @@ const UserSchema = Joi.object({
 
     password: Joi.string()
         .required()
-        .pattern(new RegExp('^[ㄱ-ㅎ가-힣0-9a-zA-Z@$!%#?&]{4,10}$')),
+        .pattern(new RegExp('^(?=.*[@$!%*#?&])[A-Za-z0-9@$!%*#?&]{6,}$')),
 
     birthDay: Joi.string().min(8),
 }).unknown(); // 정의되지 않은 key도 허용
@@ -115,6 +115,12 @@ exports.PassCehck = async(req, res) => {
             req.body
         );
 
+        if (checkUserPass) {
+            return res
+                .status(400)
+                .send({ errorMessage: '비밀번호 형식이 맞지 않습니다.' });
+        }
+
         if (password !== confirmPassword) {
             return res.status(400).send({
                 errorMessage: '비밀번호와 비밀번호 확인의 내용이 일치하지 않습니다.',
@@ -179,7 +185,7 @@ exports.sendMail = async(req, res) => {
 //로그인
 exports.login = async(req, res) => {
     const { customerId, password } = req.body;
-    const user = await userDB.findOne({ customerId });
+    const user = await userDB.findOne({ customerId: customerId });
     try {
         if (!customerId || !password) {
             return res
