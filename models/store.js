@@ -4,7 +4,7 @@ const StoreSchema = new mongoose.Schema({
     userId: String,
     storeName: String,
     address: String,
-    LatLon: String,
+    LatLon: [Number],
     createdAt: Date,
 });
 StoreSchema.virtual('storeId').get(function() {
