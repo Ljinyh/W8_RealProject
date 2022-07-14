@@ -399,10 +399,17 @@ module.exports = {
     //===================================================================================
     // 맛방 정보 수정
     rewriteRoom: async(req, res) => {
+        const roomNameCheck = Joi.object({
+            roomName: Joi.string().required().max(8),
+        }).unknown();
+
         const { user } = res.locals;
         const { roomId } = req.params;
-        const { roomName, emoji } = req.body;
         try {
+            const { roomName, emoji } = await roomNameCheck.validateAsync(
+                req.body
+            );
+
             // 맛방 DB에서 roodId에 해당하는 방 찾기
             const existRoom = await Room.findById(roomId).exec();
 
