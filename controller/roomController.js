@@ -590,15 +590,6 @@ module.exports = {
                 const ownerInfo = await User.findById(findRoom.ownerId);
                 const ownerNickname = ownerInfo.nickname;
 
-                // 방상태 체크 (privae / public)
-                let status = '';
-
-                if (findRoom.guestId.length === 0) {
-                    status = 'private';
-                } else if (findRoom.guestId.length !== 0) {
-                    status = 'public';
-                }
-
                 const theRoom = {
                     roomName: findRoom.roomName,
                     emoji: findRoom.emoji,
@@ -606,7 +597,6 @@ module.exports = {
                     ownerFaceColor: ownerInfo.faceColor,
                     ownerEyes: ownerInfo.eyes,
                     memberNum: findRoom.guestId.length + 1,
-                    status: status,
                 };
                 return res.status(200).send({ result: 'success', theRoom });
             } else {
