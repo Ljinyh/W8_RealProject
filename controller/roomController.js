@@ -530,6 +530,12 @@ module.exports = {
                     errorMessage: '사용자의 방이 존재하지 않습니다',
                 });
             }
+            if (Array.isArray(roomSeq) && roomSeq.length === 0){
+                return res.status(400).send({
+                    result: false,
+                    errorMessage: 'roomSeq 입력 오류 (빈 배열)',
+            })
+        }
 
             await UsersRoom.findOneAndUpdate({ userId: user.userId }, { $set: { roomSeq: roomSeq } });
             res.status(200).send({ result: true, message: '순서 변경 완료' });
