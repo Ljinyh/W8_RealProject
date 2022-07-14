@@ -95,7 +95,10 @@ exports.check = async(req, res) => {
         res.status(200).send({ result: 'success' });
     } catch (err) {
         console.log(err);
-        res.send({ result: false, errorMessage: '형식에 맞지 않습니다.' });
+        res.status(400).send({
+            result: false,
+            errorMessage: '형식에 맞지 않습니다.',
+        });
     }
 };
 
@@ -123,7 +126,7 @@ exports.PassCehck = async(req, res) => {
         res.status(200).send({ result: 'success' });
     } catch (err) {
         console.log(err);
-        res.send({ errorMessage: 'error' });
+        res.status(400).send({ errorMessage: 'error' });
     }
 };
 
@@ -231,7 +234,7 @@ exports.findUserId = async(req, res) => {
 
         return res.status(200).json({ msg: '아이디 찾기 성공!', name });
     } catch (err) {
-        res.send(console.log(err));
+        res.status(400).send(console.log(err));
     }
 };
 
