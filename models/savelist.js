@@ -9,6 +9,7 @@ const SaveListSchema = new mongoose.Schema({
     star: String,
     price: String,
     tag: [String],
+    recommendMenu : [String],
     createdAt: Date,
 });
 SaveListSchema.virtual('saveId').get(function() {
