@@ -4,6 +4,7 @@ const Savelist = require('../models/savelist');
 const Store = require('../models/store');
 const UsersRoom = require('../models/usersRoom');
 const usersRoom = require('../models/usersRoom');
+const store = require('../models/store');
 
 module.exports = {
     //===================================================================================
@@ -239,6 +240,8 @@ module.exports = {
                         comment: theStore[i].comment,
                         imgURL: theStore[i].imgURL,
                         tag: theStore[i].tag,
+                        address: theStores[i].address,
+                        LatLon: theStores[i].LatLon,
                     };
                     result.push(theStoreList);
                 }
