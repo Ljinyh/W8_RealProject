@@ -9,11 +9,11 @@ module.exports = {
     //===================================================================================
     // 사용자 맛방 전체조회
     allRoom: async(req, res) => {
-        const { user } = res.locals; // JWT 인증 정보
+        const { userId } = res.locals.user; // JWT 인증 정보
         try {
             //userRoom 데이터 테이블에서 찾기
             const existRoom = await UsersRoom.findOne({
-                userId: user.userId,
+                userId: userId,
             }).exec();
             if (!existRoom) {
                 return res.status(400).send({
@@ -34,8 +34,8 @@ module.exports = {
             for (let i = 0; i < arrTheRoom.length; i++) {
                 const name = arrTheRoom[i];
 
-                const ownerCheck = name.ownerId === user.userId;
-                const guestCheck = name.guestId.includes(user.userId);
+                const ownerCheck = name.ownerId === userId;
+                const guestCheck = name.guestId.includes(userId);
                 const guestNumCheck = name.guestId.length;
 
                 if (ownerCheck && guestNumCheck === 0) {
@@ -66,7 +66,10 @@ module.exports = {
             });
         } catch (err) {
             console.log(err);
-            res.send({ result: false, message: '맛방 전체 조회 실패' });
+            res.status(400).send({
+                result: false,
+                message: '맛방 전체 조회 실패',
+            });
         }
     },
 
@@ -108,7 +111,7 @@ module.exports = {
             }
         } catch (err) {
             console.log(err);
-            res.send({ result: false });
+            res.status(400).send({ result: false });
         }
     },
 
@@ -148,7 +151,7 @@ module.exports = {
             return res.status(400).send({ errorMessage: '불러오기 실패!' });
         } catch (err) {
             console.log(err);
-            res.send({ result: false });
+            res.status(400).send({ result: false });
         }
     },
 
@@ -205,7 +208,7 @@ module.exports = {
             });
         } catch (err) {
             console.log(err);
-            res.send({ result: false });
+            res.status(400).send({ result: false });
         }
     },
 
@@ -255,7 +258,7 @@ module.exports = {
             res.status(400).send({ errorMessage: '맛집리스트 가져오기 실패' });
         } catch (err) {
             console.log(err);
-            res.send({ result: false });
+            res.status(400).send({ result: false });
         }
     },
 
@@ -361,7 +364,7 @@ module.exports = {
             });
         } catch (err) {
             console.log(err);
-            res.send({ result: false });
+            res.status(400).send({ result: false });
         }
     },
 
@@ -392,7 +395,7 @@ module.exports = {
             res.status(400).send({ errorMessage: '강퇴 실패!' });
         } catch (err) {
             console.log(err);
-            res.send({ result: false });
+            res.status(400).send({ result: false });
         }
     },
 
@@ -400,7 +403,24 @@ module.exports = {
     // 맛방 정보 수정
     rewriteRoom: async(req, res) => {
         const roomNameCheck = Joi.object({
-            roomName: Joi.string().required().max(8),
+            roomName: Joi.string()
+                .required()
+                .max(8)
+                .error((errors) => {
+                    errors.forEach((err) => {
+                        switch (err.code) {
+                            case 'any.empty':
+                                err.message = '입력란을 작성해주세요!';
+                                break;
+                            case 'string.max':
+                                err.message = `최대 ${err.local.limit}자까지만 가능합니다!`;
+                                break;
+                            default:
+                                break;
+                        }
+                    });
+                    return errors;
+                }),
         }).unknown();
 
         const { user } = res.locals;
@@ -524,7 +544,7 @@ module.exports = {
             res.status(400).send({ errorMessage: '맛방 나가기 실패' });
         } catch (err) {
             console.log(err);
-            res.send({ result: false });
+            res.status(400).send({ result: false });
         }
     },
 
@@ -591,7 +611,7 @@ module.exports = {
             res.status(400).send({ errorMessage: '실패' });
         } catch (err) {
             console.log(err);
-            res.send({ result: false });
+            res.status(400).send({ result: false });
         }
     },
 
@@ -625,7 +645,7 @@ module.exports = {
             }
         } catch (err) {
             console.log(err);
-            res.send({ errorMessage: 'error' });
+            res.status(400).send({ errorMessage: 'error' });
         }
     },
 
@@ -661,7 +681,7 @@ module.exports = {
             }
         } catch (err) {
             console.log(err);
-            res.send({ errorMessage: 'error' });
+            res.status(400).send({ errorMessage: 'error' });
         }
     },
 };
