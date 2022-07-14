@@ -267,7 +267,10 @@ module.exports = {
     // roomName은 8글자, 방 초대인원 20명으로 제한 (게스트 19명)
     writeRoom: async(req, res) => {
         const roomNameCheck = Joi.object({
-            roomName: Joi.string().required().max(8),
+            roomName: Joi.string().required().max(8).messages({
+                'string.empty': '{{#label}}를 채워주세요.',
+                'string.max': '{{#label}}는 최대 8글자입니다.',
+            }),
         }).unknown();
 
         const { user } = res.locals;
@@ -403,24 +406,10 @@ module.exports = {
     // 맛방 정보 수정
     rewriteRoom: async(req, res) => {
         const roomNameCheck = Joi.object({
-            roomName: Joi.string()
-                .required()
-                .max(8)
-                .error((errors) => {
-                    errors.forEach((err) => {
-                        switch (err.code) {
-                            case 'any.empty':
-                                err.message = '입력란을 작성해주세요!';
-                                break;
-                            case 'string.max':
-                                err.message = `최대 ${err.local.limit}자까지만 가능합니다!`;
-                                break;
-                            default:
-                                break;
-                        }
-                    });
-                    return errors;
-                }),
+            roomName: Joi.string().required().max(8).messages({
+                'string.empty': '{{#label}}를 채워주세요.',
+                'string.max': '{{#label}}는 최대 8글자입니다.',
+            }),
         }).unknown();
 
         const { user } = res.locals;
