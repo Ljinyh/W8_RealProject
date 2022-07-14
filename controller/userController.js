@@ -74,22 +74,15 @@ exports.signUp = async(req, res) => {
 };
 
 //================================================================================
-//아이디, 비밀번호 중복확인API
+//아이디 중복확인API
 const checkUser = Joi.object({
     customerId: Joi.string()
         .required()
         .pattern(new RegExp('^[ㄱ-ㅎ가-힣0-9a-zA-Z]{3,11}$')),
-
-    password: Joi.string()
-        .required()
-        .pattern(new RegExp('^[ㄱ-ㅎ가-힣0-9a-zA-Z@$!%#?&]{4,10}$')),
-
-    confirmPassword: Joi.string().required().min(3),
 }).unknown();
 
 exports.check = async(req, res) => {
-    const { customerId, password, confirmPassword } =
-    await checkUser.validateAsync(req.body);
+    const { customerId } = await checkUser.validateAsync(req.body);
 
     const existUsers = await userDB.findOne({ customerId });
 
@@ -99,16 +92,34 @@ exports.check = async(req, res) => {
                 .status(400)
                 .send({ errorMessage: '중복된 아이디입니다.' });
         }
-        if (password !== confirmPassword) {
-            return res.status(400).send({
-                errorMessage: '비밀번호와 비밀번호 확인의 내용이 일치하지 않습니다.',
-            });
-        }
         res.status(200).send({ result: 'success' });
     } catch (err) {
         console.log(err);
         res.send({ result: false });
     }
+};
+
+//================================================================================
+//비밀번호 중복확인API
+const checkUserPass = Joi.object({
+    password: Joi.string()
+        .required()
+        .pattern(new RegExp('^[ㄱ-ㅎ가-힣0-9a-zA-Z@$!%#?&]{4,10}$')),
+
+    confirmPassword: Joi.string().required().min(3),
+}).unknown();
+
+exports.PassCehck = async(req, res) => {
+    const { password, confirmPassword } = await checkUserPass.validateAsync(
+        req.body
+    );
+
+    if (password !== confirmPassword) {
+        return res.status(400).send({
+            errorMessage: '비밀번호와 비밀번호 확인의 내용이 일치하지 않습니다.',
+        });
+    }
+    res.status(200).send({ result: 'success' });
 };
 
 //================================================================================
