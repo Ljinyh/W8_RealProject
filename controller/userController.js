@@ -82,11 +82,11 @@ const checkUser = Joi.object({
 }).unknown();
 
 exports.check = async(req, res) => {
-    const { customerId } = await checkUser.validateAsync(req.body);
-
-    const existUsers = await userDB.findOne({ customerId });
-
     try {
+        const { customerId } = await checkUser.validateAsync(req.body);
+
+        const existUsers = await userDB.findOne({ customerId });
+
         if (existUsers) {
             return res
                 .status(400)
@@ -95,7 +95,7 @@ exports.check = async(req, res) => {
         res.status(200).send({ result: 'success' });
     } catch (err) {
         console.log(err);
-        res.send({ result: false });
+        res.send({ result: false, errorMessage: '형식에 맞지 않습니다.' });
     }
 };
 
