@@ -25,6 +25,12 @@ router.get(
 // 맛방 만들기
 router.post('/', authMiddleware, roomController.writeRoom);
 
+//룸코드 검색
+router.post('/searchR-Code', authMiddleware, roomController.searchRoomCode);
+
+//룸코드로 입장
+router.put('/R-Code', authMiddleware, roomController.roomCode);
+
 // 맛방 초대 (공유하기)
 router.put('/:roomId/invite', authMiddleware, roomController.inviteRoom);
 
