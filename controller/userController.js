@@ -18,7 +18,7 @@ const UserSchema = Joi.object({
 
     nickname: Joi.string()
         .required()
-        .pattern(new RegExp('^[ㄱ-ㅎ가-힣0-9a-zA-Z]{3,10}$')),
+        .pattern(new RegExp('^[ㄱ-ㅎ가-힣0-9a-zA-Z]{3,8}$')),
 
     password: Joi.string()
         .required()
@@ -29,7 +29,7 @@ const UserSchema = Joi.object({
 
 //================================================================================
 //회원가입
-exports.signUp = async (req, res) => {
+exports.signUp = async(req, res) => {
     try {
         let {
             customerId,
@@ -83,13 +83,13 @@ const checkUser = Joi.object({
     password: Joi.string()
         .required()
         .pattern(new RegExp('^[ㄱ-ㅎ가-힣0-9a-zA-Z@$!%#?&]{4,10}$')),
-        
+
     confirmPassword: Joi.string().required().min(3),
 }).unknown();
 
-exports.check = async (req, res) => {
+exports.check = async(req, res) => {
     const { customerId, password, confirmPassword } =
-        await checkUser.validateAsync(req.body);
+    await checkUser.validateAsync(req.body);
 
     const existUsers = await userDB.findOne({ customerId });
 
@@ -101,8 +101,7 @@ exports.check = async (req, res) => {
         }
         if (password !== confirmPassword) {
             return res.status(400).send({
-                errorMessage:
-                    '비밀번호와 비밀번호 확인의 내용이 일치하지 않습니다.',
+                errorMessage: '비밀번호와 비밀번호 확인의 내용이 일치하지 않습니다.',
             });
         }
         res.status(200).send({ result: 'success' });
@@ -120,7 +119,7 @@ const emailValidation = Joi.object({
         .pattern(new RegExp('^[0-9a-zA-Z]+@+[0-9a-zA-Z]+.+[a-zA-Z]$')),
 }).unknown();
 
-exports.sendMail = async (req, res) => {
+exports.sendMail = async(req, res) => {
     const { email } = await emailValidation.validateAsync(req.body);
 
     const authNum = Math.random().toString().substring(2, 6); //랜덤한 숫자 4자리 생성
@@ -162,7 +161,7 @@ exports.sendMail = async (req, res) => {
 
 //================================================================================
 //로그인
-exports.login = async (req, res) => {
+exports.login = async(req, res) => {
     const { customerId, password } = req.body;
     const user = await userDB.findOne({ customerId });
     try {
@@ -203,7 +202,7 @@ exports.login = async (req, res) => {
 
 //================================================================================
 //아이디 찾기 - 핸드폰 인증번호 구현할 시 email => phoneNum으로 바꾸기
-exports.findUserId = async (req, res) => {
+exports.findUserId = async(req, res) => {
     const { email } = req.body;
 
     const existUsersEmail = await userDB.findOne({ email });
@@ -222,7 +221,7 @@ exports.findUserId = async (req, res) => {
 
 //================================================================================
 //비밀번호 찾기
-exports.findPass = async (req, res) => {
+exports.findPass = async(req, res) => {
     const { email, customerId } = req.body;
 
     //랜덤으로 36진수의 값 만들기(소숫점 뒤부터)
@@ -232,8 +231,7 @@ exports.findPass = async (req, res) => {
 
     if (!existUserPass || existUserPass === null) {
         return res.status(400).send({
-            errorMessage:
-                '작성란이 비어있거나 회원등록이 되어있지 않는 사용자입니다.',
+            errorMessage: '작성란이 비어있거나 회원등록이 되어있지 않는 사용자입니다.',
         });
     }
 
@@ -292,13 +290,13 @@ exports.findPass = async (req, res) => {
         */
 //================================================================================
 //유저 정보 수정
-exports.userinfoEdit = async (req, res) => {
-    const { customerId } = res.locals.user;
-    const { nickname, password, faceColor, eyes } = req.body;
+exports.userinfoEdit = async(req, res) => {
+    const { userId } = res.locals.user;
+    const { nickname, name, birthDay, password, faceColor, eyes } = req.body;
 
     const existNickname = await userDB.findOne({ nickname: nickname });
 
-    const users = await userDB.findOne({ customerId });
+    const users = await userDB.findById(userId).exec();
 
     try {
         if (existNickname) {
@@ -308,33 +306,31 @@ exports.userinfoEdit = async (req, res) => {
         }
 
         if (users.customerId === customerId && !password && !existNickname) {
-            await userDB.findByIdAndUpdate(
-                { _id: users._id },
-                {
-                    $set: {
-                        nickname: nickname,
-                        faceColor: faceColor,
-                        eyes: eyes,
-                    },
-                }
-            );
+            await userDB.findByIdAndUpdate({ _id: users._id }, {
+                $set: {
+                    nickname: nickname,
+                    name: name,
+                    birthDay: birthDay,
+                    faceColor: faceColor,
+                    eyes: eyes,
+                },
+            });
             return res.status(201).json({
                 msg: '회원정보가 수정되었습니다.',
             });
         }
 
         if (users.customerId === customerId && password && !existNickname) {
-            await userDB.findByIdAndUpdate(
-                { _id: users._id },
-                {
-                    $set: {
-                        nickname: nickname,
-                        faceColor: faceColor,
-                        eyes: eyes,
-                        password: bcrypt.hashSync(password, 10),
-                    },
-                }
-            );
+            await userDB.findByIdAndUpdate({ _id: users._id }, {
+                $set: {
+                    nickname: nickname,
+                    name: name,
+                    birthDay: birthDay,
+                    faceColor: faceColor,
+                    eyes: eyes,
+                    password: bcrypt.hashSync(password, 10),
+                },
+            });
 
             return res.status(201).json({
                 msg: '회원정보가 수정되었습니다.',
@@ -350,7 +346,7 @@ exports.userinfoEdit = async (req, res) => {
 
 //================================================================================
 //사용자 인증
-exports.userInfo = async (req, res) => {
+exports.userInfo = async(req, res) => {
     const { user } = res.locals;
     res.send({
         user: {
