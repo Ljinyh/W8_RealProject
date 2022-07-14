@@ -55,6 +55,7 @@ module.exports = {
                 star,
                 price,
                 recommendMenu,
+                createdAt: Date.now(),
             });
 
             // 방장이 보고있던 roomId를 가져와서 savelist에 저장
@@ -64,6 +65,7 @@ module.exports = {
                 imgURL: imgURL,
                 roomId,
                 comment,
+                createdAt: Date.now(),
             });
             res.status(200).send({
                 result: true,
