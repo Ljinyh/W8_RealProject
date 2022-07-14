@@ -170,13 +170,11 @@ module.exports = {
             const guestId = Guests.guestId;
 
             if (ownerId === userId || guestId.includes(userId)) {
-                const ownerInfo = await User.findOne({ ownerId: ownerId });
+                const ownerInfo = await User.findById(ownerId);
 
                 let guestInfo = [];
                 for (let i = 0; i < guestId.length; i++) {
-                    const users = await User.findOne({
-                        userId: guestId[i],
-                    }).exec();
+                    const users = await User.findById(guestId[i]).exec();
 
                     guestInfo.push({
                         userId: users.userId,
@@ -305,7 +303,6 @@ module.exports = {
 
     //===================================================================================
     // 맛방 초대 (공유하기)
-    // roomCode를 활용하려면 맛방 입장하기 API도 별도로 필요함. (roomId 일치 && roomCode 일치)
     inviteRoom: async(req, res) => {
         const { userId } = res.locals.user;
         const { guestId } = req.body;
