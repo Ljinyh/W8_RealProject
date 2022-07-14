@@ -78,7 +78,14 @@ exports.signUp = async(req, res) => {
 const checkUser = Joi.object({
     customerId: Joi.string()
         .required()
-        .pattern(new RegExp('^[ㄱ-ㅎ가-힣0-9a-zA-Z]{3,11}$')),
+        .min(3)
+        .max(11)
+        .pattern(new RegExp('^[ㄱ-ㅎ가-힣0-9a-zA-Z]{3,11}$'))
+        .messages({
+            'string.empty': '{{#label}}를 채워주세요.',
+            'string.min': `{{#label}}를 최소 3자이상 써주세요!`,
+            'string.max': '{{#label}}는 최대 11글자입니다.',
+        }),
 }).unknown();
 
 exports.check = async(req, res) => {
@@ -107,9 +114,18 @@ exports.check = async(req, res) => {
 const checkUserPass = Joi.object({
     password: Joi.string()
         .required()
-        .pattern(new RegExp('^(?=.*[@$!%*#?&])[A-Za-z0-9@$!%*#?&]{6,}$')),
+        .min(6)
+        .pattern(new RegExp('^(?=.*[@$!%*#?&])[A-Za-z0-9@$!%*#?&]{6,}$'))
+        .messages({
+            'string.empty': '{{#label}}를 채워주세요.',
+            'string.min': `{{#label}}를 최소 6자이상 써주세요!`,
+            'string.pattern.base': '특수문자가 들어가야합니다.',
+        }),
 
-    confirmPassword: Joi.string().required().min(3),
+    confirmPassword: Joi.string().required().min(3).messages({
+        'string.empty': '{{#label}} 를 채워주세요.',
+        'string.min': '{{#label}}은 최소 3글자 이상입니다.',
+    }),
 }).unknown();
 
 exports.PassCehck = async(req, res) => {
@@ -292,21 +308,21 @@ exports.findPass = async(req, res) => {
 //================================================================================
 //SMS 문자 인증
 /*
-        exports.sendSMS = (req, res) => {
-            const { phoneNum } = req.body;
-            const authNum = Math.random().toString().substring(2, 6);
+                    exports.sendSMS = (req, res) => {
+                        const { phoneNum } = req.body;
+                        const authNum = Math.random().toString().substring(2, 6);
 
-            try {
-                if (phoneNum) {
-                    send_message(authNum, phoneNum);
-                    res.status(200).send({ msg: '문자보내기 성공!', authNum });
-                }
-            } catch (error) {
-                res.status(500).send({ errorMessage: '문자보내기 실패' });
-                console.log(error);
-            }
-        };
-        */
+                        try {
+                            if (phoneNum) {
+                                send_message(authNum, phoneNum);
+                                res.status(200).send({ msg: '문자보내기 성공!', authNum });
+                            }
+                        } catch (error) {
+                            res.status(500).send({ errorMessage: '문자보내기 실패' });
+                            console.log(error);
+                        }
+                    };
+                    */
 //================================================================================
 //유저 정보 수정
 exports.userinfoEdit = async(req, res) => {
