@@ -22,7 +22,7 @@ const UserSchema = Joi.object({
 
     password: Joi.string()
         .required()
-        .pattern(new RegExp('^[ㄱ-ㅎ가-힣0-9a-zA-Z@$!%#?&]{4,10}$')),
+        .pattern(new RegExp('^(?=.*[@$!%*#?&])[A-Za-z0-9@$!%*#?&]{6,}$')),
 
     birthDay: Joi.string().min(8),
 }).unknown(); // 정의되지 않은 key도 허용

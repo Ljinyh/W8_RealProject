@@ -262,8 +262,14 @@ module.exports = {
     //맛방 만들기
     // roomName은 8글자, 방 초대인원 20명으로 제한 (게스트 19명)
     writeRoom: async(req, res) => {
-        const { user } = res.locals; // JWT 인증 정보
-        const { roomName, guestId, emoji } = req.body;
+        const roomNameCheck = Joi.object({
+            roomName: Joi.string().required().max(8),
+        }).unknown();
+
+        const { user } = res.locals;
+        const { roomName, guestId, emoji } = await roomNameCheck.validateAsync(
+            req.body
+        );
         try {
             const roomCode = Math.random().toString().substring(2, 8);
 
@@ -406,7 +412,7 @@ module.exports = {
 
             // 방장이 아니면 실행 불가
             if (user.userId !== existRoom.ownerId) {
-                res.status(400).send({
+                return res.status(400).send({
                     errorMessage: '방장이 아니면 수정이 불가능합니다.',
                 });
             }
@@ -532,7 +538,7 @@ module.exports = {
                 return res.status(400).send({
                     result: false,
                     errorMessage: 'roomSeq 입력 오류 (빈 배열)',
-                })
+                });
             }
 
             await UsersRoom.findOneAndUpdate({ userId: user.userId }, { $set: { roomSeq: roomSeq } });
