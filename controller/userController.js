@@ -115,12 +115,6 @@ exports.PassCehck = async(req, res) => {
             req.body
         );
 
-        if (checkUserPass) {
-            return res
-                .status(400)
-                .send({ errorMessage: '비밀번호 형식이 맞지 않습니다.' });
-        }
-
         if (password !== confirmPassword) {
             return res.status(400).send({
                 errorMessage: '비밀번호와 비밀번호 확인의 내용이 일치하지 않습니다.',

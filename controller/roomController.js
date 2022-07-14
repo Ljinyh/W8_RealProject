@@ -3,6 +3,7 @@ const User = require('../models/user');
 const Savelist = require('../models/savelist');
 const Store = require('../models/store');
 const UsersRoom = require('../models/usersRoom');
+const Joi = require('joi');
 
 module.exports = {
     //===================================================================================
@@ -267,10 +268,11 @@ module.exports = {
         }).unknown();
 
         const { user } = res.locals;
-        const { roomName, guestId, emoji } = await roomNameCheck.validateAsync(
-            req.body
-        );
+
         try {
+            const { roomName, guestId, emoji } =
+            await roomNameCheck.validateAsync(req.body);
+
             const roomCode = Math.random().toString().substring(2, 8);
 
             const createdRoom = await Room.create({
@@ -434,7 +436,7 @@ module.exports = {
     //==============================================================
     //맛방 삭제
     deleteRoom: async(req, res) => {
-        const { user } = res.locals;
+        const { userId } = res.locals.user;
         const { roomId } = req.params;
 
         try {
@@ -469,7 +471,7 @@ module.exports = {
             }
 
             // 방장의 맛방목록 DB에서 맛방 삭제
-            await UsersRoom.findOneAndUpdate({ userId: user.userId }, {
+            await UsersRoom.findOneAndUpdate({ userId: userId }, {
                 $pull: { roomSeq: roomId },
             });
 
