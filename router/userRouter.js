@@ -8,7 +8,10 @@ const router = express.Router();
 router.post('/signup', userController.signUp);
 
 // 이메일, 비밀번호 중복확인
-router.post('/check', userController.check);
+router.post('/checkId', userController.check);
+
+// 비밀번호 중복 확인
+router.post('/checkPass', userController.PassCehck);
 
 //인증번호 이메일 발송 API
 router.post('/mail', userController.sendMail);
