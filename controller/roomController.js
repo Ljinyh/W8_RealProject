@@ -3,8 +3,6 @@ const User = require('../models/user');
 const Savelist = require('../models/savelist');
 const Store = require('../models/store');
 const UsersRoom = require('../models/usersRoom');
-const usersRoom = require('../models/usersRoom');
-const store = require('../models/store');
 
 module.exports = {
     //===================================================================================
@@ -530,12 +528,12 @@ module.exports = {
                     errorMessage: '사용자의 방이 존재하지 않습니다',
                 });
             }
-            if (Array.isArray(roomSeq) && roomSeq.length === 0){
+            if (Array.isArray(roomSeq) && roomSeq.length === 0) {
                 return res.status(400).send({
                     result: false,
                     errorMessage: 'roomSeq 입력 오류 (빈 배열)',
-            })
-        }
+                })
+            }
 
             await UsersRoom.findOneAndUpdate({ userId: user.userId }, { $set: { roomSeq: roomSeq } });
             res.status(200).send({ result: true, message: '순서 변경 완료' });
@@ -637,7 +635,7 @@ module.exports = {
                     $push: { guestId: userId },
                 });
 
-                await usersRoom.findOneAndUpdate({ userId: userId }, {
+                await UsersRoom.findOneAndUpdate({ userId: userId }, {
                     $push: { roomSeq: findRoom.roomId },
                 });
                 return res.status(200).send({ result: 'success' });
