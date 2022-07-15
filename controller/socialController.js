@@ -1,6 +1,7 @@
 const jwt = require('jsonwebtoken');
 const passport = require('passport');
 const KEY = require('../config/secret.json');
+const User = require('../models/user');
 
 //Kakao callback Controller
 exports.kakaoLogin = (req, res, next) => {
@@ -8,12 +9,13 @@ exports.kakaoLogin = (req, res, next) => {
         'kakao', { failureRedirect: '/' },
         (err, user, info) => {
             if (err) return next(err);
-            const { snsId } = user;
-            const token = jwt.sign({ snsId }, KEY.SECRET_KEY, {
+            console.log(user);
+            const { userId } = user;
+
+            const token = jwt.sign({ userId }, KEY.SECRET_KEY, {
                 expiresIn: '7d',
             });
-
-            res.redirect(`http://localhost:3000/login?token=${token}`);
+            res.redirect(`http://localhost:8080/login?token=${token}`);
         }
     )(req, res, next);
 };

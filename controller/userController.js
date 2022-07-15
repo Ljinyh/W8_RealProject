@@ -4,6 +4,7 @@ const Joi = require('joi');
 const bcrypt = require('bcrypt');
 const mailer = require('../models/mail');
 const secret = require('../config/secret.json');
+const User = require('../models/user');
 // const send_message = require('../module/sms'); //sms module
 
 require('dotenv').config();
@@ -417,7 +418,7 @@ exports.userinfoEdit = async(req, res) => {
 exports.userInfo = async(req, res) => {
     const { user } = res.locals;
     try {
-        res.send({
+        return res.status(200).send({
             user: {
                 userId: user.userId,
                 name: user.name,
@@ -430,6 +431,7 @@ exports.userInfo = async(req, res) => {
             },
         });
     } catch (err) {
+        console.log(err);
         res.status(400).send({ errorMessage: '회원정보 가져오기 실패' });
     }
 };
