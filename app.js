@@ -2,6 +2,8 @@
 const express = require('express');
 const mongoose = require('mongoose');
 const cors = require('cors');
+const morgan = require('morgan');
+const helmet = require('helmet');
 const connectDB = require('./database/db');
 const reqLogMiddleware = require('./middlewares/request-log-middleware');
 
@@ -43,6 +45,8 @@ naverPassort();
 // 미들웨어
 app.use(reqLogMiddleware);
 app.use(cors(corsOption));
+app.use(morgan('dev'));
+app.use(helmet());
 
 // ============================
 // 최상위 URL
