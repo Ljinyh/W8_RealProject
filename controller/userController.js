@@ -416,16 +416,20 @@ exports.userinfoEdit = async(req, res) => {
 //사용자 인증
 exports.userInfo = async(req, res) => {
     const { user } = res.locals;
-    res.send({
-        user: {
-            userId: user.userId,
-            name: user.name,
-            birthDay: user.birthDay,
-            email: user.email,
-            customerId: user.customerId,
-            nickname: user.nickname,
-            faceColor: user.faceColor,
-            eyes: user.eyes,
-        },
-    });
+    try {
+        res.send({
+            user: {
+                userId: user.userId,
+                name: user.name,
+                birthDay: user.birthDay,
+                email: user.email,
+                customerId: user.customerId,
+                nickname: user.nickname,
+                faceColor: user.faceColor,
+                eyes: user.eyes,
+            },
+        });
+    } catch (err) {
+        res.status(400).send({ errorMessage: '회원정보 가져오기 실패' });
+    }
 };
