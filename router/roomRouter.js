@@ -31,6 +31,8 @@ router.post('/searchR-Code', authMiddleware, roomController.searchRoomCode);
 //룸코드로 입장
 router.put('/R-Code', authMiddleware, roomController.roomCode);
 
+router.post('/:roomId/roomCode', authMiddleware, roomController.findRoomCode);
+
 // 맛방 초대 (공유하기)
 router.put('/:roomId/invite', authMiddleware, roomController.inviteRoom);
 
