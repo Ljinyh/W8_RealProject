@@ -14,7 +14,7 @@ exports.kakaoLogin = (req, res, next) => {
             });
 
             res.redirect(
-                `https://d3p8bgs7s0qr62.cloudfront.net?token=${token}`
+                `https://d3p8bgs7s0qr62.cloudfront.net/login?token=${token}`
             );
         }
     )(req, res, next);
@@ -32,7 +32,7 @@ exports.googleLogin = (req, res, next) => {
             });
 
             res.redirect(
-                `https://d3p8bgs7s0qr62.cloudfront.net?token=${token}`
+                `https://d3p8bgs7s0qr62.cloudfront.net/login?token=${token}`
             );
         }
     )(req, res, next);
@@ -50,7 +50,7 @@ exports.naverLogin = (req, res, next) => {
             });
 
             res.redirect(
-                `https://d3p8bgs7s0qr62.cloudfront.net?token=${token}`
+                `https://d3p8bgs7s0qr62.cloudfront.net/login?token=${token}`
             );
         }
     )(req, res, next);
