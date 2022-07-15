@@ -570,6 +570,12 @@ module.exports = {
                     result: false,
                     errorMessage: '사용자의 방이 존재하지 않습니다',
                 });
+            }  
+            if(existRoom.roomSeq.length !== roomSeq.length){
+                return res.status(400).send({
+                    result: false,
+                    errorMessage: '변경된 방과 처음 방의 배열 갯수가 같지 않습니다'
+                });
             }
             if (Array.isArray(roomSeq) && roomSeq.length === 0) {
                 return res.status(400).send({
