@@ -236,11 +236,44 @@ exports.login = async(req, res) => {
 };
 
 //================================================================================
+//아이디 찾기 시 인증번호 이메일로 보내기
+exports.mailSending = async(req, res) => {
+    const { email } = req.body;
+
+    const authNum = Math.random().toString().substring(2, 6); //랜덤한 숫자 4자리 생성
+
+    const existUsersEmail = await userDB.findOne({ email: email });
+    try {
+        if (!existUsersEmail) {
+            return res
+                .status(400)
+                .send({ errorMessage: '등록된 이메일이 없습니다!' });
+        } else {
+            const emailParam = {
+                toEmail: email,
+                subject: 'Weat 인증번호 발급',
+                text: `
+                    안녕하세요 Weat에서 인증번호 발급을 도와드릴게요!
+                    인증번호는 <  ${authNum}  > 입니다.
+                    인증번호 입력란에 입력해 주세요! :)`,
+            };
+
+            mailer.sendEmail(emailParam);
+
+            res.status(200).send({ msg: '메세지 보내기 성공', authNum });
+        }
+    } catch (err) {
+        console.log(err);
+        res.status(400).send({ result: false, err });
+    }
+};
+
+//================================================================================
 //아이디 찾기 - 핸드폰 인증번호 구현할 시 email => phoneNum으로 바꾸기
 exports.findUserId = async(req, res) => {
     const { email } = req.body;
 
-    const existUsersEmail = await userDB.findOne({ email });
+    const existUsersEmail = await userDB.findOne({ email: email });
 
     try {
         if (!existUsersEmail || existUsersEmail === null) {

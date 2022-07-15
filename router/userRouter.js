@@ -13,8 +13,11 @@ router.post('/checkId', userController.check);
 // 비밀번호 중복 확인
 router.post('/checkPass', userController.PassCehck);
 
-//인증번호 이메일 발송 API
+//회원가입 시 인증번호 이메일 발송 API
 router.post('/mail', userController.sendMail);
+
+// 아이디 찾기 시 인증번호 이메일 발송 API
+router.post('/sendmail', userController.mailSending);
 
 // //인증번호 문자 발송 API
 // router.post('/sms', userController.sendSMS);
