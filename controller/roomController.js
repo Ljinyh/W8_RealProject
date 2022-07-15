@@ -122,7 +122,7 @@ module.exports = {
         const { roomId } = req.params;
 
         const findRoom = await Room.findById(roomId);
-
+        console.log(findRoom.guestId);
         try {
             if (findRoom) {
                 const ownerCheck = findRoom.ownerId === userId;
@@ -604,6 +604,22 @@ module.exports = {
         }
     },
 
+    //==============================================================
+    // 룸코드 생성 코드
+    findRoomCode: async(req, res) => {
+        const { roomId } = req.params;
+
+        const findRoom = await Room.findById(roomId).exec();
+        try {
+            if (findRoom) {
+                return res.status(200).send({ roomCode: findRoom.roomCode });
+            }
+            res.status(400).send({ errorMessage: '룸코드를 찾지 못했습니다!' });
+        } catch (err) {
+            console.log(err);
+            res.status(400).send({ result: false, err });
+        }
+    },
     //==============================================================
     //룸코드로 검색
     searchRoomCode: async(req, res) => {
