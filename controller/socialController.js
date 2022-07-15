@@ -15,7 +15,7 @@ exports.kakaoLogin = (req, res, next) => {
             const token = jwt.sign({ userId }, KEY.SECRET_KEY, {
                 expiresIn: '7d',
             });
-            res.redirect(`http://localhost:8080/login?token=${token}`);
+            res.redirect(`http://localhost:3000/login?token=${token}`);
         }
     )(req, res, next);
 };
