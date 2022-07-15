@@ -9,7 +9,6 @@ exports.kakaoLogin = (req, res, next) => {
         'kakao', { failureRedirect: '/' },
         (err, user, info) => {
             if (err) return next(err);
-            console.log(user);
             const { userId } = user;
 
             const token = jwt.sign({ userId }, KEY.SECRET_KEY, {

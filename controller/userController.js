@@ -363,18 +363,19 @@ exports.userinfoEdit = async(req, res) => {
     const { userId } = res.locals.user;
     const { nickname, name, birthDay, password, faceColor, eyes } = req.body;
 
-    const existNickname = await userDB.findOne({ nickname: nickname });
-
     const users = await userDB.findById(userId).exec();
 
     try {
-        if (existNickname) {
-            return res
-                .status(400)
-                .send({ errorMessage: '중복된 닉네임입니다.' });
+        if (nickname) {
+            const existNickname = await userDB.findOne({ nickname: nickname });
+            if (existNickname) {
+                return res
+                    .status(400)
+                    .send({ errorMessage: '중복된 닉네임입니다.' });
+            }
         }
 
-        if (users.customerId === customerId && !password && !existNickname) {
+        if (users && !password) {
             await userDB.findByIdAndUpdate({ _id: users._id }, {
                 $set: {
                     nickname: nickname,
@@ -389,7 +390,7 @@ exports.userinfoEdit = async(req, res) => {
             });
         }
 
-        if (users.customerId === customerId && password && !existNickname) {
+        if (users && password) {
             await userDB.findByIdAndUpdate({ _id: users._id }, {
                 $set: {
                     nickname: nickname,
