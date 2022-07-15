@@ -13,9 +13,7 @@ exports.kakaoLogin = (req, res, next) => {
                 expiresIn: '7d',
             });
 
-            res.redirect(
-                `https://d3p8bgs7s0qr62.cloudfront.net/login?token=${token}`
-            );
+            res.redirect(`http://localhost:3000/login?token=${token}`);
         }
     )(req, res, next);
 };
