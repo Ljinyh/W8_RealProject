@@ -429,6 +429,7 @@ exports.userInfo = async(req, res) => {
                 nickname: user.nickname,
                 faceColor: user.faceColor,
                 eyes: user.eyes,
+                provider: user.provider,
             },
         });
     } catch (err) {
