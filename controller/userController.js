@@ -374,7 +374,7 @@ exports.userinfoEdit = async(req, res) => {
                 .send({ errorMessage: '중복된 닉네임입니다.' });
         }
 
-        if (users.customerId === customerId && !password && !existNickname) {
+        if (users && !password && !existNickname) {
             await userDB.findByIdAndUpdate({ _id: users._id }, {
                 $set: {
                     nickname: nickname,
@@ -389,7 +389,7 @@ exports.userinfoEdit = async(req, res) => {
             });
         }
 
-        if (users.customerId === customerId && password && !existNickname) {
+        if (users && password && !existNickname) {
             await userDB.findByIdAndUpdate({ _id: users._id }, {
                 $set: {
                     nickname: nickname,
