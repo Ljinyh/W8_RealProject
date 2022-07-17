@@ -15,9 +15,13 @@ module.exports = {
             const existRoom = await UsersRoom.findOne({
                 userId: userId,
             }).exec();
+            
             if (!existRoom) {
-                return res.status(400).send({
-                    errorMessage: '사용자의 방이 존재하지 않습니다',
+                return res.status(200).send({
+                    result : true,
+                    total : 0,
+                    myRooms: [],
+                    Message: '사용자의 방이 존재하지 않습니다',
                 });
             }
 
