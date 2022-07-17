@@ -14,7 +14,7 @@ exports.kakaoLogin = (req, res, next) => {
             const token = jwt.sign({ userId }, KEY.SECRET_KEY, {
                 expiresIn: '7d',
             });
-            res.redirect(`http://localhost:3000/token=${token}`);
+            res.redirect(`http://localhost:3000?token=${token}`);
         }
     )(req, res, next);
 };
@@ -30,7 +30,7 @@ exports.googleLogin = (req, res, next) => {
                 expiresIn: '7d',
             });
 
-            res.redirect(`http://localhost:3000/token=${token}`);
+            res.redirect(`http://localhost:3000?token=${token}`);
         }
     )(req, res, next);
 };
