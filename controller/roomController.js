@@ -15,9 +15,13 @@ module.exports = {
             const existRoom = await UsersRoom.findOne({
                 userId: userId,
             }).exec();
+            
             if (!existRoom) {
-                return res.status(400).send({
-                    errorMessage: '사용자의 방이 존재하지 않습니다',
+                return res.status(200).send({
+                    result : true,
+                    total : 0,
+                    myRooms: [],
+                    Message: '사용자의 방이 존재하지 않습니다',
                 });
             }
 
@@ -281,6 +285,27 @@ module.exports = {
 
             const roomCode = Math.random().toString().substring(2, 8);
 
+            if(roomName===undefined){
+                return res.status(400).send({
+                    result: false,
+                    message: '방 이름을 입력하세요.',
+                });
+            }
+            // guestId 배열 안에 사용자가 있는지 확인
+            if (guestId.some((v) => v === user.userId)) {
+                return res.status(400).send({
+                    result: false,
+                    message: '멤버로 나 자신을 추가할 수 없습니다.',
+                });
+            }
+            if (guestId.length > 19) {
+                //맛방 멤버 총 인원 20명으로 제한
+                return res.status(400).send({
+                    result: false,
+                    message: '맛방의 최대 인원은 20명입니다.',
+                });
+            }
+            // 맛방 DB에 방 생성
             const createdRoom = await Room.create({
                 roomName,
                 ownerId: user.userId,
@@ -289,24 +314,22 @@ module.exports = {
                 roomCode,
             });
 
-            if (createdRoom.guestId.length > 19) {
-                //맛방 멤버 총 인원 20명으로 제한
-                return res.status(400).send({
-                    result: false,
-                    message: '맛방의 최대 인원은 20명입니다.',
-                });
-            }
-            //UsersRoom DB에 userId에 해당하는 목록 수정, 없으면 생성
+            // 방장의 UsersRoom DB에 userId에 해당하는 목록 수정, 없으면 생성
             await UsersRoom.findOneAndUpdate({ userId: user.userId }, { $push: { roomSeq: createdRoom.roomId } }, { upsert: true });
 
+            // 게스트들의 UsersRoom DB에 userId에 해당하는 목록 수정, 없으면 생성
             if (!!guestId) {
                 for (i = 0; i < guestId.length; i++) {
-                    await UsersRoom.findOneAndUpdate({ userId: guestId[i] }, { $push: { roomSeq: createdRoom.roomId } }, { upsert: true });
+                    await UsersRoom.findOneAndUpdate(
+                        { userId: guestId[i] },
+                        { $push: { roomSeq: createdRoom.roomId } },
+                        { upsert: true }
+                        );
                 }
             }
             return res
                 .status(200)
-                .json({ result: true, message: '맛방 만들기 성공' });
+                .json({result: true, message: '맛방 만들기 성공' });
         } catch (err) {
             console.log(err);
             res.status(400).send({
@@ -550,6 +573,12 @@ module.exports = {
                 return res.status(400).send({
                     result: false,
                     errorMessage: '사용자의 방이 존재하지 않습니다',
+                });
+            }  
+            if(existRoom.roomSeq.length !== roomSeq.length){
+                return res.status(400).send({
+                    result: false,
+                    errorMessage: '변경된 방과 처음 방의 배열 갯수가 같지 않습니다'
                 });
             }
             if (Array.isArray(roomSeq) && roomSeq.length === 0) {
