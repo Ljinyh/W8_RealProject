@@ -677,7 +677,7 @@ module.exports = {
 
                 await UsersRoom.findOneAndUpdate({ userId: userId }, {
                     $push: { roomSeq: findRoom.roomId },
-                });
+                }, { upsert: true });
                 return res.status(200).send({ result: 'success' });
             } else {
                 return res
