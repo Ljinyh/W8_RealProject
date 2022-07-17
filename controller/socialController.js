@@ -25,8 +25,8 @@ exports.googleLogin = (req, res, next) => {
         'google', { failureRedirect: '/' },
         (err, user, info) => {
             if (err) return next(err);
-            const { snsId } = user;
-            const token = jwt.sign({ snsId }, KEY.SECRET_KEY, {
+            const { userId } = user;
+            const token = jwt.sign({ userId }, KEY.SECRET_KEY, {
                 expiresIn: '7d',
             });
 
@@ -41,8 +41,8 @@ exports.naverLogin = (req, res, next) => {
         'naver', { failureRedirect: '/' },
         (err, user, info) => {
             if (err) return next(err);
-            const { snsId } = user;
-            const token = jwt.sign({ snsId }, KEY.SECRET_KEY, {
+            const { userId } = user;
+            const token = jwt.sign({ userId }, KEY.SECRET_KEY, {
                 expiresIn: '7d',
             });
 
