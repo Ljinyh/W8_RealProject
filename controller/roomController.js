@@ -15,11 +15,11 @@ module.exports = {
             const existRoom = await UsersRoom.findOne({
                 userId: userId,
             }).exec();
-            
+
             if (!existRoom) {
                 return res.status(200).send({
-                    result : true,
-                    total : 0,
+                    result: true,
+                    total: 0,
                     myRooms: [],
                     Message: '사용자의 방이 존재하지 않습니다',
                 });
@@ -285,7 +285,7 @@ module.exports = {
 
             const roomCode = Math.random().toString().substring(2, 8);
 
-            if(roomName===undefined){
+            if (roomName === undefined) {
                 return res.status(400).send({
                     result: false,
                     message: '방 이름을 입력하세요.',
@@ -320,16 +320,12 @@ module.exports = {
             // 게스트들의 UsersRoom DB에 userId에 해당하는 목록 수정, 없으면 생성
             if (!!guestId) {
                 for (i = 0; i < guestId.length; i++) {
-                    await UsersRoom.findOneAndUpdate(
-                        { userId: guestId[i] },
-                        { $push: { roomSeq: createdRoom.roomId } },
-                        { upsert: true }
-                        );
+                    await UsersRoom.findOneAndUpdate({ userId: guestId[i] }, { $push: { roomSeq: createdRoom.roomId } }, { upsert: true });
                 }
             }
             return res
                 .status(200)
-                .json({result: true, message: '맛방 만들기 성공' });
+                .json({ result: true, message: '맛방 만들기 성공' });
         } catch (err) {
             console.log(err);
             res.status(400).send({
@@ -352,13 +348,19 @@ module.exports = {
                 $or: [{ userId: guestId }],
             });
 
-            if (guestId.length > 20) {
+            if (theRoom.guestId.length > 20) {
                 return res
                     .status(400)
                     .send({ errorMessage: '초대인원이 꽉 찼습니다.' });
             }
 
-            if (guestId.includes(userId)) {
+            if ((theRoom, guestId.includes(guestId))) {
+                return res
+                    .status(400)
+                    .send({ erroMessage: '이미 초대되었습니다!' });
+            }
+
+            if (theRoom.guestId.includes(userId)) {
                 return res
                     .status(400)
                     .send({ errorMessage: '자기 자신은 초대할 수 없습니다!' });
@@ -574,11 +576,11 @@ module.exports = {
                     result: false,
                     errorMessage: '사용자의 방이 존재하지 않습니다',
                 });
-            }  
-            if(existRoom.roomSeq.length !== roomSeq.length){
+            }
+            if (existRoom.roomSeq.length !== roomSeq.length) {
                 return res.status(400).send({
                     result: false,
-                    errorMessage: '변경된 방과 처음 방의 배열 갯수가 같지 않습니다'
+                    errorMessage: '변경된 방과 처음 방의 배열 갯수가 같지 않습니다',
                 });
             }
             if (Array.isArray(roomSeq) && roomSeq.length === 0) {
