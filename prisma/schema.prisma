@@ -11,20 +11,21 @@ datasource db {
 }
 
 model User {
-  userId    Int        @id @default(autoincrement())
-  name      String?
-  nickname  String     @unique @db.VarChar(20)
-  email     String     @unique
-  password  String
-  birthDay  String?
-  faceColor String
-  eyes      String
-  snsId     String?
-  provider  String?
-  createdAt DateTime   @default(now())
-  rooms     Room[]
-  userRooms UserRoom[]
-  savelists Savelist[]
+  userId     Int        @id @default(autoincrement())
+  name       String?
+  customerId String?
+  nickname   String?    @unique @db.VarChar(20)
+  email      String     @unique
+  password   String
+  birthDay   String?
+  faceColor  String
+  eyes       String
+  snsId      String?
+  provider   String?
+  createdAt  DateTime   @default(now())
+  rooms      Room[]
+  userRooms  UserRoom[]
+  savelists  Savelist[]
 }
 
 model Room {
