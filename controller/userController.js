@@ -270,7 +270,7 @@ exports.mailSending = async(req, res) => {
 };
 
 //================================================================================
-//아이디 찾기 - 핸드폰 인증번호 구현할 시 email => phoneNum으로 바꾸기
+//아이디 찾기
 exports.findUserId = async(req, res) => {
     const { email } = req.body;
 
@@ -282,7 +282,11 @@ exports.findUserId = async(req, res) => {
         }
         const name = existUsersEmail.customerId;
 
-        return res.status(200).json({ msg: '아이디 찾기 성공!', name });
+        return res.status(200).json({
+            msg: '아이디 찾기 성공!',
+            customerId: name,
+            createdAt: existUsersEmail.createdAt.toISOString(),
+        });
     } catch (err) {
         res.status(400).send(console.log(err));
     }
