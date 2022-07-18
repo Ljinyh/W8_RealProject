@@ -1,0 +1,80 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  userId    Int        @id @default(autoincrement())
+  name      String?
+  nickname  String     @unique @db.VarChar(20)
+  email     String     @unique
+  password  String
+  birthDay  String?
+  faceColor String
+  eyes      String
+  snsId     String?
+  provider  String?
+  createdAt DateTime   @default(now())
+  rooms     Room[]
+  userRooms UserRoom[]
+  savelists Savelist[]
+}
+
+model Room {
+  roomId    Int        @id @default(autoincrement())
+  roomName  String
+  roomOwner User       @relation(fields: [ownerId], references: [userId])
+  ownerId   Int
+  guestId   String
+  emoji     String
+  roomCode  String
+  createdAt DateTime   @default(now())
+  updatedAt DateTime   @updatedAt
+  savelists Savelist[]
+}
+
+model UserRoom {
+  id      Int     @id @default(autoincrement())
+  user    User    @relation(fields: [userId], references: [userId])
+  userId  Int
+  roomSeq String?
+}
+
+model Savelist {
+  saveId        Int      @id @default(autoincrement())
+  user          User     @relation(fields: [userId], references: [userId])
+  userId        Int
+  room          Room     @relation(fields: [roomId], references: [roomId])
+  roomId        Int
+  store         Store    @relation(fields: [storeId], references: [storeId])
+  storeId       Int
+  comment       String?
+  imgURL        String?
+  star          String?
+  price         String?
+  tag           String?
+  recommendMenu String?
+  createdAt     DateTime @default(now())
+}
+
+model Store {
+  storeId   Int        @id @default(autoincrement())
+  userId    String
+  storeName String
+  address   String
+  LatLon    String
+  createdAt DateTime   @default(now())
+  updatedAt DateTime   @updatedAt
+  savelist  Savelist[]
+}
+
+// published Boolean  @default(false)
+// author    User     @relation(fields: [authorId], references: [id])
+// authorId  Int
