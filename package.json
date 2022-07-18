@@ -7,7 +7,7 @@
     "start": "node src/server.js",
     "studio" : "npx prisma studio",
     "migrate" : "npx prisma migrate dev",
-    "prettify": "prettier --write *.js **/*.js"
+    "prettify": "prettier --write src/*.ts src/**/*.ts src/*.js src/**/*.js"
   },
   "repository": {
     "type": "git",
