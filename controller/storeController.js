@@ -40,7 +40,7 @@ module.exports = {
     // 맛집 생성 (첫 기록하기), 방장의 맛방에 맛집 추가까지
     createStore: async (req, res) => {
         const { user } = res.locals; // JWT 인증 정보
-        const { storeName, comment, address, LatLon, imgURL, tag, star, price, recommendMenu } = req.body;
+        const { storeName, comment, address, LatLon, imgURL, tag, star, recommendMenu } = req.body;
         const { roomId } = req.params;
 
         try {
@@ -51,10 +51,7 @@ module.exports = {
                 address,
                 imgURL,
                 LatLon,
-                tag,
-                star,
-                price,
-                recommendMenu,
+                mainTag : tag,
                 createdAt: Date.now(),
             });
 
@@ -65,6 +62,9 @@ module.exports = {
                 imgURL: imgURL,
                 roomId,
                 comment,
+                star,
+                tag,
+                recommendMenu,
                 createdAt: Date.now(),
             });
             res.status(200).send({

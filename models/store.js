@@ -5,6 +5,7 @@ const StoreSchema = new mongoose.Schema({
     storeName: String,
     address: String,
     LatLon: [Number],
+    maimTag:[String],
     createdAt: Date,
 });
 StoreSchema.virtual('storeId').get(function() {
