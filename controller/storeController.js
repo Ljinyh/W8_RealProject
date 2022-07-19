@@ -91,11 +91,11 @@ module.exports = {
 
         try {
             const existStore = await Store.findById(storeId);
-            console.log(existStore);
             const storefinder = await User.findById(existStore.userId);
-            console.log(existStore, storefinder);
             const list = await Savelist.find({ storeId: storeId });
-            console.log(list.star);
+            let allStarArr = []; // null 값이 들어오면 에러가 나기 때문에 빈 배열 선언
+            allStarArr = list.map(a=>a.star)
+            const starAvg = allStarArr.reduce(function add(sum, currValue){return sum + currValue},0) / allStarArr.length
 
             res.status(200).send({
                 message: '맛집 정보 조회 완료',
@@ -105,7 +105,8 @@ module.exports = {
                     faceColor: storefinder.faceColor,
                     eyes: storefinder.eyes,
                     tag: existStore.mainTag,
-                    starAvg : 0,
+                    // starAvg : Math.round(starAvg), //소수점 반올림 정수 반환
+                    starAvg : Math.round(starAvg*2)/2, // 소수점 0.5 단위로 반올림 반환
                     comment: existStore.comment,
                 },
             });
