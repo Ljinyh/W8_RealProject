@@ -245,6 +245,12 @@ exports.mailSending = async(req, res) => {
 
     const existUsersEmail = await userDB.findOne({ email: email });
     try {
+        if (!email) {
+            return res
+                .status(400)
+                .send({ errorMessage: '입력칸을 채워주세요' });
+        }
+
         if (!existUsersEmail) {
             return res
                 .status(400)
