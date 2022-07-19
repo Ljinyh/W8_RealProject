@@ -13,7 +13,7 @@ module.exports = {
             for (i = 0; i < allStore.length; i++) {
                 findUser = await User.findById(allStore[i].userId);
                 storeMap.push({
-                    storeId : allStore[i].storeId,
+                    storeId: allStore[i].storeId,
                     storeName: allStore[i].storeName,
                     address: allStore[i].address,
                     LatLon: allStore[i].LatLon,
@@ -40,7 +40,16 @@ module.exports = {
     // 맛집 생성 (첫 기록하기), 방장의 맛방에 맛집 추가까지
     createStore: async (req, res) => {
         const { user } = res.locals; // JWT 인증 정보
-        const { storeName, comment, address, LatLon, imgURL, tag, star, recommendMenu } = req.body;
+        const {
+            storeName,
+            comment,
+            address,
+            LatLon,
+            imgURL,
+            tag,
+            star,
+            recommendMenu,
+        } = req.body;
         const { roomId } = req.params;
 
         try {
@@ -51,7 +60,7 @@ module.exports = {
                 address,
                 imgURL,
                 LatLon,
-                mainTag : tag,
+                mainTag: tag,
                 createdAt: Date.now(),
             });
 
@@ -73,6 +82,37 @@ module.exports = {
         } catch (err) {
             console.log(err);
             res.send({ result: false, message: '맛집 기록 실패' });
+        }
+    },
+
+    // 맛집 캐릭터 얼굴 태그 평균 별점
+    detailStore: async (req, res) => {
+        const { storeId } = req.params;
+
+        try {
+            const existStore = await Store.findById(storeId);
+            const storefinder = await User.findById(existStore.userId);
+            const list = await Savelist.find({ storeId: storeId });
+            let allStarArr = []; // null 값이 들어오면 에러가 나기 때문에 빈 배열 선언
+            allStarArr = list.map(a=>a.star)
+            const starAvg = allStarArr.reduce(function add(sum, currValue){return sum + currValue},0) / allStarArr.length
+
+            res.status(200).send({
+                message: '맛집 정보 조회 완료',
+                result: {
+                    storeId,
+                    storeName: existStore.storeName,
+                    faceColor: storefinder.faceColor,
+                    eyes: storefinder.eyes,
+                    tag: existStore.mainTag,
+                    // starAvg : Math.round(starAvg), //소수점 반올림 정수 반환
+                    starAvg : Math.round(starAvg*2)/2, // 소수점 0.5 단위로 반올림 반환
+                    comment: existStore.comment,
+                },
+            });
+        } catch (err) {
+            console.log(err);
+            res.send({ result: false, message: '맛집 정보 조회 실패' });
         }
     },
 };

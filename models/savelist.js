@@ -6,7 +6,7 @@ const SaveListSchema = new mongoose.Schema({
     storeId: String,
     comment: String,
     imgURL: [String],
-    star: String,
+    star: Number,
     price: String,
     tag: [String],
     recommendMenu : [String],

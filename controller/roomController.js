@@ -610,8 +610,11 @@ module.exports = {
 
         const theRoom = await Room.findById(roomId).exec();
         const theStore = await Store.findById(storeId).exec();
-
+        const existSavelist = await Savelist.findOne({storeId, roomId})
         try {
+            if (existSavelist){
+                return res.status(400).send({ errorMessage: '이미 맛방에 저장되어 있는 맛집입니다.' });
+            }
             if (theRoom && theStore) {
                 Savelist.create({
                     userId,
