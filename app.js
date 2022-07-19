@@ -20,7 +20,7 @@ const naverPassort = require('./passport/naver');
 // ============================
 // CORS Access - Origin
 const corsOption = {
-    origin: ['http://localhost:3000', 'https://d3p8bgs7s0qr62.cloudfront.net'],
+    origin: ['http://localhost:3000', 'https://weat.site'],
     credentials: true,
 };
 
