@@ -48,6 +48,6 @@ module.exports = (server) => {
         //     }
         // });
 
-        // socket.on('disconnect', () => {});
+        socket.on('disconnect', () => {});
     });
 };
