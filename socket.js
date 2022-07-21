@@ -89,7 +89,7 @@ module.exports = (server) => {
             const senderName = findUser.nickname;
             const createdAt = new Date();
 
-            for(let i=0; i<guestName.length; i++){
+            for(let i=0; i<gusetId.length; i++){
                 
             const CheckAlert = await Alert.findOne({ senderName: senderName ,gusetId: gusetId[i], roomName: roomName});
     
@@ -102,12 +102,8 @@ module.exports = (server) => {
                 });
                 const findUserAlertDB = await Alert.findOne({ senderName: senderName ,gusetId: gusetId[i], roomName: roomName});
                 findUserAlertDB.createdAt = timeForToday(createdAt);
-                console.log(findUserAlertDB);
-                console.log(findUserAlertDB.createdAt);
 
                 const receiver = getUser(gusetId[i]);
-                console.log(receiver)
-                console.log(onlineUsers)
 
                 io.to(receiver.socketId).emit('newInviteDB',{
                     findUserAlertDB : [findUserAlertDB],
