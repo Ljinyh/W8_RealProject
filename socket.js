@@ -88,14 +88,8 @@ module.exports = (server) => {
             const roomName = findRoom.roomName;
             const senderName = findUser.nickname;
             const createdAt = new Date();
-            // const theInvited = [];
 
             for(let i=0; i<guestName.length; i++){
-                // theInvited.push(
-                //     guestName,
-                //     senderName,
-                //     roomName,
-                //     createdAt)
                 
             const CheckAlert = await Alert.findOne({ senderName: senderName ,guestName: guestName[i], roomName: roomName});
             
@@ -107,14 +101,16 @@ module.exports = (server) => {
                     createdAt
                 });
                 const findUserAlertDB = await Alert.findOne({ senderName: senderName ,guestName: guestName[i], roomName: roomName});
-                console.log(findUserAlertDB);
                 findUserAlertDB.createdAt = timeForToday(createdAt);
-                const receiver = getUser(userId);
-                io.to(receiver.socketId).emit('newInviteDB',{
+                
+                const guest = await Connect.findOne({guestName: guestName[i]});
+                const receiver = guest.socketId
+
+                io.to(receiver).emit('newInviteDB',{
                     findUserAlertDB : [findUserAlertDB],
                 });
             } else {
-                socket.emit("errorMessage", "이미 초대한 가족입니다.");
+                socket.emit("errorMessage", "이미 초대한 회원입니다.");
                 return;
             }}
         });
