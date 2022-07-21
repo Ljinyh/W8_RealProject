@@ -3,7 +3,7 @@ const IO = require('socket.io');
 // const User = require('./models/user');
 // const Room = require('./models/room');
 // const UsersRoom = require('./models/usersRoom');
-const Connect = require('./models/connect');
+// const Connect = require('./models/connect');
 
 module.exports = (server) => {
     const io = IO(server, {
