@@ -1,4 +1,7 @@
 const IO = require('socket.io');
+const app = require('express');
+const cors = require('cors')
+app.use(cors(cors));
 
 // const User = require('./models/user');
 // const Room = require('./models/room');
