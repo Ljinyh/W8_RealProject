@@ -99,6 +99,7 @@ module.exports = (server) => {
                     userId: guestName[i],
                     senderName,
                     roomName,
+                    roomId,
                     type: '초대',
                     createdAt
                 });
