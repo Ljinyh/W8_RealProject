@@ -106,7 +106,6 @@ module.exports = (server) => {
                     roomName,
                     createdAt
                 });
-            }
                 const findUserAlertDB = await Alert.findOne({ senderName: senderName ,guestName: guestName, roomName: roomName});
                 findUserAlertDB.createdAt = timeForToday(createdAt);
                 const receiver = getUser(userId);
@@ -116,7 +115,7 @@ module.exports = (server) => {
             } else {
                 socket.emit("errorMessage", "이미 초대한 가족입니다.");
                 return;
-            }
+            }}
         });
 
         //소켓 연결해제
