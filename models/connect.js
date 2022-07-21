@@ -6,7 +6,7 @@ const connectSchema = mongoose.Schema({
         required: true,
     },
 
-    nickName: {
+    nickname: {
         type: String,
         required: true,
     },
