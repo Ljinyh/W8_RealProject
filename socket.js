@@ -44,7 +44,7 @@ module.exports = (server) => {
                         socketId: receiver.socketId,
                         connectedAt: createdAt,
                     },
-                });
+                }, { upsert: true });
 
                 await Connect.findOne({ userId: userId });
             }
