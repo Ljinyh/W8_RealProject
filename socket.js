@@ -38,13 +38,13 @@ module.exports = (server) => {
                 addNewUser(userId, nickname, socket.id);
                 const receiver = getUser(userId);
                 const createdAt = new Date();
-                const userFind = await Connect.findOneAndUpdate({ userId: userId }, {
+                const userFind = await Connect.findOneAndUpdate({ userId: userId, nickname: nickname }, {
                     $set: {
                         connected: true,
                         socketId: receiver.socketId,
                         connectedAt: createdAt,
                     },
-                }, { upsert: true });
+                });
 
                 await Connect.findOne({ userId: userId });
             }
