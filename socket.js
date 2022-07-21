@@ -27,7 +27,8 @@ module.exports = (server) => {
     };
 
     io.on('connection', (socket) => {
-        io.emit('first Event', '소켓 연결 성공!');
+        console.log('소켓 연결이 되었나');
+        io.emit('firstEvent', '소켓 연결 성공!');
 
         socket.on('newUser', async({ userId }) => {
             if (userId !== undefined) {
@@ -45,5 +46,7 @@ module.exports = (server) => {
                 await Connect.findOne({ userId: userId });
             }
         });
+
+        socket.on('disconnect', () => {});
     });
 };
