@@ -82,6 +82,7 @@ module.exports = (server) => {
             }
         });
 
+        //멤버 초대 시 실시간 알림
         socket.on('inviteMember', async({userId, guestName, roomId}) => {
             const findUser = await User.findById(userId);
             const findRoom = await Room.findById(roomId);
@@ -95,19 +96,16 @@ module.exports = (server) => {
     
             if(!CheckAlert){
                 await Alert.create({
-                    guestId: guestName[i],
+                    userId: guestName[i],
                     senderName,
                     roomName,
+                    type: '초대',
                     createdAt
                 });
                 const findUserAlertDB = await Alert.findOne({ senderName: senderName ,guestId: guestName[i], roomName: roomName});
                 findUserAlertDB.createdAt = timeForToday(createdAt);
-                console.log(findUserAlertDB);
-                console.log(findUserAlertDB.createdAt);
 
                 const receiver = getUser(guestName[i]);
-                console.log(receiver)
-                console.log(onlineUsers)
 
                 io.to(receiver.socketId).emit('newInviteDB',{
                     findUserAlertDB : [findUserAlertDB],
@@ -116,6 +114,22 @@ module.exports = (server) => {
                 socket.emit("errorMessage", "이미 초대한 회원입니다.");
                 return;
             }}
+        });
+
+        // 알림 목록 보내기
+        socket.on('getAlert', async({ receiverId }) => {
+            if(receiverId) {
+                const receiver = getUser(receiverId);
+                const findUserAlertDB = await Alert.find({ userId: receiverId });
+                if(findUserAlertDB.length !== 0){
+                    for(let alretDB of findUserAlertDB) {
+                        alretDB.createdAt = timeForToday(alretDB.createdAt);
+                    }
+                    io.to(receiver.socketId).emit('getNotification', {
+                        findAlertDB : findUserAlertDB,
+                    });
+                }
+            }
         });
 
         //소켓 연결해제
