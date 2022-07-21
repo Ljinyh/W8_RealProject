@@ -28,25 +28,26 @@ module.exports = (server) => {
 
     io.on('connection', (socket) => {
         console.log('소켓 연결이 되었나');
+
         io.emit('firstEvent', '소켓 연결 성공!');
 
-        socket.on('newUser', async({ userId }) => {
-            if (userId !== undefined) {
-                addNewUser(userId, socket.id);
-                const receiver = getUser(userId);
-                const createdAt = new Date();
-                const userFind = await Connect.findOneAndUpdate({ userId: userId }, {
-                    $set: {
-                        connected: true,
-                        socketId: receiver.socketId,
-                        connectedAt: createdAt,
-                    },
-                }, { upsert: true });
+        // socket.on('newUser', async({ userId }) => {
+        //     if (userId !== undefined) {
+        //         addNewUser(userId, socket.id);
+        //         const receiver = getUser(userId);
+        //         const createdAt = new Date();
+        //         const userFind = await Connect.findOneAndUpdate({ userId: userId }, {
+        //             $set: {
+        //                 connected: true,
+        //                 socketId: receiver.socketId,
+        //                 connectedAt: createdAt,
+        //             },
+        //         }, { upsert: true });
 
-                await Connect.findOne({ userId: userId });
-            }
-        });
+        //         await Connect.findOne({ userId: userId });
+        //     }
+        // });
 
-        socket.on('disconnect', () => {});
+        // socket.on('disconnect', () => {});
     });
 };
