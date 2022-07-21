@@ -109,7 +109,7 @@ module.exports = (server) => {
 
                 const receiver = getUser(guestName[i]);
                 console.log(receiver)
-                console.log(onlineUsers)
+
 
                 io.to(receiver.socketId).emit('newInviteDB',{
                     findUserAlertDB : [findUserAlertDB],
