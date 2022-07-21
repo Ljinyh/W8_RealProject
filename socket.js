@@ -9,6 +9,7 @@ const Room = require('./models/room');
 const Alert = require('./models/alret.js');
 const Connect = require('./models/connect');
 const { isReadable } = require('nodemailer/lib/xoauth2');
+const { createImportSpecifier } = require('typescript');
 
 //soket cors 설정
 const app = express();
@@ -23,6 +24,7 @@ module.exports = (server) => {
 //===============================================================================================
 
     let onlineUsers = [];
+
     const addNewUser = (userId, nickname, socketId) => {
         !onlineUsers.some((user) => user.userId === userId) &&
             onlineUsers.push({ userId, nickname ,socketId });
@@ -92,7 +94,7 @@ module.exports = (server) => {
             for(let i=0; i<guestName.length; i++){
                 
             const CheckAlert = await Alert.findOne({ senderName: senderName ,guestName: guestName[i], roomName: roomName});
-            
+    
             if(!CheckAlert){
                 await Alert.create({
                     guestName: guestName[i],
@@ -102,8 +104,12 @@ module.exports = (server) => {
                 });
                 const findUserAlertDB = await Alert.findOne({ senderName: senderName ,guestName: guestName[i], roomName: roomName});
                 findUserAlertDB.createdAt = timeForToday(createdAt);
-                
-                const receiver = getUser(guestName[0]);
+                console.log(findUserAlertDB);
+                console.log(findUserAlertDB.createdAt);
+
+                const receiver = getUser(guestName[i]);
+                console.log(receiver)
+                console.log(onlineUsers)
 
                 io.to(receiver.socketId).emit('newInviteDB',{
                     findUserAlertDB : [findUserAlertDB],
