@@ -1,6 +1,8 @@
 const IO = require('socket.io');
-const {app} = require('express');
+const express = require('express');
 const cors = require('cors')
+
+const app = express();
 app.use(cors(cors));
 
 // const User = require('./models/user');
