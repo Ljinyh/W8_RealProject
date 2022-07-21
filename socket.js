@@ -91,7 +91,7 @@ module.exports = (server) => {
 
             for(let i=0; i<guestName.length; i++){
                 
-            const CheckAlert = await Alert.findOne({ senderName: senderName ,guestName: guestName[i], roomName: roomName});
+            const CheckAlert = await Alert.findOne({ senderName: senderName ,guestId: guestName[i], roomName: roomName});
     
             if(!CheckAlert){
                 await Alert.create({
@@ -100,7 +100,7 @@ module.exports = (server) => {
                     roomName,
                     createdAt
                 });
-                const findUserAlertDB = await Alert.findOne({ senderName: senderName ,guestName: guestName[i], roomName: roomName});
+                const findUserAlertDB = await Alert.findOne({ senderName: senderName ,guestId: guestName[i], roomName: roomName});
                 findUserAlertDB.createdAt = timeForToday(createdAt);
                 console.log(findUserAlertDB);
                 console.log(findUserAlertDB.createdAt);
