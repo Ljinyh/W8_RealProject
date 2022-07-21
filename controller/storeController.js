@@ -4,7 +4,7 @@ const Savelist = require('../models/savelist');
 const Store = require('../models/store');
 
 module.exports = {
-    // 지도에 맛집 보여주기
+    // 지도에 맛집 보여주기 (현재 위치기반 검색)
     mapViewer: async (req, res) => {
         try {
             const allStore = await Store.find().exec();
@@ -81,11 +81,11 @@ module.exports = {
             });
         } catch (err) {
             console.log(err);
-            res.send({ result: false, message: '맛집 기록 실패' });
+            res.status(400).send({ result: false, message: '맛집 기록 실패' });
         }
     },
 
-    // 맛집 캐릭터 얼굴 태그 평균 별점
+    // 맛집 상세 조회 말풍선 (내가 소속된 맛방별로 검색)
     detailStore: async (req, res) => {
         const { storeId } = req.params;
 
@@ -94,25 +94,149 @@ module.exports = {
             const storefinder = await User.findById(existStore.userId);
             const list = await Savelist.find({ storeId: storeId });
             let allStarArr = []; // null 값이 들어오면 에러가 나기 때문에 빈 배열 선언
-            allStarArr = list.map(a=>a.star)
-            const starAvg = allStarArr.reduce(function add(sum, currValue){return sum + currValue},0) / allStarArr.length
+            allStarArr = list.map((a) => a.star);
+            const starAvg =
+                allStarArr.reduce(function add(sum, currValue) {
+                    return sum + currValue;
+                }, 0) / allStarArr.length;
 
             res.status(200).send({
                 message: '맛집 정보 조회 완료',
                 result: {
                     storeId,
                     storeName: existStore.storeName,
+                    nickname: storefinder.nickname,
                     faceColor: storefinder.faceColor,
                     eyes: storefinder.eyes,
                     tag: existStore.mainTag,
                     // starAvg : Math.round(starAvg), //소수점 반올림 정수 반환
-                    starAvg : Math.round(starAvg*2)/2, // 소수점 0.5 단위로 반올림 반환
+                    starAvg: Math.round(starAvg * 2) / 2, // 소수점 0.5 단위로 반올림 반환
                     comment: existStore.comment,
                 },
             });
         } catch (err) {
             console.log(err);
-            res.send({ result: false, message: '맛집 정보 조회 실패' });
+            res.status(400).send({
+                result: false,
+                message: '맛집 정보 조회 실패',
+            });
+        }
+    },
+    // 사용자의 맛방 목록 조회 (내가 소속된 맛방 별로 검색)
+    allMatBang: async (req, res) => {
+        try {
+            return res.status(200).send({ result: true, message: ' ' });
+        } catch (err) {
+            console.log(err);
+            res.status(400).send({ result: false, message: ' ' });
+        }
+    },
+    // 특정 맛방의 맛집 태그 아이콘
+    roomTagIcon: async (req, res) => {
+        try {
+            return res.status(200).send({ result: true, message: ' ' });
+        } catch (err) {
+            console.log(err);
+            res.status(400).send({ result: false, message: ' ' });
+        }
+    },
+    // 맛마디 전체 조회
+    allMatmadi: async (req, res) => {
+        try {
+            return res.status(200).send({ result: true, message: ' ' });
+        } catch (err) {
+            console.log(err);
+            res.status(400).send({ result: false, message: ' ' });
+        }
+    },
+    // 맛마디 상세 조회
+    detailMatmadi: async (req, res) => {
+        try {
+            return res.status(200).send({ result: true, message: ' ' });
+        } catch (err) {
+            console.log(err);
+            res.status(400).send({ result: false, message: ' ' });
+        }
+    },
+    // 맛마디 수정
+    updateMatmadi: async (req, res) => {
+        try {
+            return res.status(200).send({ result: true, message: ' ' });
+        } catch (err) {
+            console.log(err);
+            res.status(400).send({ result: false, message: ' ' });
+        }
+    },
+    // 맛마디 좋아요 토글
+    likeMatmadi: async (req, res) => {
+        try {
+            return res.status(200).send({ result: true, message: ' ' });
+        } catch (err) {
+            console.log(err);
+            res.status(400).send({ result: false, message: ' ' });
+        }
+    },
+    // 맛마디 좋아요 취소
+    unlikeMatmadi: async (req, res) => {
+        try {
+            return res.status(200).send({ result: true, message: ' ' });
+        } catch (err) {
+            console.log(err);
+            res.status(400).send({ result: false, message: ' ' });
+        }
+    },
+    // 특정 맛집의 맛태그 조회
+    mattag: async (req, res) => {
+        try {
+            return res.status(200).send({ result: true, message: ' ' });
+        } catch (err) {
+            console.log(err);
+            res.status(400).send({ result: false, message: ' ' });
+        }
+    },
+    // 특정 맛집의 추천 메뉴 조회
+    viewMenu: async (req, res) => {
+        try {
+            return res.status(200).send({ result: true, message: ' ' });
+        } catch (err) {
+            console.log(err);
+            res.status(400).send({ result: false, message: ' ' });
+        }
+    },
+    // 추천 메뉴 추가
+    addMenu: async (req, res) => {
+        try {
+            return res.status(200).send({ result: true, message: ' ' });
+        } catch (err) {
+            console.log(err);
+            res.status(400).send({ result: false, message: ' ' });
+        }
+    },
+    // 추천 메뉴 좋아요 토글
+    likeMenu: async (req, res) => {
+        try {
+            return res.status(200).send({ result: true, message: ' ' });
+        } catch (err) {
+            console.log(err);
+            res.status(400).send({ result: false, message: ' ' });
+        }
+    },
+    // 추천 메뉴 좋아요 취소
+    unlikeMenu: async (req, res) => {
+        try {
+            return res.status(200).send({ result: true, message: ' ' });
+        } catch (err) {
+            console.log(err);
+            res.status(400).send({ result: false, message: ' ' });
+        }
+    },
+    // 태그 필터 검색
+    tagMapViewer: async (req, res) => {
+        try {
+            return res.status(200).send({ result: true, message: ' ' });
+        } catch (err) {
+            console.log(err);
+            res.status(400).send({ result: false, message: ' ' });
         }
     },
 };
