@@ -88,17 +88,25 @@ module.exports = (server) => {
             const roomName = findRoom.roomName;
             const senderName = findUser.nickname;
             const createdAt = new Date();
-            
+            // const theInvited = [];
 
-            const CheckAlert = await Alert.findOne({ senderName: senderName ,guestName: guestName, roomName: roomName});
+            for(let i=0; i<guestName.length; i++){
+                // theInvited.push(
+                //     guestName,
+                //     senderName,
+                //     roomName,
+                //     createdAt)
+                
+            const CheckAlert = await Alert.findOne({ senderName: senderName ,guestName: guestName[i], roomName: roomName});
             
             if(!CheckAlert){
                 await Alert.create({
-                    guestName,
+                    guestName: guestName[i],
                     senderName,
                     roomName,
                     createdAt
                 });
+            }
                 const findUserAlertDB = await Alert.findOne({ senderName: senderName ,guestName: guestName, roomName: roomName});
                 findUserAlertDB.createdAt = timeForToday(createdAt);
                 const receiver = getUser(userId);
