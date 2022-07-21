@@ -50,8 +50,15 @@ module.exports = (server) => {
             }
         });
 
-        socket.on('disconnect', () => {
-            console.log('disconnected');
+        //소켓 연결해제
+        socket.on('disconnect', async() => {
+            const user = await Connect.findOne({ socketId: socket.id });
+            const createdAt = new Date();
+            if(user){
+                await Connect.updateOne({ socketId: socket.id },
+                    {$set: { connected: false, connectedAt: createdAt }});
+            }
+
         });
     });
 };
