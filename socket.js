@@ -8,8 +8,6 @@ const Room = require('./models/room');
 // const UsersRoom = require('./models/usersRoom');
 const Alert = require('./models/alret.js');
 const Connect = require('./models/connect');
-const { isReadable } = require('nodemailer/lib/xoauth2');
-const { createImportSpecifier } = require('typescript');
 
 //soket cors 설정
 const app = express();
@@ -104,9 +102,12 @@ module.exports = (server) => {
                 });
                 const findUserAlertDB = await Alert.findOne({ senderName: senderName ,guestName: guestName[i], roomName: roomName});
                 findUserAlertDB.createdAt = timeForToday(createdAt);
-
+                console.log(findUserAlertDB);
+                console.log(findUserAlertDB.createdAt);
 
                 const receiver = getUser(guestName[i]);
+                console.log(receiver)
+                console.log(onlineUsers)
 
                 io.to(receiver.socketId).emit('newInviteDB',{
                     findUserAlertDB : [findUserAlertDB],
