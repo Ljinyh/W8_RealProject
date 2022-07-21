@@ -58,7 +58,7 @@ module.exports = (server) => {
                 await Connect.updateOne({ socketId: socket.id },
                     {$set: { connected: false, connectedAt: createdAt }});
             }
-
+            removeUser(socket.id);
         });
     });
 };
