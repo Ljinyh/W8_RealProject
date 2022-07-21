@@ -8,7 +8,7 @@ const Connect = require('./models/connect');
 module.exports = (server) => {
     const io = IO(server, {
         cors: {
-            origin: ['http://localhost:3000', 'https://weat.site'],
+            origin: '*',
         },
     });
 
@@ -48,6 +48,8 @@ module.exports = (server) => {
         //     }
         // });
 
-        socket.on('disconnect', () => {});
+        socket.on('disconnect', () => {
+            console.log('disconnected');
+        });
     });
 };
