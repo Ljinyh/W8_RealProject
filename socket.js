@@ -17,9 +17,9 @@ module.exports = (server) => {
     });
 
     let onlineUsers = [];
-    const addNewUser = (userId, socketId) => {
+    const addNewUser = (userId, nickname, socketId) => {
         !onlineUsers.some((user) => user.userId === userId) &&
-            onlineUsers.push({ userId, socketId });
+            onlineUsers.push({ userId, nickname ,socketId });
     };
 
     const removeUser = (socketId) => {
