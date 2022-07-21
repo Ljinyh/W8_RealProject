@@ -1,12 +1,13 @@
 const IO = require('socket.io');
+const http = require('./app');
 
 const User = require('./models/user');
 const Room = require('./models/room');
 const UsersRoom = require('./models/usersRoom');
 const Connect = require('./models/connect');
 
-module.exports = (server) => {
-    const io = IO(server, {
+module.exports = (http) => {
+    const io = IO(http, {
         cors: {
             origin: '*',
         },
