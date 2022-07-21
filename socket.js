@@ -6,7 +6,7 @@ const Room = require('./models/room');
 const UsersRoom = require('./models/usersRoom');
 const Connect = require('./models/connect');
 
-module.exports = (http) => {
+module.exports = () => {
     const io = IO(http, {
         cors: {
             origin: '*',
