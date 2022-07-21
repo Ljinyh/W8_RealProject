@@ -1,7 +1,7 @@
 const mongoose = require('mongoose');
 
 const alertSchema = mongoose.Schema({
-    gusetId: String,
+    guestId: String,
     senderName: String,
     roomName: String,
     createdAt: String,
