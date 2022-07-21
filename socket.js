@@ -1,5 +1,5 @@
 const IO = require('socket.io');
-const app = require('express');
+const {app} = require('express');
 const cors = require('cors')
 app.use(cors(cors));
 
