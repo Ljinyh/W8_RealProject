@@ -8,7 +8,7 @@ const Connect = require('./models/connect');
 module.exports = (server) => {
     const io = IO(server, {
         cors: {
-            origin: ['https://weat.site', 'http://localhost:3000'],
+            origin: ['http://localhost:3000', 'https://weat.site'],
         },
     });
 
@@ -46,6 +46,4 @@ module.exports = (server) => {
             }
         });
     });
-
-    io.listen(8080);
 };
