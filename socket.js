@@ -2,11 +2,15 @@ const IO = require('socket.io');
 const express = require('express');
 const cors = require('cors')
 
-// const User = require('./models/user');
-// const Room = require('./models/room');
+// 모듈 불러오기
+const User = require('./models/user');
+const Room = require('./models/room');
 // const UsersRoom = require('./models/usersRoom');
+const Alert = require('./models/alret.js');
 const Connect = require('./models/connect');
+const { isReadable } = require('nodemailer/lib/xoauth2');
 
+//soket cors 설정
 const app = express();
 app.use(cors(cors));
 module.exports = (server) => {
@@ -15,6 +19,8 @@ module.exports = (server) => {
             origin: '*',
         },
     });
+
+//===============================================================================================
 
     let onlineUsers = [];
     const addNewUser = (userId, nickname, socketId) => {
@@ -30,9 +36,35 @@ module.exports = (server) => {
         return onlineUsers.find((user) => user.userId === userId);
     };
 
+    // 알림 등록시간
+    function timeForToday(createdAt) {
+        const today = new Date();
+        const timeValue = new Date(createdAt);
+
+        const betweenTime = Math.floor(
+            (today.getTime() - timeValue.getTime()) / 1000 /60
+        ); // 분
+        
+        if(betweenTime < 1) return "방금 전"; // 1분미만이면 방금 전
+        if(betweenTime < 60) return `${betweenTime}분 전` // 60분 미만이면 n분 전
+
+        const betweenTimeHour = Math.floor(betweenTime / 60); // 시
+        if(betweenTimeHour < 24) return `${betweenTimeHour}시간 전` // 24시간 미만이면 n시간 전
+
+        const betweenTimeDay = Math.floor(betweenTime / 60 / 24); //일
+        if(betweenTimeDay < 7) return `${betweenTimeDay}일 전` // 7일 미만이면 n일 전
+        if(betweenTimeDay < 365) return `${timeValue.getMonth() +1}월 ${timeValue.getDate()}일` //365일 미만이면 년을 제외하고 월 일만
+
+        return `${timeValue.getFullYear()}년 ${timeValue.getMonth() +1}월 ${timeValue.getDate()}일` // 365일 이상이면 년 월 일
+    }
+
+//===============================================================================================
+
+    // 소켓 시작
     io.on('connection', (socket) => {
         io.emit('firstEvent', '소켓 연결 성공!');
 
+        //소켓 연결 시 Connect에 저장 및 연결상태 나타내기
         socket.on('newUser', async({ userId, nickname }) => {
             if (userId !== undefined) {
                 addNewUser(userId, nickname, socket.id);
@@ -47,6 +79,35 @@ module.exports = (server) => {
                 }, { upsert: true });
 
                 await Connect.findOne({ userId: userId });
+            }
+        });
+
+        socket.on('inviteMember', async({userId, guestName, roomId}) => {
+            const findUser = await User.findById(userId);
+            const findRoom = await Room.findById(roomId);
+            const roomName = findRoom.roomName;
+            const senderName = findUser.nickname;
+            const createdAt = new Date();
+            
+
+            const CheckAlert = await Alert.findOne({ senderName: senderName ,guestName: guestName, roomName: roomName});
+            
+            if(!CheckAlert){
+                await Alert.create({
+                    guestName,
+                    senderName,
+                    roomName,
+                    createdAt
+                });
+                const findUserAlertDB = await Alert.findOne({ senderName: senderName ,guestName: guestName, roomName: roomName});
+                findUserAlertDB.createdAt = timeForToday(createdAt);
+                const receiver = getUser(userId);
+                io.to(receiver.socketId).emit('newInviteDB',{
+                    findUserAlertDB : [findUserAlertDB],
+                });
+            } else {
+                socket.emit("errorMessage", "이미 초대한 가족입니다.");
+                return;
             }
         });
 
