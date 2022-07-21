@@ -82,7 +82,7 @@ module.exports = (server) => {
             }
         });
 
-        socket.on('inviteMember', async({userId, gusetId , roomId}) => {
+        socket.on('inviteMember', async({userId, gusetId, roomId}) => {
             const findUser = await User.findById(userId);
             const findRoom = await Room.findById(roomId);
             const roomName = findRoom.roomName;
