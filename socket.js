@@ -32,8 +32,8 @@ module.exports = (server) => {
         onlineUsers = onlineUsers.filter((user) => user.socketId !== socketId);
     };
 
-    const getUser = (nickname) => {
-        return onlineUsers.find((user) => user.nickname === nickname);
+    const getUser = (userId) => {
+        return onlineUsers.find((user) => user.userId === userId);
     };
 
     // 알림 등록시간
@@ -82,7 +82,7 @@ module.exports = (server) => {
             }
         });
 
-        socket.on('inviteMember', async({userId, guestName, roomId}) => {
+        socket.on('inviteMember', async({userId, gusetId , roomId}) => {
             const findUser = await User.findById(userId);
             const findRoom = await Room.findById(roomId);
             const roomName = findRoom.roomName;
@@ -91,21 +91,21 @@ module.exports = (server) => {
 
             for(let i=0; i<guestName.length; i++){
                 
-            const CheckAlert = await Alert.findOne({ senderName: senderName ,guestName: guestName[i], roomName: roomName});
+            const CheckAlert = await Alert.findOne({ senderName: senderName ,gusetId: gusetId[i], roomName: roomName});
     
             if(!CheckAlert){
                 await Alert.create({
-                    guestName: guestName[i],
+                    gusetId: gusetId[i],
                     senderName,
                     roomName,
                     createdAt
                 });
-                const findUserAlertDB = await Alert.findOne({ senderName: senderName ,guestName: guestName[i], roomName: roomName});
+                const findUserAlertDB = await Alert.findOne({ senderName: senderName ,gusetId: gusetId[i], roomName: roomName});
                 findUserAlertDB.createdAt = timeForToday(createdAt);
                 console.log(findUserAlertDB);
                 console.log(findUserAlertDB.createdAt);
 
-                const receiver = getUser(guestName[i]);
+                const receiver = getUser(gusetId[i]);
                 console.log(receiver)
                 console.log(onlineUsers)
 
