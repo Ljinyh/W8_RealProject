@@ -1,7 +1,10 @@
 //Server
 const app = require('./app'); // app.js에서 http 객체 가져오기
 const port = require('./config/port.json');
+const Socket = require('./socket');
 
-app.listen(port.port, () => {
+const server = app.listen(port.port, () => {
     console.log(port.port, '포트로 서버가 켜졌어요!');
 });
+
+Socket(server);
