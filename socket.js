@@ -32,8 +32,8 @@ module.exports = (server) => {
         onlineUsers = onlineUsers.filter((user) => user.socketId !== socketId);
     };
 
-    const getUser = (userId) => {
-        return onlineUsers.find((user) => user.userId === userId);
+    const getUser = (nickname) => {
+        return onlineUsers.find((user) => user.nickname === nickname);
     };
 
     // 알림 등록시간
