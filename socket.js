@@ -103,11 +103,9 @@ module.exports = (server) => {
                 const findUserAlertDB = await Alert.findOne({ senderName: senderName ,guestName: guestName[i], roomName: roomName});
                 findUserAlertDB.createdAt = timeForToday(createdAt);
                 
-                const receivers = findUserAlertDB.guestName;
-                const user = await Connect.findOne({guestName: receivers});
-                const receiver = getUser(user.socketId);
+                const receiver = getUser(guestName);
 
-                io.to(receiver).emit('newInviteDB',{
+                io.to(receiver.socketId).emit('newInviteDB',{
                     findUserAlertDB : [findUserAlertDB],
                 });
             } else {
