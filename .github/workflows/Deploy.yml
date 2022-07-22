@@ -22,14 +22,13 @@ jobs:
         uses: actions/setup-node@v2
         with:
           node-version: ${{ matrix.node-version }}
-
-      - name: Check Npm -v
-        run: npm -v
+          
+      - run: cd W8_RealProject
+      
+      - run : npm install
 
       - name: build server files
-        working-directory: ./
-        run: |
-          npm run build
+        run: npm run build
           
       - name: AWS configure credentials
         uses: aws-actions/configure-aws-credentials@v1
