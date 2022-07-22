@@ -98,4 +98,5 @@ dist
 # TernJS port file
 .tern-port
 
-# email config
+# env config
+.env
