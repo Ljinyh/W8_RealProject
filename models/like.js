@@ -6,9 +6,9 @@ const LikeSchema = new mongoose.Schema({
     menuId: String,
     category: String,
 });
-RoomSchema.virtual('likeId').get(function () {
+LikeSchema.virtual('likeId').get(function () {
     return this._id.toHexString();
 });
-RoomSchema.set('toJSON', { virtuals: true });
+LikeSchema.set('toJSON', { virtuals: true });
 
 module.exports = mongoose.model('Like', LikeSchema);
