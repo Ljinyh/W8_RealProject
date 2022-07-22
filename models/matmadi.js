@@ -8,9 +8,9 @@ const MatmadiSchema = new mongoose.Schema({
     imgURL: [String],
     createdAt: Date,
 });
-RoomSchema.virtual('madiId').get(function() {
+MatmadiSchema.virtual('madiId').get(function() {
     return this._id.toHexString();
 });
-RoomSchema.set('toJSON', { virtuals: true });
+MatmadiSchema.set('toJSON', { virtuals: true });
 
 module.exports = mongoose.model('Matmadi', MatmadiSchema);
