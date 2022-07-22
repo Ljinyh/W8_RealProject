@@ -3,6 +3,7 @@ const User = require('../models/user');
 const Savelist = require('../models/savelist');
 const Store = require('../models/store');
 const UsersRoom = require('../models/usersRoom');
+const { findUser } = require('./roomController');
 
 module.exports = {
     // 지도에 맛집 보여주기 (현재 위치기반 검색)
@@ -198,8 +199,31 @@ module.exports = {
     },
     // 특정 맛방의 맛집 태그 아이콘
     roomTagIcon: async (req, res) => {
+        const { userId } = res.locals.user;
+        const { roomId } = req.params;
         try {
-            return res.status(200).send({ result: true, message: ' ' });
+            //
+            const findStoreList = await Savelist.find({ roomId });
+            //console.log(findStoreList[0].userId);
+
+            // 맛방에 등록된 맛집리스트 찾기
+            const findUserIcon = [];
+            const findStoreInfo = []
+            for (let i = 0; i < findStoreList.length; i++){
+                //console.log(findStoreList[i].userId)
+                let mo = await Store.findById(findStoreList[i].storeId)
+                let me = await User.findById(findStoreList[i].userId)
+                findUserIcon.push(me)
+                findStoreInfo.push(mo)
+            }
+            
+            const result = findStoreList.map((a, idx) => ({
+                storeId: a.storeId,
+                LatLon : findStoreInfo[idx].LatLon,
+                faceColor: findUserIcon[idx].faceColor,
+                eyes : findUserIcon[idx].eyes
+            }))
+            return res.status(200).send({ result: result, message: ' ' });
         } catch (err) {
             console.log(err);
             res.status(400).send({ result: false, message: ' ' });

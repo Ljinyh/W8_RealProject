@@ -16,7 +16,7 @@ router.get('/:storeId', authMiddleware, storeController.detailStore)
 router.get('/', authMiddleware, storeController.allMatBang)
 
 // 특정 맛방의 맛집 태그 아이콘
-router.get('/:roomId', authMiddleware, storeController.roomTagIcon)
+router.get('/:roomId/tagicon', authMiddleware, storeController.roomTagIcon)
 
 // 맛마디 전체 조회
 router.get('/:storeId/matmadi', authMiddleware, storeController.allMatmadi)
