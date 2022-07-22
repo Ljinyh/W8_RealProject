@@ -2,6 +2,7 @@ const Room = require('../models/room');
 const User = require('../models/user');
 const Savelist = require('../models/savelist');
 const Store = require('../models/store');
+const UsersRoom = require('../models/usersRoom');
 
 module.exports = {
     // 지도에 맛집 보여주기 (현재 위치기반 검색)
@@ -122,10 +123,74 @@ module.exports = {
             });
         }
     },
-    // 사용자의 맛방 목록 조회 (내가 소속된 맛방 별로 검색)
+    // 사용자의 맛방 목록 조회 (내가 소속된 맛방 별로 검색) // 맛방에 등록된 맛집 수
     allMatBang: async (req, res) => {
+        const { userId } = res.locals.user;
         try {
-            return res.status(200).send({ result: true, message: ' ' });
+            //userRoom 데이터 테이블에서 찾기
+            const existRoom = await UsersRoom.findOne({
+                userId: userId,
+            }).exec();
+            // userId, roomSeq : [kdskd,skdks,skdk]
+
+            if (!existRoom) {
+                return res.status(200).send({
+                    result: true,
+                    total: 0,
+                    myRooms: [],
+                    Message: '사용자의 방이 존재하지 않습니다',
+                });
+            }
+
+            // roomSeq로 RoomDB에서 정보찾기. 배열로 생성
+            const arrTheRoom = [];
+            const storeNum = [];
+            for (i = 0; i < existRoom.roomSeq.length; i++) {
+                roomInfo = await Room.findById(existRoom.roomSeq[i]);
+                allStorelist = await Savelist.find({
+                    roomId: existRoom.roomSeq[i],
+                });
+                arrTheRoom.push(roomInfo);
+                storeNum.push(allStorelist.length);
+            }
+
+            // 방 목록 배열에, 조건에 해당하는 status 키값 집어넣기
+            let status = '';
+            const myroom = [];
+            for (let i = 0; i < arrTheRoom.length; i++) {
+                const name = arrTheRoom[i];
+
+                const ownerCheck = name.ownerId === userId;
+                const guestCheck = name.guestId.includes(userId);
+                const guestNumCheck = name.guestId.length;
+
+                if (ownerCheck && guestNumCheck === 0) {
+                    status = 'private';
+                } else if (!ownerCheck && guestCheck) {
+                    status = 'publicGuest';
+                } else if (ownerCheck && !guestCheck) {
+                    status = 'publicOwner';
+                }
+                myroom.push(status);
+            }
+
+            const result = arrTheRoom.map((room, idx) => ({
+                roomId: room.roomId,
+                roomName: room.roomName,
+                emoji: room.emoji,
+                ownerId: room.ownerId,
+                guestId: room.guestId,
+                memberNum: room.guestId.length + 1,
+                status: myroom[idx],
+                roomCode: room.roomCode,
+                storeNum: storeNum[idx],
+            }));
+
+            res.status(200).send({
+                result: true,
+                total: existRoom.roomSeq.length,
+                myRooms: result,
+            });
         } catch (err) {
             console.log(err);
             res.status(400).send({ result: false, message: ' ' });
