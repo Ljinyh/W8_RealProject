@@ -1,14 +1,14 @@
 const passport = require('passport');
 const naverStrategy = require('passport-naver').Strategy;
 const User = require('../models/user');
-const NAVER = require('../config/socialConfig.json');
+require("dotenv").config();
 
 module.exports = () => {
     passport.use(
         new naverStrategy({
-                clientID: NAVER.NAVER_ID,
-                clientSecret: NAVER.NAVER_PASS,
-                callbackURL: NAVER.NAVER_CALLBACK_URL,
+                clientID: process.env.NAVER_ID,
+                clientSecret: process.env.NAVER_PASS,
+                callbackURL: process.env.NAVER_CALLBACK_URL,
             },
 
             async(accessToken, refreshToken, profile, done) => {

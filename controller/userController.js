@@ -3,8 +3,9 @@ const userDB = require('../models/user');
 const Joi = require('joi');
 const bcrypt = require('bcrypt');
 const mailer = require('../models/mail');
-const secret = require('../config/secret.json');
+//const secret = require('../config/secret.json');
 const User = require('../models/user');
+require("dotenv").config();
 // const send_message = require('../module/sms'); //sms module
 
 require('dotenv').config();
@@ -221,7 +222,7 @@ exports.login = async(req, res) => {
         }
 
         //비밀번호까지 맞다면 토큰을 생성하기.
-        const token = jwt.sign({ userId: user.userId }, secret.SECRET_KEY, {
+        const token = jwt.sign({ userId: user.userId }, process.env.SECRET_KEY, {
             expiresIn: '3d',
         });
         res.status(200).send({

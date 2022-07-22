@@ -1,13 +1,13 @@
 const passport = require('passport');
 const KakaoStrategy = require('passport-kakao').Strategy;
 const User = require('../models/user');
-const KAKAO = require('../config/socialConfig.json');
+require("dotenv").config()
 
 module.exports = () => {
     passport.use(
         new KakaoStrategy({
-                clientID: KAKAO.KAKAO_ID,
-                callbackURL: KAKAO.KAKAO_CALLBACK_URL,
+                clientID: process.env.KAKAO_ID,
+                callbackURL: process.env.KAKAO_CALLBACK_URL,
             },
 
             async(accessToken, refreshToken, profile, done) => {
