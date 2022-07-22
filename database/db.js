@@ -1,5 +1,4 @@
 const mongoose = require('mongoose');
-const Mongo = require('../config/mongodb.json');
 require("dotenv").config();
 
 function connectDB() {
