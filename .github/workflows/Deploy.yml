@@ -1,27 +1,38 @@
-name: Deploy
 on:
   push:
     branches: main
 jobs:
-  build:
-    runs-on: ubuntu-latest
+  deploy:
+    name: Deploy
+    runs-on: ubuntu-18.04
+    environment: production
+    
     steps:
-      - name: Checkout source code.
-        uses: actions/checkout@master
-        with:
+    - name: Checkout
+      uses: actions/checkout@v3
+      with:
           ref: main
 
-      - name: Install Dependencies
-        run: |
-          npm install
-
-      - name: Configure AWS Credentials
-        uses: aws-actions/configure-aws-credentials@v1
-        with:
+    - name: Configure AWS Credentials
+      uses: aws-actions/configure-aws-credentials@v1
+      with:
           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region: ap-northeast-2
+          
+    - name: Cache node modules
+      uses: actions/cache@v1
+      with:
+        path: node_modules
+        key: ${{ runner.OS }}-build-${{ hashFiles('**/package-lock.json') }}
+        restore-keys: |
+          ${{ runner.OS }}-build-
+          ${{ runner.OS }}-
+    - name: Install Dependencies   
+      run: npm install
+    - name: Build               
+      run: npm run build
 
-      - name: Deploy server.js app
-        run: |
+    - name: Deploy server.js app
+      run: |
           sudo pm2 restart server
