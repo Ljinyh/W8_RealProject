@@ -37,11 +37,4 @@ jobs:
           aws-region: ap-northeast-2
 
       - name: upload to S3
-        run: aws s3 cp --region ap-northeast-2 ./w8.zip s3://w8codepipline/deploy/
-
-      - name: deploy with AWS codeDeploy
-        run: aws deploy create-deployment
-          --application-name hous-codedeploy
-          --deployment-config-name CodeDeployDefault.OneAtATime
-          --deployment-group-name GROUP
-          --s3-location bucket=w8codepipline,bundleType=zip,key=deploy/w8.zip
+        run: aws s3 cp --region ap-northeast-2 ./w8codepipline/
