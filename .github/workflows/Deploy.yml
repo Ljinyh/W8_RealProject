@@ -24,4 +24,4 @@ jobs:
 
       - name: Deploy server.js app
         run: |
-          npm run deploy
+          sudo pm2 restart server
