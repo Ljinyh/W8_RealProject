@@ -22,12 +22,6 @@ jobs:
         uses: actions/setup-node@v2
         with:
           node-version: ${{ matrix.node-version }}
-
-      - run : npm install
-
-      - name: build server files
-        working-directory: ./
-        run: npm run build
           
       - name: AWS configure credentials
         uses: aws-actions/configure-aws-credentials@v1
@@ -35,6 +29,9 @@ jobs:
           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region: ap-northeast-2
-          
-      - name : pm2 start
-        run: sudo pm2 restart server
+
+      - name: server start
+        run : |
+          ssh -i "${{ secrets.AWS_PRIVATE_KEY}}" ${{ secrets.HOST}}
+          cd W8_RealProject
+          sudo pm2 start server
