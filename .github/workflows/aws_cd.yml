@@ -9,9 +9,18 @@ jobs:
     name: Deploy to EC2
     runs-on: ubuntu-18.04
     
-    steps:
-    - name: Checkout the files
-      uses: actions/checkout@v2
+    steps:    
+    - name: Checkout
+      uses: actions/checkout@v3
+
+    - name: Configure AWS credentials
+      uses: aws-actions/configure-aws-credentials@v1
+      with:
+        SSH_PRIVATE_KEY: ${ { secrets.AWS_PRIVATE_KEY }}
+        REMOTE_HOST: ${ { secrets.HOST }}
+        REMOTE_USER: ${ { secrets.USERNAME }}
+        aws-region: ${{ env.AWS_REGION }}
+
       
     - name: Cache node modules  # node modules 캐싱
       uses: actions/cache@v1
@@ -22,12 +31,5 @@ jobs:
             ${{ runner.OS }}-build-
             ${{ runner.OS }}-
             
-    - name: Deploy to Server 1
-      uses: easingthemes/ssh-deploy@main
-      env:
-        SSH_PRIVATE_KEY: ${ { secrets.AWS_PRIVATE_KEY }}
-        REMOTE_HOST: ${ { secrets.HOST }}
-        REMOTE_USER: ${ { secrets.USERNAME }}
-        
     - run: npm install
     - run: sudo pm2 restart server
