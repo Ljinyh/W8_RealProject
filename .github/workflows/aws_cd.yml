@@ -7,11 +7,26 @@ on:
 jobs:
   deploy:
     name: Deploy to EC2
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-18.04
     
     steps:
     - name: Checkout the files
       uses: actions/checkout@v2
+      
+    - name: Cache node modules  # node modules 캐싱
+      uses: actions/cache@v1
+      with:
+          path: node_modules
+          key: ${{ runner.OS }}-master-build-${{ hashFiles('**/yarn.lock') }}
+          restore-keys: |
+            ${{ runner.OS }}-build-
+            ${{ runner.OS }}-
+
+    - name: Install Dependencies # node module install
+      run: npm
+
+    - name: Build # project build
+      run: npm build
       
     - name: Deploy to Server 1
       uses: easingthemes/ssh-deploy@main
