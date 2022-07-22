@@ -1,5 +1,6 @@
 const nodemailer = require('nodemailer');
-const senderInfo = require('../config/senderInfo.json');
+//const senderInfo = require('../config/senderInfo.json');
+require("dotenv").config();
 
 const mailSender = {
     sendEmail: function(param) {
@@ -10,13 +11,13 @@ const mailSender = {
             secure: false,
             requireTLS: true,
             auth: {
-                user: senderInfo.user, // 보내는 메일의 주소
-                pass: senderInfo.pass, // 보내는 메일의 비밀번호
+                user: process.env.USER, // 보내는 메일의 주소
+                pass: process.env.PASS, // 보내는 메일의 비밀번호
             },
         });
         // 메일 옵션
         const mailOptions = {
-            from: senderInfo.user, // 보내는 메일의 주소
+            from: process.env.USER, // 보내는 메일의 주소
             to: param.toEmail, // 수신할 이메일
             subject: param.subject, // 메일 제목
             text: param.text, // 메일 내용

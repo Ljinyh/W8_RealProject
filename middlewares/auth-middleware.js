@@ -1,6 +1,7 @@
 const jwt = require('jsonwebtoken');
 const userDB = require('../models/user');
-const secret = require('../config/secret.json');
+//const secret = require('../config/secret.json');
+require("dotenv").config();
 
 module.exports = async(req, res, next) => {
     const { authorization } = req.headers;
@@ -13,7 +14,7 @@ module.exports = async(req, res, next) => {
         return;
     }
     try {
-        const { userId } = jwt.verify(tokenValue, secret.SECRET_KEY);
+        const { userId } = jwt.verify(tokenValue, process.env.SECRET_KEY);
 
         const user = await userDB.findById(userId);
 

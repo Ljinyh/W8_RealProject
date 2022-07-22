@@ -2,7 +2,7 @@
 /*
 const axios = require('axios');
 const CryptoJS = require('crypto-js');
-const config = require('../config/SMSservice.json');
+require("dotenv").config();
 
 function send_message(authNum, phoneNum) {
     const auth_Num = authNum;
@@ -11,10 +11,10 @@ function send_message(authNum, phoneNum) {
     const date = Date.now().toString();
 
     // 환경변수로 저장했던 중요한 정보들
-    const serviceId = config.SMS_SERVICE_ID;
-    const secretKey = config.SMS_SECRET_KEY;
-    const accessKey = config.SMS_ACCESS_KEY_ID;
-    const my_number = config.SMS_MYNUM;
+    const serviceId = process.env.SMS_SERVICE_ID;
+    const secretKey = process.env.SMS_SECRET_KEY;
+    const accessKey = process.env.SMS_ACCESS_KEY_ID;
+    const my_number = process.env.SMS_MYNUM;
 
     // 그 외 url 관련
     const method = 'POST';

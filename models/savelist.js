@@ -4,12 +4,6 @@ const SaveListSchema = new mongoose.Schema({
     userId: String,
     roomId: String,
     storeId: String,
-    comment: String,
-    imgURL: [String],
-    star: Number,
-    price: String,
-    tag: [String],
-    recommendMenu : [String],
     createdAt: Date,
 });
 SaveListSchema.virtual('saveId').get(function() {
