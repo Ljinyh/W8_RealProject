@@ -32,6 +32,7 @@ jobs:
 
       - name: server start
         run : |
-          ssh -i "${{ secrets.AWS_PRIVATE_KEY}}" ${{ secrets.HOST}}
+          echo "$PRIVATE_KEY" > private_key
+          ssh -i private_key ${{ secrets.HOST}}
           cd W8_RealProject
           sudo pm2 start server
