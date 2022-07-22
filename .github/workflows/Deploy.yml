@@ -32,6 +32,6 @@ jobs:
 
       - name: server start
         run : |
-          ssh -i "/c/Users/User/Downloads/${{ secrets.AWS_PRIVATE_KEY}}" ubuntu@ec2-43-200-21-225.ap-northeast-2.compute.amazonaws.com
+          ssh -i "${{ secrets.AWS_PRIVATE_KEY}}" ubuntu@ec2-43-200-21-225.ap-northeast-2.compute.amazonaws.com
           cd W8_RealProject
           sudo pm2 start server
