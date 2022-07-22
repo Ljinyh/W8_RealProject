@@ -51,7 +51,7 @@ app.use(helmet());
 // ============================
 // 최상위 URL
 app.get('/', (req, res) => {
-    res.send('Backend Server');
+    res.send('Hello! This is Backend Server');
 });
 
 // ============================
