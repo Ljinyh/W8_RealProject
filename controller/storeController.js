@@ -38,6 +38,35 @@ module.exports = {
             });
         }
     },
+    // 맛방에 맛집 저장
+    saveStore: async (req, res) => {
+        const { userId } = res.locals.user;
+        const { storeId, selectedRooms } = req.body;
+        try {
+            for (let i = 0; i < selectedRooms.length; i++) {
+                const theRoom = await Room.findById(selectedRooms[i]).exec();
+
+                const existSavelist = await Savelist.findOne({
+                    storeId,
+                    roomId: selectedRooms[i],
+                });
+                if (existSavelist) {
+                    return res.status(400).send({
+                        errorMessage: '이미 맛방에 저장되어 있는 맛집입니다.',
+                    });
+                }
+                Savelist.create({
+                    userId,
+                    roomId: selectedRooms[i],
+                    storeId,
+                    createdAt: Date.now(),
+                });
+            }
+        } catch (err) {
+            console.log(err);
+            res.status(400).send({ result: false, message: '맛집 기록 실패' });
+        }
+    },
 
     // 맛집 생성 (첫 기록하기), 방장의 맛방에 맛집 추가까지
     createStore: async (req, res) => {
@@ -199,7 +228,6 @@ module.exports = {
     },
     // 특정 맛방의 맛집 태그 아이콘
     roomTagIcon: async (req, res) => {
-        const { userId } = res.locals.user;
         const { roomId } = req.params;
         try {
             //
@@ -208,21 +236,21 @@ module.exports = {
 
             // 맛방에 등록된 맛집리스트 찾기
             const findUserIcon = [];
-            const findStoreInfo = []
-            for (let i = 0; i < findStoreList.length; i++){
+            const findStoreInfo = [];
+            for (let i = 0; i < findStoreList.length; i++) {
                 //console.log(findStoreList[i].userId)
-                let mo = await Store.findById(findStoreList[i].storeId)
-                let me = await User.findById(findStoreList[i].userId)
-                findUserIcon.push(me)
-                findStoreInfo.push(mo)
+                let stores = await Store.findById(findStoreList[i].storeId);
+                let users = await User.findById(findStoreList[i].userId);
+                findStoreInfo.push(stores);
+                findUserIcon.push(users);
             }
-            
+
             const result = findStoreList.map((a, idx) => ({
                 storeId: a.storeId,
-                LatLon : findStoreInfo[idx].LatLon,
+                LatLon: findStoreInfo[idx].LatLon,
                 faceColor: findUserIcon[idx].faceColor,
-                eyes : findUserIcon[idx].eyes
-            }))
+                eyes: findUserIcon[idx].eyes,
+            }));
             return res.status(200).send({ result: result, message: ' ' });
         } catch (err) {
             console.log(err);
@@ -232,6 +260,7 @@ module.exports = {
     // 맛마디 전체 조회
     allMatmadi: async (req, res) => {
         try {
+            
             return res.status(200).send({ result: true, message: ' ' });
         } catch (err) {
             console.log(err);
