@@ -32,7 +32,6 @@ jobs:
 
       - name: server start
         run : |
-          echo "$PRIVATE_KEY" > private_key
-          ssh -i private_key ${{ secrets.HOST}}
+          ssh -i "/c/Users/User/Downloads/8W_RealProject.pem" ubuntu@ec2-43-200-21-225.ap-northeast-2.compute.amazonaws.com
           cd W8_RealProject
           sudo pm2 start server
