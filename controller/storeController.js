@@ -70,8 +70,16 @@ module.exports = {
                         createdAt: Date.now(),
                     });
                 }
-                //savelist에서 선택된 roomId가 있는지 없는지 찾고. 있으면 놔두고 없으면 생성하고, 선택되지않은 애는 삭제하고.
+            } 
+            //선택된 룸ID 유저의 savelist중 스토어 아이디를 갖고있는 roomId?
+             //savelist에서 선택된 roomId가 있는지 없는지 찾고. 있으면 놔두고 없으면 생성하고, 선택되지않은 애는 삭제하고.
+            const findExistSavelist = await Savelist.find(storeId, userId)
+            for(let i=0; i<findExistSavelist.length; i++){
+                if(!selectedRooms.includes(findExistSavelist[i].roomId)){
+                    await Savelist.findByIdAndDelete(findExistSavelist[i]) //이거 작동하는지 확인해야함. saveId로 참조해야하는거같은데.
+                }
             }
+
             res.status(200).send({
                 result: true,
                 message: '맛방에 맛집 저장 완료',
