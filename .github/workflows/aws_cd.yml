@@ -21,10 +21,7 @@ jobs:
           restore-keys: |
             ${{ runner.OS }}-build-
             ${{ runner.OS }}-
-
-    - name: Build # project build
-      run: npm build
-      
+            
     - name: Deploy to Server 1
       uses: easingthemes/ssh-deploy@main
       env:
