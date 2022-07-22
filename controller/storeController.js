@@ -3,7 +3,7 @@ const User = require('../models/user');
 const Savelist = require('../models/savelist');
 const Store = require('../models/store');
 const UsersRoom = require('../models/usersRoom');
-const { findUser } = require('./roomController');
+const Matmadi = require('../models/matmadi');
 
 module.exports = {
     // 지도에 맛집 보여주기 (현재 위치기반 검색)
@@ -38,30 +38,44 @@ module.exports = {
             });
         }
     },
-    // 맛방에 맛집 저장
+    // 맛방에 맛집 저장 - 이미 선택된 맛방도 다시 중복으로 들어옴. 에러를 내면 안되고 그냥 넘어가면됨. 이미 선택된 맛방이 선택되지 않았을때는 savelist에서 제거해야함.
     saveStore: async (req, res) => {
         const { userId } = res.locals.user;
         const { storeId, selectedRooms } = req.body;
         try {
+            // 존재하는 맛집 id인지 확인
+            const theStore = await Store.findById(storeId).exec();
+            if(!theStore){
+                return res.status(400).send({
+                    errorMessage: '존재하지 않는 맛집입니다.',
+                });
+            }
+            // roomId가 여러개 들어옴. roomId 별로 savelist에 저장
             for (let i = 0; i < selectedRooms.length; i++) {
+                // 선택된 맛방이 존재하는 맛방인지 확인
                 const theRoom = await Room.findById(selectedRooms[i]).exec();
-
+                //roomId가 이미 savelistDB에 있는지 확인
                 const existSavelist = await Savelist.findOne({
                     storeId,
                     roomId: selectedRooms[i],
                 });
-                if (existSavelist) {
-                    return res.status(400).send({
-                        errorMessage: '이미 맛방에 저장되어 있는 맛집입니다.',
+                if (!theRoom) {
+                    res.status(400).send({ result: false, message: '존재하는 맛방이 아닙니다.' });
+                }
+                if (!existSavelist) {
+                    await Savelist.create({
+                        userId,
+                        roomId: selectedRooms[i],
+                        storeId,
+                        createdAt: Date.now(),
                     });
                 }
-                Savelist.create({
-                    userId,
-                    roomId: selectedRooms[i],
-                    storeId,
-                    createdAt: Date.now(),
-                });
+                //savelist에서 선택된 roomId가 있는지 없는지 찾고. 있으면 놔두고 없으면 생성하고, 선택되지않은 애는 삭제하고.
             }
+            res.status(200).send({
+                result: true,
+                message: '맛방에 맛집 저장 완료',
+            });
         } catch (err) {
             console.log(err);
             res.status(400).send({ result: false, message: '맛집 기록 실패' });
@@ -70,45 +84,47 @@ module.exports = {
 
     // 맛집 생성 (첫 기록하기), 방장의 맛방에 맛집 추가까지
     createStore: async (req, res) => {
-        const { user } = res.locals; // JWT 인증 정보
+        const { userId } = res.locals.user; // JWT 인증 정보
         const {
             storeName,
-            comment,
             address,
             LatLon,
             imgURL,
             tag,
             star,
+            comment,
             recommendMenu,
         } = req.body;
-        const { roomId } = req.params;
 
         try {
             // 정보를 가게 DB에 저장
             const save = await Store.create({
-                userId: user.userId,
+                userId,
                 storeName,
                 address,
-                imgURL,
                 LatLon,
                 mainTag: tag,
                 createdAt: Date.now(),
             });
 
-            // 방장이 보고있던 roomId를 가져와서 savelist에 저장
+            // roomId 배열을 savelist에 배열로 저장
             await Savelist.create({
-                userId: user.userId,
+                userId,
                 storeId: save.storeId,
-                imgURL: imgURL,
                 roomId,
+            });
+            // 맛마디 저장
+            await Matmadi.create({
+                userId,
                 comment,
                 star,
-                tag,
+                imgURL: imgURL,
                 recommendMenu,
                 createdAt: Date.now(),
             });
-            res.status(200).send({
+            await Menu.res.status(200).send({
                 result: true,
+                storeId: save.storeId,
             });
         } catch (err) {
             console.log(err);
@@ -259,8 +275,10 @@ module.exports = {
     },
     // 맛마디 전체 조회
     allMatmadi: async (req, res) => {
+        const { storeId } = req.params;
         try {
-            
+            const existMatmadi = await Mamadi.find(storeId).exec();
+
             return res.status(200).send({ result: true, message: ' ' });
         } catch (err) {
             console.log(err);
