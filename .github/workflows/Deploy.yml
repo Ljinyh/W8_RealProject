@@ -29,7 +29,6 @@ jobs:
       - name: build server files
         working-directory: ./
         run: |
-          npm
           npm run build
           
       - name: AWS configure credentials
