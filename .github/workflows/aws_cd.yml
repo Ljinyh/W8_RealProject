@@ -34,7 +34,6 @@ jobs:
         SSH_PRIVATE_KEY: ${ { secrets.AWS_PRIVATE_KEY }}
         REMOTE_HOST: ${ { secrets.HOST }}
         REMOTE_USER: ${ { secrets.USERNAME }}
-        TARGET: ${ { secrets.TARGET_DIR }}
         
     - run: npm install
     - run: sudo pm2 restart server
