@@ -165,7 +165,15 @@ socket.on('TheStore', async ({ roomId, userId, memberId, storeName }) => {
                     });
                 }
 
-                if (findAlertDB && findAlertDB.type === type) {
+                const TheAlertDB = await Alert.findOne({
+                    roomId: roomId,
+                    senderName: userId,
+                    userId: memberId[i],
+                    storeName: storeName,
+                    type: type,
+                }).exec();
+
+                if (TheAlertDB && TheAlertDB.type === type) {
                     console.log("들어오나")
                     findAlertDB.createdAt = timeForToday(createdAt);
                     const members = await getUser(memberId[i]);
