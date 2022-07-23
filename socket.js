@@ -141,6 +141,7 @@ module.exports = (server) => {
                 const roomName = findRoom.roomName;
                 const createdAt = new Date();
                 const type = '맛집등록';
+                console.log({'방찾기':findRoom})
 
                 for (let i = 0; i < memberId.length; i++) {
                     const findAlertDB = await Alert.findOne({
@@ -149,7 +150,7 @@ module.exports = (server) => {
                         userId: memberId[i],
                         type: type,
                     }).exec();
-
+                    
                     if (
                         !findAlertDB &&
                         findAlertDB.userId !== memberId[i] &&
@@ -170,13 +171,13 @@ module.exports = (server) => {
                         const members = getUser(memberId[i]);
 
                         io.to(members[i].socketId).emit('AddStore', {
-                            sender: user.nickname,
+                            senderName: user.nickname,
                             roomName,
                             type: findAlertDB.type,
                             roomId,
                         });
                     }
-                }
+                }console.log(findUserAlertDB)
             }
         });
 
