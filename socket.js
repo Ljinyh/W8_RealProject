@@ -151,7 +151,7 @@ socket.on('TheStore', async ({ roomId, userId, memberId }) => {
                     type: type,
                 }).exec();
 
-                if (!findAlertDB) {
+                if (!findAlertDB && findAlertDB === undefined) {
                     await Alert.create({
                         userId: memberId[i],
                         senderName: userId,
@@ -174,7 +174,6 @@ socket.on('TheStore', async ({ roomId, userId, memberId }) => {
                     });
                 }
             }
-            console.log('2',findAlertDB);
         }
     }
 });
