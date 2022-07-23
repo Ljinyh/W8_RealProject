@@ -12,6 +12,7 @@ const Connect = require('./models/connect');
 //soket cors 설정
 const app = express();
 app.use(cors(cors));
+
 module.exports = (server) => {
     const io = IO(server, {
         cors: { origin: '*' },
