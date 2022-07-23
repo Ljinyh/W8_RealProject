@@ -3,5 +3,5 @@ REPOSITORY=/home/ubuntu/W8_RealProject
 
 cd $REPOSITORY
 
-sudo npm
-sudo pm2 start server
+npm install
+sudo pm2 restart server
