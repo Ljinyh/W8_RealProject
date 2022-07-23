@@ -34,7 +34,7 @@ jobs:
         env:
           PRIVATE_KEY: ${{ secrets.AWS_PRIVATE_KEY  }}
           HOST : ${{ secrets.HOST}}
-          USER : ${{ secrests.USERNAME}}
+          USER : ${{ secrets.USERNAME}}
           
         run : |
           ssh -i "${PRIVATE_KEY}" ${USER}@${HOST}
