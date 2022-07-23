@@ -166,7 +166,7 @@ socket.on('TheStore', async ({ roomId, userId, memberId }) => {
                     findAlertDB.createdAt = timeForToday(createdAt);
                     const members = getUser(memberId[i]);
 
-                    io.to(members[i].socketId).emit('AddStore', {
+                    io.to(members.socketId).emit('AddStore', {
                         senderName: user.nickname,
                         roomName,
                         type: findAlertDB.type,
