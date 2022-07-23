@@ -34,9 +34,10 @@ jobs:
         env:
           PRIVATE_KEY: ${{ secrets.AWS_PRIVATE_KEY  }}
           HOST : ${{ secrets.HOST}}
+          USER : ${{ secrests.USERNAME}}
           
         run : |
-          ssh -i "${PRIVATE_KEY}" ${HOST}
+          ssh -i "${PRIVATE_KEY}" ${USER}@${HOST}
           cd W8_RealProject
           git pull
           sudo pm2 start server
