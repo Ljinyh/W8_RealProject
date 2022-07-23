@@ -44,6 +44,6 @@ jobs:
     - name: deploy with AWS codeDeploy
       run: aws deploy create-deployment
         --application-name W8_CD
-        --deployment-config-name CodeDeployDefault.OneAtATime
-        --deployment-group-name GROUP
+        --deployment-config-name CodeDeployDefault.AllAtOnce 
+        --deployment-group-name w8cd
         --s3-location bucket=w8codepipline,bundleType=zip,key=deploy/hous.zip
