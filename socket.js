@@ -135,14 +135,15 @@ socket.on('inviteMember', async ({ userId, guestName, roomId }) => {
 
 // 방에 맛집 추가 시 알림
 socket.on('TheStore', async ({ roomId, userId, memberId, storeName }) => {
-    console.log('맛집이름',storeName)
     if (roomId && userId) {
-        const findUser = await User.findById(userId);
-        const senderName = findUser.nickname;
-        const findRoom = await Room.findById(roomId).exec();
-        const roomName = findRoom.roomName;
         const createdAt = new Date();
         const type = '맛집등록';
+
+        const findUser = await User.findById(userId);
+        const senderName = findUser.nickname;
+
+        const findRoom = await Room.findById(roomId).exec();
+        const roomName = findRoom.roomName;
 
         for (let i = 0; i < memberId.length; i++) {
             if (findRoom) {
@@ -153,8 +154,8 @@ socket.on('TheStore', async ({ roomId, userId, memberId, storeName }) => {
                     storeName: storeName,
                     type: type,
                 }).exec();
-                console.log('2',findAlertDB)
-                if (!findAlertDB || findAlertDB === undefined || findAlertDB == null) {
+  
+                if (!findAlertDB) {
                     await Alert.create({
                         userId: memberId[i],
                         senderName: senderName,
