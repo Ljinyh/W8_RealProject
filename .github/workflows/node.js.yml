@@ -30,7 +30,7 @@ jobs:
     - run: npm run build --if-present
     
     - name: zip file
-      run: zip -r hous.zip ./controller ./database ./middlewares ./models ./passport ./router ./package.json ./package-lock.json ./app.js ./server.js ./socket.js ./prettierrc.js
+      run: zip -r hous.zip .github/workflows ./controller ./database ./middlewares ./models ./passport ./router ./package.json ./package-lock.json ./app.js ./server.js ./socket.js ./prettierrc.js
       
     - name: AWS configure credentials
       uses: aws-actions/configure-aws-credentials@v1
