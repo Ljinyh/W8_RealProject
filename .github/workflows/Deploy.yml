@@ -33,7 +33,7 @@ jobs:
       - name: server start
         env:
           PRIVATE_KEY: ${{ secrets.AWS_PRIVATE_KEY  }}
-          HOST_NAME : ${{ secrets.HOST}}
+          HOST : ${{ secrets.HOST}}
           
         run : |
           ssh -i "${PRIVATE_KEY}" ${HOST}
