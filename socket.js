@@ -134,7 +134,7 @@ socket.on('inviteMember', async ({ userId, guestName, roomId }) => {
 });
 
 // 방에 맛집 추가 시 알림
-socket.on('TheStore', async ({ roomId, userId, memberId }) => {
+socket.on('TheStore', async ({ roomId, userId, memberId, storeName }) => {
     if (roomId && userId) {
         const user = await getUser(userId);
         const findRoom = await Room.findById(roomId).exec();
@@ -148,6 +148,7 @@ socket.on('TheStore', async ({ roomId, userId, memberId }) => {
                     roomId: roomId,
                     senderName: userId,
                     userId: memberId[i],
+                    storeName: storeName,
                     type: type,
                 }).exec();
 
@@ -156,6 +157,7 @@ socket.on('TheStore', async ({ roomId, userId, memberId }) => {
                         userId: memberId[i],
                         senderName: userId,
                         roomName: roomName,
+                        storeName:storeName,
                         roomId: roomId,
                         type,
                         createdAt,
