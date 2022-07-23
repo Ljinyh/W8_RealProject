@@ -31,8 +31,13 @@ jobs:
           aws-region: ap-northeast-2
 
       - name: server start
+        env:
+          PRIVATE_KEY: ${{ secrets.AWS_PRIVATE_KEY  }}
+          HOST_NAME : ${{ secrets.HOST}}
         run : |
-          chmod 400 ${{ secrets.AWS_PRIVATE_KEY}}
-          ssh -i "${{ secrets.AWS_PRIVATE_KEY}}" ubuntu@ec2-43-200-21-225.ap-northeast-2.compute.amazonaws.com
+          echo "$PRIVATE_KEY" > private_key
+          chmod 600 private_key
+          ssh -i private_key ${HOST}
           cd W8_RealProject
+          git pull
           sudo pm2 start server
