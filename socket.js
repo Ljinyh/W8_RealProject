@@ -137,8 +137,8 @@ socket.on('inviteMember', async ({ userId, guestName, roomId }) => {
 socket.on('TheStore', async ({ roomId, userId, memberId, storeName }) => {
     console.log('맛집이름',storeName)
     if (roomId && userId) {
-        const user = await User.findById(userId);
-        const senderName = user.nickname;
+        const findUser = await User.findById(userId);
+        const senderName = findUser.nickname;
         const findRoom = await Room.findById(roomId).exec();
         const roomName = findRoom.roomName;
         const createdAt = new Date();
@@ -148,7 +148,7 @@ socket.on('TheStore', async ({ roomId, userId, memberId, storeName }) => {
             if (findRoom) {
                 const findAlertDB = await Alert.findOne({
                     roomId: roomId,
-                    senderName: userId,
+                    senderName: senderName,
                     userId: memberId[i],
                     storeName: storeName,
                     type: type,
@@ -157,7 +157,7 @@ socket.on('TheStore', async ({ roomId, userId, memberId, storeName }) => {
                 if (!findAlertDB || findAlertDB === undefined || findAlertDB == null) {
                     await Alert.create({
                         userId: memberId[i],
-                        senderName: userId,
+                        senderName: senderName,
                         roomName: roomName,
                         storeName:storeName,
                         roomId: roomId,
@@ -168,7 +168,7 @@ socket.on('TheStore', async ({ roomId, userId, memberId, storeName }) => {
 
                 const TheAlertDB = await Alert.findOne({
                     roomId: roomId,
-                    senderName: userId,
+                    senderName: senderName,
                     userId: memberId[i],
                     storeName: storeName,
                     type: type,
