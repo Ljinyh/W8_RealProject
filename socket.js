@@ -153,7 +153,7 @@ socket.on('TheStore', async ({ roomId, userId, memberId, storeName }) => {
                     type: type,
                 }).exec();
                 console.log('2',findAlertDB)
-                if (!findAlertDB && findAlertDB === undefined && findAlertDB === null) {
+                if (!findAlertDB || findAlertDB === undefined || findAlertDB === null) {
                     await Alert.create({
                         userId: memberId[i],
                         senderName: userId,
