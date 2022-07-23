@@ -17,7 +17,6 @@ jobs:
     strategy:
       matrix:
         node-version: [16.x]
-        # See supported Node.js release schedule at https://nodejs.org/en/about/releases/
 
     steps:
     - uses: actions/checkout@v3
@@ -30,7 +29,7 @@ jobs:
     - run: npm run build --if-present
     
     - name: zip file
-      run: zip -r hous.zip .github/workflows ./scripts ./controller ./database ./middlewares ./models ./passport ./router ./package.json ./package-lock.json ./app.js ./server.js ./socket.js ./prettierrc.js
+      run: zip -r hous.zip .github/workflows ./appspec.yml ./scripts ./controller ./database ./middlewares ./models ./passport ./router ./package.json ./package-lock.json ./app.js ./server.js ./socket.js ./prettierrc.js
       
     - name: AWS configure credentials
       uses: aws-actions/configure-aws-credentials@v1
