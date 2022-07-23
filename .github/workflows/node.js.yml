@@ -28,4 +28,22 @@ jobs:
         cache: 'npm'
     - run: npm ci
     - run: npm run build --if-present
+    
+    - name: zip file
+      run: zip -r hous.zip ./controller ./database ./middlewares ./models ./passport ./router ./package.json ./package-lock.json ./app.js ./server.js ./socket.js ./prettierrc.js
       
+    - name: AWS configure credentials
+      uses: aws-actions/configure-aws-credentials@v1
+      with:
+        aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+        aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+        aws-region: ap-northeast-2
+        
+    - name: upload to S3
+      run: aws s3 cp --region ap-northeast-2 ./hous.zip s3://w8codepipline/deploy/
+    - name: deploy with AWS codeDeploy
+      run: aws deploy create-deployment
+        --application-name W8_CD
+        --deployment-config-name CodeDeployDefault.OneAtATime
+        --deployment-group-name GROUP
+        --s3-location bucket=w8codepipline,bundleType=zip,key=deploy/hous.zip
