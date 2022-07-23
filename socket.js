@@ -136,7 +136,7 @@ socket.on('inviteMember', async ({ userId, guestName, roomId }) => {
 // 방에 맛집 추가 시 알림
 socket.on('TheStore', async ({ roomId, userId, memberId }) => {
     if (roomId && userId) {
-        const user = getUser(userId);
+        const user = await getUser(userId);
         const findRoom = await Room.findById(roomId).exec();
         const roomName = findRoom.roomName;
         const createdAt = new Date();
@@ -164,7 +164,7 @@ socket.on('TheStore', async ({ roomId, userId, memberId }) => {
 
                 if (findAlertDB && findAlertDB.type === type) {
                     findAlertDB.createdAt = timeForToday(createdAt);
-                    const members = getUser(memberId[i]);
+                    const members = await getUser(memberId[i]);
 
                     io.to(members.socketId).emit('AddStore', {
                         senderName: user.nickname,
