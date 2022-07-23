@@ -5,6 +5,7 @@ const alertSchema = mongoose.Schema({
     senderName: String,
     roomName: String,
     roomId: String,
+    storeName: String,
     type: String,
     createdAt: String,
 });
