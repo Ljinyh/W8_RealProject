@@ -135,6 +135,7 @@ socket.on('inviteMember', async ({ userId, guestName, roomId }) => {
 
 // 방에 맛집 추가 시 알림
 socket.on('TheStore', async ({ roomId, userId, memberId, storeName }) => {
+    console.log('맛집이름',storeName)
     if (roomId && userId) {
         const user = await getUser(userId);
         const findRoom = await Room.findById(roomId).exec();
@@ -151,7 +152,7 @@ socket.on('TheStore', async ({ roomId, userId, memberId, storeName }) => {
                     storeName: storeName,
                     type: type,
                 }).exec();
-
+                console.log('2',findAlertDB)
                 if (!findAlertDB && findAlertDB === undefined) {
                     await Alert.create({
                         userId: memberId[i],
@@ -165,6 +166,7 @@ socket.on('TheStore', async ({ roomId, userId, memberId, storeName }) => {
                 }
 
                 if (findAlertDB && findAlertDB.type === type) {
+                    console.log("들어오나")
                     findAlertDB.createdAt = timeForToday(createdAt);
                     const members = await getUser(memberId[i]);
 
