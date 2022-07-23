@@ -177,7 +177,7 @@ module.exports = (server) => {
                             roomId,
                         });
                     }
-                }console.log(findUserAlertDB)
+                }console.log(findAlertDB)
             }
         });
 
