@@ -212,7 +212,7 @@ socket.on('getAlert', async ({ receiverId }) => {
 
 //알림 삭제
 socket.on('delete', async (alertId) => {
-    console.log(Object.values(alertId))
+    alertId = Object.values(alertId)[0]
     await Alert.deleteOne({ _id: alertId });
 });
 
