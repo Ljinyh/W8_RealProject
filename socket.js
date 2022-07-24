@@ -212,7 +212,7 @@ socket.on('getAlert', async ({ receiverId }) => {
 
 //알림 삭제
 socket.on('delete', async (alertId) => {
-    await Alert.findByIdAndDelete({_id: alertId});
+    await Alert.findByIdAndDelete(alertId);
 });
 
 //로그아웃 시 연결 해제
