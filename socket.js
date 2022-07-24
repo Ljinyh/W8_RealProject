@@ -212,7 +212,8 @@ socket.on('getAlert', async ({ receiverId }) => {
 
 //알림 삭제
 socket.on('delete', async (alertId) => {
-    await Alert.findByIdAndDelete(alertId);
+    console.log(alertId)
+    await Alert.deleteOne({ _id: alertId });
 });
 
 //로그아웃 시 연결 해제
