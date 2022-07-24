@@ -4,6 +4,7 @@ const Savelist = require('../models/savelist');
 const Store = require('../models/store');
 const UsersRoom = require('../models/usersRoom');
 const Matmadi = require('../models/matmadi');
+const Like = require('../models/like');
 
 module.exports = {
     // 지도에 맛집 보여주기 (현재 위치기반 검색)
@@ -45,7 +46,7 @@ module.exports = {
         try {
             // 존재하는 맛집 id인지 확인
             const theStore = await Store.findById(storeId).exec();
-            if(!theStore){
+            if (!theStore) {
                 return res.status(400).send({
                     errorMessage: '존재하지 않는 맛집입니다.',
                 });
@@ -60,7 +61,10 @@ module.exports = {
                     roomId: selectedRooms[i],
                 });
                 if (!theRoom) {
-                    res.status(400).send({ result: false, message: '존재하는 맛방이 아닙니다.' });
+                    res.status(400).send({
+                        result: false,
+                        message: '존재하는 맛방이 아닙니다.',
+                    });
                 }
                 if (!existSavelist) {
                     await Savelist.create({
@@ -70,13 +74,13 @@ module.exports = {
                         createdAt: Date.now(),
                     });
                 }
-            } 
+            }
             //선택된 룸ID 유저의 savelist중 스토어 아이디를 갖고있는 roomId?
-             //savelist에서 선택된 roomId가 있는지 없는지 찾고. 있으면 놔두고 없으면 생성하고, 선택되지않은 애는 삭제하고.
-            const findExistSavelist = await Savelist.find(storeId, userId)
-            for(let i=0; i<findExistSavelist.length; i++){
-                if(!selectedRooms.includes(findExistSavelist[i].roomId)){
-                    await Savelist.findByIdAndDelete(findExistSavelist[i]) //이거 작동하는지 확인해야함. saveId로 참조해야하는거같은데.
+            //savelist에서 선택된 roomId가 있는지 없는지 찾고. 있으면 놔두고 없으면 생성하고, 선택되지않은 애는 삭제하고.
+            const findExistSavelist = await Savelist.find(storeId, userId);
+            for (let i = 0; i < findExistSavelist.length; i++) {
+                if (!selectedRooms.includes(findExistSavelist[i].roomId)) {
+                    await Savelist.findByIdAndDelete(findExistSavelist[i]); //이거 작동하는지 확인해야함. saveId로 참조해야하는거같은데.
                 }
             }
 
@@ -281,13 +285,84 @@ module.exports = {
             res.status(400).send({ result: false, message: ' ' });
         }
     },
+
+    // 리뷰 남기기 (맛마디)
+    writeMatmadi: async (req, res) => {
+        const { userId } = res.locals.user;
+        const { storeId } = req.params;
+        const {
+            comment,
+            star,
+            imgURL,
+            tagMenu,
+            tagTasty,
+            tagPoint,
+            ratingTasty,
+            ratingPrice,
+            ratingService,
+        } = req.body;
+        try {
+            const existMatmadi = await Matmadi.findOne({ userId, storeId });
+            if (existMatmadi) {
+                return res.status(400).send({
+                    result: false,
+                    message: '사용자가 이미 리뷰를 작성했습니다.',
+                });
+            }
+            await Matmadi.create({
+                storeId,
+                userId,
+                comment,
+                star,
+                imgURL,
+                tagMenu,
+                tagTasty,
+                tagPoint,
+                ratingTasty,
+                ratingPrice,
+                ratingService,
+                createdAt,
+            });
+            return res
+                .status(200)
+                .send({ result: true, message: '리뷰 작성 완료!' });
+        } catch (err) {
+            console.log(err);
+            res.status(400).send({ result: false, message: ' ' });
+        }
+    },
+
     // 맛마디 전체 조회
     allMatmadi: async (req, res) => {
         const { storeId } = req.params;
         try {
-            const existMatmadi = await Mamadi.find(storeId).exec();
+            const existMatmadi = await Matmadi.find(storeId).exec();
+            //리뷰별 좋아요 갯수 찾아서 배열에 넣음.
+            const likeNum = [];
+            for (i = 0; i < existMatmadi.length; i++) {
+                likes = await Like.find({ madiId: existMatmadi[i].madiId });
+                likeNum.push(likes.length);
+            }
+            // map 함수로 찾은 리뷰 데이터와 좋아요 개수 출력
+            const result = existMatmadi.map((a, idx) => ({
+                commentId: a.madiId,
+                imgURL: a.imgURL,
+                comment: a.comment,
+                star: a.star,
+                likeNum: likeNum[idx],
+                faceColor: a.faceColor,
+                eyes: a.eyes,
+            }));
 
-            return res.status(200).send({ result: true, message: ' ' });
+            return res
+                .status(200)
+                .send({
+                    // likeNum(좋아요) 많은 순서로 배열 정렬
+                    result: result.sort(
+                        (a, b) => parseFloat(a.likeNum) - parseFloat(b.likeNum)
+                    ),
+                    message: '리뷰 전체 조회 완료',
+                });
         } catch (err) {
             console.log(err);
             res.status(400).send({ result: false, message: ' ' });
@@ -347,15 +422,7 @@ module.exports = {
             res.status(400).send({ result: false, message: ' ' });
         }
     },
-    // 추천 메뉴 추가
-    addMenu: async (req, res) => {
-        try {
-            return res.status(200).send({ result: true, message: ' ' });
-        } catch (err) {
-            console.log(err);
-            res.status(400).send({ result: false, message: ' ' });
-        }
-    },
+    
     // 추천 메뉴 좋아요 토글
     likeMenu: async (req, res) => {
         try {
