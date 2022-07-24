@@ -21,6 +21,9 @@ router.get('/', authMiddleware, storeController.allMatBang);
 // 특정 맛방의 맛집 태그 아이콘
 router.get('/:roomId/tagicon', authMiddleware, storeController.roomTagIcon);
 
+// 리뷰 남기기 (맛마디)
+router.post('/:storeId/matmadi', authMiddleware, storeController.writeMatmadi);
+
 // 맛마디 전체 조회
 router.get('/:storeId/matmadi', authMiddleware, storeController.allMatmadi);
 
