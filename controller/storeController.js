@@ -354,15 +354,13 @@ module.exports = {
                 eyes: a.eyes,
             }));
 
-            return res
-                .status(200)
-                .send({
-                    // likeNum(좋아요) 많은 순서로 배열 정렬
-                    result: result.sort(
-                        (a, b) => parseFloat(a.likeNum) - parseFloat(b.likeNum)
-                    ),
-                    message: '리뷰 전체 조회 완료',
-                });
+            return res.status(200).send({
+                // likeNum(좋아요) 많은 순서로 배열 정렬
+                result: result.sort(
+                    (a, b) => parseFloat(a.likeNum) - parseFloat(b.likeNum)
+                ),
+                message: '리뷰 전체 조회 완료',
+            });
         } catch (err) {
             console.log(err);
             res.status(400).send({ result: false, message: ' ' });
@@ -370,22 +368,86 @@ module.exports = {
     },
     // 맛마디 상세 조회
     detailMatmadi: async (req, res) => {
+        const { madiId } = res.params;
         try {
-            return res.status(200).send({ result: true, message: ' ' });
+            const existMatmadi = await Matmadi.findById(madiId);
+            const author = await User.findById(existMatmadi.userId);
+            const likes = await Like.find({ madiId });
+            const result = {
+                imgURL: existMatmadi.imgURL,
+                comment: existMatmadi.comment,
+                star: existMatmadi.star,
+                likeNum: likes.length,
+                nickname: author.nickname,
+                faceColor: author.faceColor,
+                eyes: author.eyes,
+                createdAt: existMatmadi.createdAt,
+            };
+            return res
+                .status(200)
+                .send({ result: result, message: '리뷰 상세조회 완료' });
         } catch (err) {
             console.log(err);
-            res.status(400).send({ result: false, message: ' ' });
+            res.status(400).send({
+                result: false,
+                message: '리뷰 상세조회 실패',
+            });
         }
     },
     // 맛마디 수정
     updateMatmadi: async (req, res) => {
+        const { userId } = res.locals.user;
+        const { madiId } = res.params;
         try {
-            return res.status(200).send({ result: true, message: ' ' });
+            const existMatmadi = await Matmadi.findById(madiId);
+            if (userId !== existMatmadi.userId) {
+                return res.status(400).send({
+                    result: false,
+                    message: '사용자 작성한 리뷰가 아닙니다.',
+                });
+            }
+            const result = await Matmadi.findByIdAndUpdate(madiId, {
+                $set: {
+                    comment,
+                    star,
+                    imgURL,
+                    tagMenu,
+                    tagTasty,
+                    tagPoint,
+                    ratingTasty,
+                    ratingPrice,
+                    ratingService,
+                },
+            });
+            return res
+                .status(200)
+                .send({ result: result, message: '리뷰 수정 완료' });
         } catch (err) {
             console.log(err);
-            res.status(400).send({ result: false, message: ' ' });
+            res.status(400).send({ result: false, message: '리뷰 수정 실패' });
         }
     },
+        // 맛마디 삭제
+        deleteMatmadi: async (req, res) => {
+            const { userId } = res.locals.user;
+            const { madiId } = res.params;
+            try {
+                const existMatmadi = await Matmadi.findById(madiId);
+                if (userId !== existMatmadi.userId) {
+                    return res.status(400).send({
+                        result: false,
+                        message: '사용자 작성한 리뷰가 아닙니다.',
+                    });
+                }
+                const result = await Matmadi.findByIdAndDelete(madiId);
+                return res
+                    .status(200)
+                    .send({ result: result, message: '리뷰 삭제 완료' });
+            } catch (err) {
+                console.log(err);
+                res.status(400).send({ result: false, message: '리뷰 삭제 실패' });
+            }
+        },
     // 맛마디 좋아요 토글
     likeMatmadi: async (req, res) => {
         try {
@@ -422,7 +484,7 @@ module.exports = {
             res.status(400).send({ result: false, message: ' ' });
         }
     },
-    
+
     // 추천 메뉴 좋아요 토글
     likeMenu: async (req, res) => {
         try {
