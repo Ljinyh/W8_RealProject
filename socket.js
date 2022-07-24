@@ -145,7 +145,7 @@ socket.on(
             const findUser = await User.findById(userId);
             const senderName = findUser.nickname;
 
-            const findRoom = await Room.findById(roomId).exec();
+            const findRoom = await Room.findById(roomId);
             const roomName = findRoom.roomName;
 
             for (let i = 0; i < memberId.length; i++) {
@@ -156,7 +156,7 @@ socket.on(
                         userId: memberId[i],
                         storeName: storeName,
                         type: type,
-                    }).exec();
+                    });
 
                     if (!findAlertDB) {
                         await Alert.create({
@@ -176,17 +176,14 @@ socket.on(
                         userId: memberId[i],
                         storeName: storeName,
                         type: type,
-                    }).exec();
+                    });
 
                     if (TheAlertDB && TheAlertDB.type === type) {
-                        findAlertDB.createdAt = timeForToday(createdAt);
+                        TheAlertDB.createdAt = timeForToday(createdAt);
                         const members = getUser(memberId[i]);
 
                         io.to(members.socketId).emit('AddStore', {
-                            senderName: senderName,
-                            roomName,
-                            type: findAlertDB.type,
-                            roomId,
+                            TheAlertDB: [TheAlertDB]
                         });
                     }
                 }
