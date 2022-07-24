@@ -15,7 +15,7 @@ alertSchema.virtual('alertId').get(function() {
 });
 
 alertSchema.set('toJSON', {
-    virtual: true,
+    virtuals: true,
 });
 
 module.exports = mongoose.model('Alert', alertSchema);
