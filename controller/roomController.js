@@ -354,12 +354,6 @@ module.exports = {
                     .send({ errorMessage: '초대인원이 꽉 찼습니다.' });
             }
 
-            if ((theRoom.guestId.includes(guestId))) {
-                return res
-                    .status(400)
-                    .send({ erroMessage: '이미 초대되었습니다!' });
-            }
-
             if (theRoom.guestId.includes(userId)) {
                 return res
                     .status(400)
@@ -367,6 +361,12 @@ module.exports = {
             }
 
             for (let i = 0; i < guestId.length; i++) {
+                if ((theRoom.guestId.includes(guestId[i]))) {
+                    return res
+                        .status(400)
+                        .send({ erroMessage: '이미 초대되었습니다!' });
+                }
+
                 if (
                     theRoom &&
                     inviteUser &&
