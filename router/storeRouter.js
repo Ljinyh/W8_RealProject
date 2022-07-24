@@ -33,7 +33,7 @@ router.get('/:storeId/:madiId', authMiddleware, storeController.detailMatmadi);
 // 맛마디 수정
 router.put('/:madiId/matmadi', authMiddleware, storeController.updateMatmadi);
 
-// 맛마디 수정
+// 맛마디 삭제
 router.delete('/:madiId/matmadi', authMiddleware, storeController.deleteMatmadi);
 
 // 맛마디 좋아요 토글
