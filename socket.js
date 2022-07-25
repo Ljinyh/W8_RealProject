@@ -100,7 +100,7 @@ socket.on('inviteMember', async ({ userId, guestName, roomId }) => {
     for (let i = 0; i < guestName.length; i++) {
         const CheckAlert = await Alert.findOne({
             senderName: senderName,
-            guestId: guestName[i],
+            userId: guestName[i],
             roomName: roomName,
             type: type,
         });
@@ -116,7 +116,7 @@ socket.on('inviteMember', async ({ userId, guestName, roomId }) => {
             });
             const findUserAlertDB = await Alert.findOne({
                 senderName: senderName,
-                guestId: guestName[i],
+                userId: guestName[i],
                 roomName: roomName,
                 type: type,
             });
