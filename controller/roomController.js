@@ -333,7 +333,7 @@ writeRoom: async (req, res) => {
         }
         return res
             .status(200)
-            .json({ result: true, message: '맛방 만들기 성공', roomId: createdRoom.roomId });
+            .json({ result: true, message: '맛방 만들기 성공', roomId: createdRoom.roomId, guestId: guestId });
     } catch (err) {
         console.log(err);
         res.status(400).send({
