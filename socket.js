@@ -196,7 +196,7 @@ socket.on(
 socket.on('getAlert', async ({ receiverId }) => {
     if (receiverId) {
         const receiver = getUser(receiverId);
-        const findUserAlertDB = await Alert.find({
+        let findUserAlertDB = await Alert.find({
             userId: receiverId,
         });
         try{
