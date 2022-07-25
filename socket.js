@@ -120,16 +120,16 @@ socket.on('inviteMember', async ({ userId, guestName, roomId }) => {
                 roomName: roomName,
                 type: type,
             });
+
+            if(findUserAlertDB && findUserAlertDB.type === type){
             findUserAlertDB.createdAt = timeForToday(createdAt);
 
             const receiver = getUser(guestName[i]);
 
             io.to(receiver.socketId).emit('newInviteDB', {
                 findUserAlertDB: [findUserAlertDB],
-            });
-        } else {
-            socket.emit('errorMessage', '이미 초대한 회원입니다.');
-            return;
+            }
+        )};
         }
     }
 });
