@@ -8,6 +8,7 @@ const Room = require('./models/room');
 // const UsersRoom = require('./models/usersRoom');
 const Alert = require('./models/alret.js');
 const Connect = require('./models/connect');
+const { createImportSpecifier } = require('typescript');
 
 //soket cors 설정
 const app = express();
@@ -192,6 +193,11 @@ socket.on(
     }
 );
 
+//알림 삭제
+socket.on('delete', async (alertId) => {
+    await Alert.findByIdAndDelete(alertId);
+});
+
 // 알림 목록 보내기
 socket.on('getAlert', async ({ receiverId }) => {
     if (receiverId) {
@@ -199,6 +205,7 @@ socket.on('getAlert', async ({ receiverId }) => {
         let findUserAlertDB = await Alert.find({
             userId: receiverId,
         });
+
         try{
             for (let alretDB of findUserAlertDB) {
                 alretDB.createdAt = timeForToday(alretDB.createdAt);
@@ -206,6 +213,8 @@ socket.on('getAlert', async ({ receiverId }) => {
             io.to(receiver.socketId).emit('getNotification', {
                 findAlertDB: findUserAlertDB,
             });
+            console.log('1', findAlertDB)
+            console.log('2', findUserAlertDB)
 
         } catch (err) {
             console.log(err)
@@ -213,10 +222,6 @@ socket.on('getAlert', async ({ receiverId }) => {
     }
 });
 
-//알림 삭제
-socket.on('delete', async (alertId) => {
-    await Alert.findByIdAndDelete(alertId);
-});
 
 //로그아웃 시 연결 해제
 socket.on('userOut', async (userId) => {
