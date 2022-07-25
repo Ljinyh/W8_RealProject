@@ -213,7 +213,7 @@ socket.on('getAlert', async ({ receiverId }) => {
             io.to(receiver.socketId).emit('getNotification', {
                 findAlertDB: findUserAlertDB,
             });
-
+            console.log('3', findUserAlertDB)
         } catch (err) {
             console.log(err)
         }
