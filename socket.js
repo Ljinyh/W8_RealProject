@@ -204,7 +204,6 @@ socket.on('getAlert', async ({ receiverId }) => {
         let findUserAlertDB = await Alert.find({
             userId: receiverId,
         });
-        console.log('2', findUserAlertDB)
 
         try{
             for (let alretDB of findUserAlertDB) {
@@ -213,7 +212,7 @@ socket.on('getAlert', async ({ receiverId }) => {
             io.to(receiver.socketId).emit('getNotification', {
                 findAlertDB: findUserAlertDB,
             });
-            console.log('3', findUserAlertDB)
+
         } catch (err) {
             console.log(err)
         }

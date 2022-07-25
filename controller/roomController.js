@@ -354,14 +354,14 @@ module.exports = {
                     .send({ errorMessage: '초대인원이 꽉 찼습니다.' });
             }
 
-            if (theRoom.guestId.includes(userId)) {
+            if (theRoom.guestId.includes(userId) || theRoom.ownerId === userId) {
                 return res
                     .status(400)
                     .send({ errorMessage: '자기 자신은 초대할 수 없습니다!' });
             }
 
             for (let i = 0; i < guestId.length; i++) {
-                if ((theRoom.guestId.includes(guestId[i]))) {
+                if (theRoom.guestId.includes(guestId[i]) || theRoom.ownerId === guestId[i]) {
                     return res
                         .status(400)
                         .send({ erroMessage: '이미 초대되었습니다!' });
@@ -382,11 +382,9 @@ module.exports = {
                     await UsersRoom.findOneAndUpdate({ userId: guestId }, {
                         $push: { roomSeq: roomId },
                     }, { upsert: true });
-
+                }
                     return res.status(200).send({ msg: `초대성공!` });
                 }
-            }
-
             res.status(400).send({
                 errorMessage: '이미 초대된 사람이거나 회원정보가 없거나 방이 없습니다!',
             });
