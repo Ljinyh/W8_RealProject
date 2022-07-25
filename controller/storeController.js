@@ -245,7 +245,6 @@ module.exports = {
             const findUserIcon = []; // 처음 등록한 유저의 정보를 맛집 순서대로 쌓는다.
             const findStarAvg = []; // 별점 평균을 맛집의 순서대로 쌓는다.
 
-            const commentList = [];
             for (let i = 0; i < findStoreList.length; i++) {
                 //console.log(findStoreList[i].userId)
                 let stores = await Store.findById(findStoreList[i].storeId);
@@ -270,24 +269,25 @@ module.exports = {
                 } else {
                     findStarAvg.push(0); // 등록한 리뷰(별점)가 없다면 0를 표시한다.
                 }
-
-                /*
-                // 해당 가게에 같은 맛방 멤버가 쓴 가장 최신 코멘트를 출력할 것.
-                for (j = 0; j < roomInfo.guestId.length; i++) {
-                    findComment = await Matmadi.findOne({
-                        storeId: findStoreList[i].storeId,
-                        userId: roomInfo.guestId[j],
-                    });
-                    commentList.push(findComment);
-                }
-                commentList.push(
-                    await Matmadi.findOne({ storeId: findStoreList[i].storeId })
-                );
-                commentList.sort(function (a, b) {
-                    return a.createdAt - b.createdAt;
-                });
-                */
             }
+
+            console.log('findStoreList', findStoreList);
+            // 해당 가게에 같은 맛방 멤버가 쓴 가장 최신 코멘트를 출력할 것.
+             const commentList = [];
+            // for (j = 0; j < roomInfo.guestId.length; j++) {
+            //     findComment = await Matmadi.findOne({
+            //         storeId: findStoreList[j].storeId,
+            //         userId: roomInfo.guestId[j],
+            //     });
+            //     commentList.push(findComment);
+            // }
+            // commentList.push(
+            //     await Matmadi.findOne({ storeId: findStoreList[j].storeId })
+            // );
+            // commentList.sort(function (a, b) {
+            //     return a.createdAt - b.createdAt;
+            // });
+            //console.log('');
 
             let comment = '';
             if (commentList !== null) {
@@ -304,6 +304,7 @@ module.exports = {
                 faceColor: findUserIcon[idx].faceColor,
                 eyes: findUserIcon[idx].eyes,
                 starAvg: findStarAvg[idx],
+                tag: findStoreInfo[idx].mainTag[0],
                 comment: comment, //가장 많은 좋아요를 받은 맛마디? //같은 방 사람이 쓴 맛마디?
             }));
             return res.status(200).send({
