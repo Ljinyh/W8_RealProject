@@ -364,19 +364,12 @@ module.exports = {
 
             // 초대된 사람 제외
             const inviteGuest = await guestId.filter((e) => !existUser.includes(e));
-            console.log(inviteGuest)
 
-            if(inviteGuest.length === 0) {
+            if(inviteGuest.length === 0 || inviteGuest.includes(theRoom.ownerId)) {
                 return res.status(400).send({ errorMessage: "이미 초대되었습니다"})
             }
 
-            for (let i = 0; i < inviteGuest.length; i++) {
-                if (theRoom.ownerId === inviteGuest[i]) {
-                    return res
-                        .status(400)
-                        .send({ errorMessage: '이미 초대되었습니다!' });
-                }
-                
+            for (let i = 0; i < inviteGuest.length; i++) {                
                 if (
                     theRoom &&
                     inviteUser &&
