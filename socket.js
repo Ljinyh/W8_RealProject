@@ -194,27 +194,28 @@ socket.on(
 
 // 알림 목록 보내기
 socket.on('getAlert', async ({ receiverId }) => {
-            const receiver = getUser(receiverId);
-
-            let findUserAlertDB = await Alert.find({
-                userId: receiverId,
-            });
-            if(findUserAlertDB.length !== 0) {
-            for (let i=0; i<findUserAlertDB.length; i++) {
-                findUserAlertDB[i].createdAt = timeForToday(alretDB.createdAt);
+    if (receiverId) {
+        const receiver = getUser(receiverId);
+        const findUserAlertDB = await Alert.find({
+            userId: receiverId,
+        });
+        try{
+            for (let alretDB of findUserAlertDB) {
+                alretDB.createdAt = timeForToday(alretDB.createdAt);
             }
-        }
-        if(findUserAlertDB.length === 0){
-            findUserAlertDB = 'no Alert';            
-        }
             io.to(receiver.socketId).emit('getNotification', {
                 findAlertDB: findUserAlertDB,
             });
-    });
+
+        } catch (err) {
+            console.log(err)
+        }
+    }
+});
 
 //알림 삭제
 socket.on('delete', async (alertId) => {
-    await Alert.deleteOne({_id: alertId});
+    await Alert.findByIdAndDelete(alertId);
 });
 
 //로그아웃 시 연결 해제
