@@ -4,7 +4,8 @@ const TagSchema = new mongoose.Schema({
     storeId: String,
     tagMenu: String,
     tagTasty: String,
-    tagPoing: String,
+    tagPoint: String,
+    category: String,
 });
 TagSchema.virtual('tagId').get(function () {
     return this._id.toHexString();

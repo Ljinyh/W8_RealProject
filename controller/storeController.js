@@ -11,7 +11,7 @@ const { find } = require('../models/user');
 module.exports = {
     // 지도에 맛집 보여주기 (현재 위치기반 검색)
     mapViewer: async (req, res) => {
-        const {LatLon} = req.query.LatLon;
+        const { LatLon } = req.query.LatLon;
         try {
             const allStore = await Store.find().exec();
 
@@ -54,21 +54,22 @@ module.exports = {
                     errorMessage: '존재하지 않는 맛집입니다.',
                 });
             }
-            // roomId가 여러개 들어옴. roomId 별로 savelist에 저장
+            // roomId가 배열로 여러개 들어옴. roomId 별로 savelist에 저장
             for (let i = 0; i < selectedRooms.length; i++) {
                 // 선택된 맛방이 존재하는 맛방인지 확인
                 const theRoom = await Room.findById(selectedRooms[i]).exec();
-                //roomId가 이미 savelistDB에 있는지 확인
-                const existSavelist = await Savelist.findOne({
-                    storeId,
-                    roomId: selectedRooms[i],
-                });
+
                 if (!theRoom) {
                     res.status(400).send({
                         result: false,
                         message: '존재하는 맛방이 아닙니다.',
                     });
                 }
+                //roomId가 이미 savelistDB에 있는지 확인
+                const existSavelist = await Savelist.findOne({
+                    storeId,
+                    roomId: selectedRooms[i],
+                });
                 if (!existSavelist) {
                     await Savelist.create({
                         userId,
@@ -103,18 +104,15 @@ module.exports = {
     // 맛집 생성 (첫 기록하기), 방장의 맛방에 맛집 추가까지
     createStore: async (req, res) => {
         const { userId } = res.locals.user; // JWT 인증 정보
-        const {
-            storeName,
-            address,
-            LatLon,
-            tag,
-            
-        } = req.body;
+        const { storeName, address, LatLon, tag } = req.body;
 
         try {
-            const existStore = await Store.find({LatLon, storeName})
-            if(existStore){
-                return res.status(400).send({result : false, message : "이미 존재하는 맛집입니다."})
+            const existStore = await Store.find({ LatLon, storeName });
+            if (existStore) {
+                return res.status(400).send({
+                    result: false,
+                    message: '이미 존재하는 맛집입니다.',
+                });
             }
             // 정보를 가게 DB에 저장
             const save = await Store.create({
@@ -125,11 +123,11 @@ module.exports = {
                 mainTag: tag,
                 createdAt: Date.now(),
             });
-            
+
             res.status(200).send({
                 result: true,
                 storeId: save.storeId,
-                message : "맛집 기록 완료"
+                message: '맛집 기록 완료',
             });
         } catch (err) {
             console.log(err);
@@ -253,7 +251,7 @@ module.exports = {
             //
             const findStoreList = await Savelist.find({ roomId });
             const findRoom = await Room.findById(roomId);
-            const roomName = findRoom.roomName
+            const roomName = findRoom.roomName;
             // 맛방에 등록된 맛집리스트 찾기
             const findStoreInfo = []; // 맛집의 정보를 순서대로 쌓는다.
             const findUserIcon = []; // 처음 등록한 유저의 정보가 맛집 순서대로 쌓인다
@@ -283,8 +281,7 @@ module.exports = {
                     findStarAvg.push(0);
                 }
             }
-            likes = await Like.find({madiId: madiId})
-
+            likes = await Like.find({ madiId: madiId });
 
             const result = findStoreList.map((a, idx) => ({
                 storeId: a.storeId,
@@ -296,7 +293,10 @@ module.exports = {
                 starAvg: findStarAvg[idx],
                 comment: '', //가장 많은 좋아요를 받은 맛마디?
             }));
-            return res.status(200).send({ result: result, message: '${roomName} 맛방의 맛집 조회 완료.' });
+            return res.status(200).send({
+                result: result,
+                message: '${roomName} 맛방의 맛집 조회 완료.',
+            });
             /*
             const existStore = await Store.findById(storeId);
             const storefinder = await User.findById(existStore.userId);
@@ -367,7 +367,13 @@ module.exports = {
             });
             // 태그 DB에 해당 태그 데이터가 있는지 확인하고 없으면 create
             // 그냥 찾고 if문으로 없으면 생성할까..
-            await Tag.findOneAndUpdate(tagMenu, { upsert: true });
+            for (i = 0; i < tagMenu.length; i++) {
+                await Tag.findOneAndUpdate(
+                    { storeId, tagMenu: tagMenu[i] },
+                    { $push: { tagMenu, storeId, category: 'tagMenu' } },
+                    { upsert: true }
+                );
+            }
             return res
                 .status(200)
                 .send({ result: true, message: '리뷰 작성 완료!' });
@@ -564,16 +570,23 @@ module.exports = {
             });
         }
     },
-    // 특정 맛집의 맛태그 조회 //태그와 추천메뉴 같이 출력해야함. 아래 API 제거하기
+    // 특정 맛집의 태그 조회 //태그와 추천메뉴 같이 출력해야함. 아래 API 제거하기
     tag: async (req, res) => {
         const { storeId } = req.params;
         try {
-            const existTag = await Tag.find({ storeId });
-            const result = {
-                tagMenu: existTag.tagMenu,
-                tagTasty: existTag.tagTasty,
-                tagPoint: existTag.tagPoint,
-            };
+            const existTag = await Tag.find({ storeId, category });
+            const tagMenu = [];
+            const tagTasty = [];
+            const tagPoint = [];
+            console.log(existTag);
+
+            for (i = 0; i < existTag.length; i++) {
+                tagMenu.push(existTag[i].tagMenu);
+                tagTasty.push(existTag[i].tagTasty);
+                tagPoint.push(existTag[i].tagPoint);
+            }
+
+            const result = {};
             return res
                 .status(200)
                 .send({ result: result, message: '맛집 태그 조회 완료' });
