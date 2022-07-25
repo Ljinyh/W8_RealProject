@@ -199,10 +199,14 @@ socket.on('getAlert', async ({ receiverId }) => {
             const findUserAlertDB = await Alert.find({
                 userId: receiverId,
             });
-
+            if(findUserAlertDB.length !== 0) {
             for (let i=0; i<findUserAlertDB.length; i++) {
                 findUserAlertDB[i].createdAt = timeForToday(alretDB.createdAt);
             }
+        }
+        if(findUserAlertDB.length === 0){
+            findUserAlertDB =[];            
+        }
             io.to(receiver.socketId).emit('getNotification', {
                 findAlertDB: findUserAlertDB,
             });
