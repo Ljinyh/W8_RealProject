@@ -196,7 +196,7 @@ socket.on(
 socket.on('getAlert', async ({ receiverId }) => {
             const receiver = getUser(receiverId);
 
-            const findUserAlertDB = await Alert.find({
+            let findUserAlertDB = await Alert.find({
                 userId: receiverId,
             });
             if(findUserAlertDB.length !== 0) {
@@ -205,7 +205,7 @@ socket.on('getAlert', async ({ receiverId }) => {
             }
         }
         if(findUserAlertDB.length === 0){
-            findUserAlertDB =[];            
+            findUserAlertDB = 'no Alert';            
         }
             io.to(receiver.socketId).emit('getNotification', {
                 findAlertDB: findUserAlertDB,
