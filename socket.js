@@ -5,7 +5,6 @@ const cors = require('cors');
 // 모듈 불러오기
 const User = require('./models/user');
 const Room = require('./models/room');
-// const UsersRoom = require('./models/usersRoom');
 const Alert = require('./models/alret.js');
 const Connect = require('./models/connect');
 
