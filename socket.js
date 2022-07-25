@@ -194,21 +194,23 @@ socket.on(
 
 // 알림 목록 보내기
 socket.on('getAlert', async ({ receiverId }) => {
-    if (receiverId) {
         const receiver = getUser(receiverId);
         const findUserAlertDB = await Alert.find({
             userId: receiverId,
         });
-        if (findUserAlertDB) {
+
+        try{
             for (let alretDB of findUserAlertDB) {
                 alretDB.createdAt = timeForToday(alretDB.createdAt);
             }
             io.to(receiver.socketId).emit('getNotification', {
                 findAlertDB: findUserAlertDB,
             });
+
+        } catch (err) {
+            console.log(err)
         }
-    }
-});
+    });
 
 //알림 삭제
 socket.on('delete', async (alertId) => {
