@@ -5,7 +5,7 @@ const cors = require('cors');
 // 모듈 불러오기
 const User = require('./models/user');
 const Room = require('./models/room');
-const Alert = require('./models/alret.js');
+const Alert = require('./models/alert');
 const Connect = require('./models/connect');
 
 //soket cors 설정
