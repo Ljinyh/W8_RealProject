@@ -365,8 +365,8 @@ module.exports = {
                 return res.status(400).send({ errorMessage: "이미 초대되었습니다"})
             }
 
+            if (theRoom) {
             for (let i = 0; i < inviteGuest.length; i++) {              
-                if (theRoom) {
                     await theRoom.updateOne({
                         $push: {
                             guestId: inviteGuest,
@@ -376,9 +376,9 @@ module.exports = {
                     await UsersRoom.findOneAndUpdate({ userId: inviteGuest[i] }, {
                         $push: { roomSeq: roomId },
                     }, { upsert: true });
-                }}
+                }
                     return res.status(200).send({ msg: `초대성공!` });
-                
+            }
 
             res.status(400).send({
                 errorMessage: '회원정보가 없거나 방이 없습니다!',
