@@ -194,12 +194,12 @@ socket.on(
 
 // 알림 목록 보내기
 socket.on('getAlert', async ({ receiverId }) => {
-        const receiver = getUser(receiverId);
-        const findUserAlertDB = await Alert.find({
-            userId: receiverId,
-        });
-
         try{
+            const receiver = getUser(receiverId);
+            const findUserAlertDB = await Alert.find({
+                userId: receiverId,
+            });
+
             for (let alretDB of findUserAlertDB) {
                 alretDB.createdAt = timeForToday(alretDB.createdAt);
             }
