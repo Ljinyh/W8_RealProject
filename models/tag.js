@@ -11,4 +11,4 @@ TagSchema.virtual('tagId').get(function () {
 });
 TagSchema.set('toJSON', { virtuals: true });
 
-module.exports = mongoose.model('Like', TagSchema);
+module.exports = mongoose.model('Tag', TagSchema);

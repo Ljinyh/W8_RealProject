@@ -48,9 +48,6 @@ router.get('/:storeId/mattag', authMiddleware, storeController.mattag);
 // 특정 맛집의 추천 메뉴 조회
 router.get('/:storeId/menu', authMiddleware, storeController.viewMenu);
 
-// 추천 메뉴 추가
-router.post('/:storeId/menu', authMiddleware, storeController.addMenu);
-
 // 추천 메뉴 좋아요 토글
 router.post('/:storeId/menu/:menuId', authMiddleware, storeController.likeMenu);
 

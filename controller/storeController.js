@@ -5,7 +5,7 @@ const Store = require('../models/store');
 const UsersRoom = require('../models/usersRoom');
 const Matmadi = require('../models/matmadi');
 const Like = require('../models/like');
-const Tag = require('../models/tag')
+const Tag = require('../models/tag');
 
 module.exports = {
     // 지도에 맛집 보여주기 (현재 위치기반 검색)
@@ -78,7 +78,10 @@ module.exports = {
             }
             //선택된 룸ID 유저의 savelist중 스토어 아이디를 갖고있는 roomId?
             //savelist에서 선택된 roomId가 있는지 없는지 찾고. 있으면 놔두고 없으면 생성하고, 선택되지않은 애는 삭제하고.
-            const findExistSavelist = await Savelist.find(storeId, userId);
+            const findExistSavelist = await Savelist.findOneAndUpdate({
+                roomId,
+                userId,
+            });
             for (let i = 0; i < findExistSavelist.length; i++) {
                 if (!selectedRooms.includes(findExistSavelist[i].roomId)) {
                     await Savelist.findByIdAndDelete(findExistSavelist[i]); //이거 작동하는지 확인해야함. saveId로 참조해야하는거같은데.
@@ -327,7 +330,7 @@ module.exports = {
             });
             // 태그 DB에 해당 태그 데이터가 있는지 확인하고 없으면 create
             // 그냥 찾고 if문으로 없으면 생성할까..
-            await Tag.findOneAndUpdate(tagMenu,{upsert : true})
+            await Tag.findOneAndUpdate(tagMenu, { upsert: true });
             return res
                 .status(200)
                 .send({ result: true, message: '리뷰 작성 완료!' });
@@ -433,32 +436,32 @@ module.exports = {
             res.status(400).send({ result: false, message: '리뷰 수정 실패' });
         }
     },
-        // 맛마디 삭제
-        // 삭제할 태그는 배열로 저장되어있지만 TagDB는 임.
-        deleteMatmadi: async (req, res) => {
-            const { userId } = res.locals.user;
-            const { madiId } = req.params;
-            try {
-                const existMatmadi = await Matmadi.findById(madiId);
-                if (userId !== existMatmadi.userId) {
-                    return res.status(400).send({
-                        result: false,
-                        message: '사용자 작성한 리뷰가 아닙니다.',
-                    });
-                }
-                // 사용자의 태그 삭제가 태그 DB의 마지막 데이터일 때, 태그 DB의 데이터 삭제
-                function deleteLastData (a) {
-                    for(i=0; i<existMatmadi.a.length; i++){
-                        data = await Matmadi.find({a:existMatmadi.a[i]})
-                        if(data.length === 1){
-                            await Tag.findOneAndDelete({a:existMatmadi.a[i]})
-                        }
+    // 맛마디 삭제
+    // 삭제할 태그는 배열로 저장되어있지만 TagDB는 임.
+    deleteMatmadi: async (req, res) => {
+        const { userId } = res.locals.user;
+        const { madiId } = req.params;
+        try {
+            const existMatmadi = await Matmadi.findById(madiId);
+            if (userId !== existMatmadi.userId) {
+                return res.status(400).send({
+                    result: false,
+                    message: '사용자 작성한 리뷰가 아닙니다.',
+                });
+            }
+            // 사용자의 태그 삭제가 태그 DB의 마지막 데이터일 때, 태그 DB의 데이터 삭제
+            function deleteLastData(a) {
+                for (i = 0; i < existMatmadi.a.length; i++) {
+                    data = Matmadi.find({ a: existMatmadi.a[i] });
+                    if (data.length === 1) {
+                        Tag.findOneAndDelete({ a: existMatmadi.a[i] });
                     }
                 }
-                deleteLastData(tagMenu)
-                deleteLastData(tagTasty)
-                deleteLastData(tagPoint)
-                /*
+            }
+            deleteLastData(tagMenu);
+            deleteLastData(tagTasty);
+            deleteLastData(tagPoint);
+            /*
                 for(i=0; i<existMatmadi.tagMenu.length; i++){
                     data = await find({tagMenu:existMatmadi.tagMenu[i]})
                     if(data.length === 1){
@@ -467,32 +470,37 @@ module.exports = {
                 }
                 const result = await Matmadi.findByIdAndDelete(madiId);
                 */
-                return res
-                    .status(200)
-                    .send({ result: result, message: '리뷰 삭제 완료' });
-            } catch (err) {
-                console.log(err);
-                res.status(400).send({ result: false, message: '리뷰 삭제 실패' });
-            }
-        },
+            return res
+                .status(200)
+                .send({ result: result, message: '리뷰 삭제 완료' });
+        } catch (err) {
+            console.log(err);
+            res.status(400).send({ result: false, message: '리뷰 삭제 실패' });
+        }
+    },
 
     // 맛마디 좋아요 토글
     likeMatmadi: async (req, res) => {
-        const {userId} = res.locals.user;
-        const {madiId} = req.body;
+        const { userId } = res.locals.user;
+        const { madiId } = req.body;
         try {
-            const likeDone = await Like.findOne({userId,madiId})
-            if(likeDone){
+            const likeDone = await Like.findOne({ userId, madiId });
+            if (likeDone) {
                 return res
-                .status(400)
-                .send({ result: false, message: "이미 좋아요를 눌렀습니다." });
+                    .status(400)
+                    .send({
+                        result: false,
+                        message: '이미 좋아요를 눌렀습니다.',
+                    });
             }
-            await Like.create({userId, madiId})
+            await Like.create({ userId, madiId });
 
-              // 해당 게시글 좋아요 개수 다시 출력해주기 (갱신)
+            // 해당 게시글 좋아요 개수 다시 출력해주기 (갱신)
             const likes = await Like.find({ tagId });
             const likeNum = likes.length;
-            return res.status(200).send({ result: true, likeNum, message: '좋아요 완료' });
+            return res
+                .status(200)
+                .send({ result: true, likeNum, message: '좋아요 완료' });
         } catch (err) {
             console.log(err);
             res.status(400).send({ result: false, message: '좋아요 실패' });
@@ -500,58 +508,95 @@ module.exports = {
     },
     // 맛마디 좋아요 취소
     unlikeMatmadi: async (req, res) => {
-        const {userId} = res.locals.user;
-        const {madiId} = req.body;
+        const { userId } = res.locals.user;
+        const { madiId } = req.body;
         try {
-            const cancleLike = await Like.findOneAndDelete({userId, madiId})
-            if(!cancleLike){
+            const cancleLike = await Like.findOneAndDelete({ userId, madiId });
+            if (!cancleLike) {
                 return res
-                .status(400)
-                .send({ result: false, message: "이미 좋아요를 취소했습니다." });
+                    .status(400)
+                    .send({
+                        result: false,
+                        message: '이미 좋아요를 취소했습니다.',
+                    });
             }
-            return res.status(200).send({ result: true, message: '좋아요 취소 완료' });
+            return res
+                .status(200)
+                .send({ result: true, message: '좋아요 취소 완료' });
         } catch (err) {
             console.log(err);
-            res.status(400).send({ result: false, message: '좋아요 취소 실패' });
+            res.status(400).send({
+                result: false,
+                message: '좋아요 취소 실패',
+            });
         }
     },
     // 특정 맛집의 맛태그 조회 //태그와 추천메뉴 같이 출력해야함. 아래 API 제거하기
     mattag: async (req, res) => {
-        const {storeId} = req.params;
-        try { 
-            return res.status(200).send({ result: true, message: ' ' });
+        const { storeId } = req.params;
+        try {
+            const existTag = await Tag.find({ storeId });
+            const result = {
+                tagMenu: existTag.tagMenu,
+                tagTasty: existTag.tagTasty,
+                tagPoint: existTag.tagPoint,
+            };
+            return res
+                .status(200)
+                .send({ result: result, message: '맛집 태그 조회 완료' });
         } catch (err) {
             console.log(err);
-            res.status(400).send({ result: false, message: ' ' });
+            res.status(400).send({
+                result: false,
+                message: '맛집 태그 조회 실패',
+            });
         }
     },
     // 특정 맛집의 추천 메뉴 조회
     viewMenu: async (req, res) => {
+        const { storeId } = req.params;
         try {
-            return res.status(200).send({ result: true, message: ' ' });
+            const existTag = await Tag.find({ storeId });
+            const result = [];
+            for (i = 0; i < existTag.length; i++) {
+                if (existTag[i]) {
+                    result.push(existTag[i].tagMenu);
+                }
+            }
+            return res
+                .status(200)
+                .send({ result: result, message: '맛집 태그 조회 완료' });
         } catch (err) {
             console.log(err);
-            res.status(400).send({ result: false, message: ' ' });
+            res.status(400).send({
+                result: false,
+                message: '맛집 태그 조회 실패',
+            });
         }
     },
 
     // 태그 좋아요 토글
     likeMenu: async (req, res) => {
-        const {userId} = res.locals.user;
-        const {tagId} = req.body;
+        const { userId } = res.locals.user;
+        const { tagId } = req.body;
         try {
-            const likeDone = await Like.findOne({userId,tagId})
-            if(likeDone){
+            const likeDone = await Like.findOne({ userId, tagId });
+            if (likeDone) {
                 return res
-                .status(400)
-                .send({ result: false, message: "이미 좋아요를 눌렀습니다." });
+                    .status(400)
+                    .send({
+                        result: false,
+                        message: '이미 좋아요를 눌렀습니다.',
+                    });
             }
-            await Like.create({userId, tagId})
-              // 해당 게시글 좋아요 개수 다시 출력해주기 (갱신)
+            await Like.create({ userId, tagId });
+            // 해당 게시글 좋아요 개수 다시 출력해주기 (갱신)
             const likes = await Like.find({ tagId });
             const likeNum = likes.length;
-             
-            return res.status(200).send({ result: true, likeNum, message: '좋아요 완료' });
+
+            return res
+                .status(200)
+                .send({ result: true, likeNum, message: '좋아요 완료' });
         } catch (err) {
             console.log(err);
             res.status(400).send({ result: false, message: '좋아요 실패' });
@@ -559,27 +604,35 @@ module.exports = {
     },
     // 태그 좋아요 취소
     unlikeMenu: async (req, res) => {
-        const {userId} = res.locals.user;
-        const {tagId} = req.body;
+        const { userId } = res.locals.user;
+        const { tagId } = req.body;
         try {
-            const cancleLike = await Like.findOneAndDelete({userId, tagId})
-            if(!cancleLike){
+            const cancleLike = await Like.findOneAndDelete({ userId, tagId });
+            if (!cancleLike) {
                 return res
-                .status(400)
-                .send({ result: false, message: "이미 좋아요를 취소했습니다." });
+                    .status(400)
+                    .send({
+                        result: false,
+                        message: '이미 좋아요를 취소했습니다.',
+                    });
             }
-            return res.status(200).send({ result: true, message: '좋아요 취소 완료' });
+            return res
+                .status(200)
+                .send({ result: true, message: '좋아요 취소 완료' });
         } catch (err) {
             console.log(err);
-            res.status(400).send({ result: false, message: '좋아요 취소 실패' });
+            res.status(400).send({
+                result: false,
+                message: '좋아요 취소 실패',
+            });
         }
     },
     // 태그 필터 검색
     tagMapViewer: async (req, res) => {
         try {
             return res.status(200).send({ result: true, message: ' ' });
-        } catch (err) {
             console.log(err);
+        } catch (err) {
             res.status(400).send({ result: false, message: ' ' });
         }
     },
