@@ -354,7 +354,7 @@ module.exports = {
                     .send({ errorMessage: '초대인원이 꽉 찼습니다.' });
             }
 
-            if (theRoom.guestId.includes(userId)) {
+            if (guestId.includes(userId)) {
                 return res
                     .status(400)
                     .send({ errorMessage: '자기 자신은 초대할 수 없습니다!' });
