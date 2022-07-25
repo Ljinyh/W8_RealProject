@@ -382,7 +382,7 @@ module.exports = {
                         },
                     });
 
-                    await UsersRoom.findOneAndUpdate({ userId: inviteGuest}, {
+                    await UsersRoom.findOneAndUpdate({ userId: inviteGues[i]}, {
                         $push: { roomSeq: roomId },
                     }, { upsert: true });
                 }
