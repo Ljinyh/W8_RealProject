@@ -200,13 +200,14 @@ socket.on('getAlert', async ({ receiverId }) => {
                 userId: receiverId,
             });
 
-            if(findUserAlertDB.length){
-            for (let alretDB of findUserAlertDB) {
-                alretDB.createdAt = timeForToday(alretDB.createdAt);
-            }
+            if(findUserAlertDB){
+            for (let i=0; i<findUserAlertDB.length; i++) {
+                findUserAlertDB[i].createdAt = timeForToday(alretDB.createdAt);
+            
             io.to(receiver.socketId).emit('getNotification', {
                 findAlertDB: findUserAlertDB,
             });
+        }
         }
     });
 
