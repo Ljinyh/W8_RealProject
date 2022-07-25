@@ -346,6 +346,10 @@ module.exports = {
             const theRoom = await Room.findById(roomId);
             const existUser = theRoom.guestId;
             
+            // 초대된 사람 제외
+            const inviteGuest = await guestId.filter((e) => !existUser.includes(e));
+            console.log(inviteGuest)
+
             if (existUser.length > 20) {
                 return res
                     .status(400)
@@ -358,19 +362,15 @@ module.exports = {
                     .send({ errorMessage: '자기 자신은 초대할 수 없습니다!' });
             }
 
-            // 초대된 사람 제외
-            const inviteGuest = await guestId.filter((e) => !existUser.includes(e));
-
             if(inviteGuest.length === 0 || inviteGuest.includes(theRoom.ownerId)) {
                 return res.status(400).send({ errorMessage: "이미 초대되었습니다"})
             }
 
             if (theRoom) {
-            for (let i = 0; i < inviteGuest.length; i++) {              
+            for (let i = 0; i < inviteGuest.length; i++) {         
+                if(!existUser.includes(inviteGuest[i]) && theRoom.ownerId !== inviteGuest[i]) {     
                     await theRoom.updateOne({
-                        $push: {
-                            guestId: inviteGuest,
-                        },
+                        $push: { guestId: inviteGuest },
                     });
 
                     await UsersRoom.findOneAndUpdate({ userId: inviteGuest[i] }, {
@@ -378,7 +378,7 @@ module.exports = {
                     }, { upsert: true });
                 }
                     return res.status(200).send({ msg: `초대성공!` });
-            }
+            }}
 
             res.status(400).send({
                 errorMessage: '회원정보가 없거나 방이 없습니다!',
