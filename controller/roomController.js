@@ -348,7 +348,9 @@ module.exports = {
                 $or: [{ userId: guestId }],
             });
 
-            if (theRoom.guestId.length > 20) {
+            const existUser = theRoom.guestId;
+            
+            if (existUser.length > 20) {
                 return res
                     .status(400)
                     .send({ errorMessage: '초대인원이 꽉 찼습니다.' });
@@ -360,26 +362,29 @@ module.exports = {
                     .send({ errorMessage: '자기 자신은 초대할 수 없습니다!' });
             }
 
-            for (let i = 0; i < guestId.length; i++) {
-                if (theRoom.guestId.includes(guestId[i]) || theRoom.ownerId === guestId[i]) {
+            // 초대된 사람 제외
+            const inviteGuest = await guestId.filter((e) => !existUser.includes(e));
+
+            for (let i = 0; i < inviteGuest.length; i++) {
+                if (inviteGuest.length === 0 || theRoom.ownerId === inviteGuest[i]) {
                     return res
                         .status(400)
                         .send({ erroMessage: '이미 초대되었습니다!' });
                 }
-
+                
                 if (
                     theRoom &&
                     inviteUser &&
-                    theRoom.ownerId !== guestId[i] &&
-                    !theRoom.guestId.includes(guestId[i])
+                    theRoom.ownerId !== inviteGuest[i] &&
+                    !existUser.includes(inviteGuest[i])
                 ) {
                     await theRoom.updateOne({
                         $push: {
-                            guestId: guestId,
+                            guestId: inviteGuest,
                         },
                     });
 
-                    await UsersRoom.findOneAndUpdate({ userId: guestId }, {
+                    await UsersRoom.findOneAndUpdate({ userId: inviteGuest[i] }, {
                         $push: { roomSeq: roomId },
                     }, { upsert: true });
                 }
@@ -387,7 +392,7 @@ module.exports = {
                 }
 
             res.status(400).send({
-                errorMessage: '이미 초대된 사람이거나 회원정보가 없거나 방이 없습니다!',
+                errorMessage: '회원정보가 없거나 방이 없습니다!',
             });
         } catch (err) {
             console.log(err);
