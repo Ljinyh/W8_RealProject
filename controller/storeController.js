@@ -271,8 +271,8 @@ module.exports = {
                     findStarAvg.push(0); // 등록한 리뷰(별점)가 없다면 0를 표시한다.
                 }
 
+                /*
                 // 해당 가게에 같은 맛방 멤버가 쓴 가장 최신 코멘트를 출력할 것.
-
                 for (j = 0; j < roomInfo.guestId.length; i++) {
                     findComment = await Matmadi.findOne({
                         storeId: findStoreList[i].storeId,
@@ -286,9 +286,9 @@ module.exports = {
                 commentList.sort(function (a, b) {
                     return a.createdAt - b.createdAt;
                 });
+                */
             }
 
-            console.log(commentList);
             let comment = '';
             if (commentList !== null) {
                 comment = '첫 리뷰를 남겨보세요!';
