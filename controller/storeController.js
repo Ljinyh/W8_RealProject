@@ -7,11 +7,12 @@ const Matmadi = require('../models/matmadi');
 const Like = require('../models/like');
 const Tag = require('../models/tag');
 const { find } = require('../models/user');
+const room = require('../models/room');
 
 module.exports = {
     // 지도에 맛집 보여주기 (현재 위치기반 검색)
     mapViewer: async (req, res) => {
-        const { LatLon } = req.query.LatLon;
+        //const { LatLon } = req.query.LatLon;
         try {
             const allStore = await Store.find().exec();
 
@@ -54,6 +55,7 @@ module.exports = {
                     errorMessage: '존재하지 않는 맛집입니다.',
                 });
             }
+            /*
             // roomId가 배열로 여러개 들어옴. roomId 별로 savelist에 저장
             for (let i = 0; i < selectedRooms.length; i++) {
                 // 선택된 맛방이 존재하는 맛방인지 확인
@@ -79,16 +81,29 @@ module.exports = {
                     });
                 }
             }
-            //선택된 룸ID 유저의 savelist중 스토어 아이디를 갖고있는 roomId?
-            //savelist에서 선택된 roomId가 있는지 없는지 찾고. 있으면 놔두고 없으면 생성하고, 선택되지않은 애는 삭제하고.
-            const findExistSavelist = await Savelist.findOneAndUpdate({
-                roomId,
-                userId,
-            });
-            for (let i = 0; i < findExistSavelist.length; i++) {
-                if (!selectedRooms.includes(findExistSavelist[i].roomId)) {
-                    await Savelist.findByIdAndDelete(findExistSavelist[i]); //이거 작동하는지 확인해야함. saveId로 참조해야하는거같은데.
-                }
+            */
+            // savelist DB에 해당 가게를 저장한 roomId 찾아서 배열로 만들기
+            const findRoomSavelist = await Savelist.find({ storeId });
+            const existRoomId = findRoomSavelist.map((a) => a.roomId);
+            console.log(existRoomId);
+
+            //유저가 입력한 배열과 기존 배열을 비교
+            const deleteRoomId = existRoomId.filter((x) => !roomId.includes(x));
+            console.log(deleteRoomId);
+
+            const newRoomId = roomId.filter((x) => existRoomId.includes(x));
+            // 없어진 roomId는 (savelistDB에서 roomId && storeId 찾아 삭제하고,
+            for (i = 0; i < deleteRoomId.length; i++) {
+                await Savelist.deleteOne({ storeId, roomId: deleteRoomId[i] });
+            }
+            //새로 생긴 roomId는 roomId && storeId 로 생성
+            for (i = 0; i < newRoomId.length; i++) {
+                await Savelist.create({
+                    userId,
+                    roomId: newRoomId[i],
+                    storeId,
+                    createdAt: Date.now(),
+                });
             }
 
             res.status(200).send({
