@@ -8,7 +8,6 @@ const Room = require('./models/room');
 // const UsersRoom = require('./models/usersRoom');
 const Alert = require('./models/alret.js');
 const Connect = require('./models/connect');
-const { createImportSpecifier } = require('typescript');
 
 //soket cors 설정
 const app = express();
