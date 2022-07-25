@@ -5,16 +5,16 @@ const cors = require('cors');
 // 모듈 불러오기
 const User = require('./models/user');
 const Room = require('./models/room');
-// const UsersRoom = require('./models/usersRoom');
 const Alert = require('./models/alret.js');
 const Connect = require('./models/connect');
 
 //soket cors 설정
 const app = express();
 app.use(cors(cors));
+
 module.exports = (server) => {
     const io = IO(server, {
-        cors: { origin: '*' } 
+        cors: { origin: '*' },
     });
 
 //===============================================================================================
@@ -22,48 +22,48 @@ module.exports = (server) => {
 let onlineUsers = [];
 
 const addNewUser = (userId, nickname, socketId) => {
-        !onlineUsers.some((user) => user.userId === userId) &&
-            onlineUsers.push({ userId, nickname, socketId });
-    };
+    !onlineUsers.some((user) => user.userId === userId) &&
+        onlineUsers.push({ userId, nickname, socketId });
+};
 
 const removeUser = (socketId) => {
-        onlineUsers = onlineUsers.filter((user) => user.socketId !== socketId);
-    };
+    onlineUsers = onlineUsers.filter((user) => user.socketId !== socketId);
+};
 
 const getUser = (userId) => {
-        return onlineUsers.find((user) => user.userId === userId);
-    };
+    return onlineUsers.find((user) => user.userId === userId);
+};
 
-    // 알림 등록시간
+// 알림 등록시간
 function timeForToday(createdAt) {
     const today = new Date();
     const timeValue = new Date(createdAt);
 
     const betweenTime = Math.floor(
-            (today.getTime() - timeValue.getTime()) / 1000 / 60
-        ); // 분
+        (today.getTime() - timeValue.getTime()) / 1000 / 60
+    ); // 분
 
-        if (betweenTime < 1) return '방금 전'; // 1분미만이면 방금 전
-        if (betweenTime < 60) return `${betweenTime}분 전`; // 60분 미만이면 n분 전
+    if (betweenTime < 1) return '방금 전'; // 1분미만이면 방금 전
+    if (betweenTime < 60) return `${betweenTime}분 전`; // 60분 미만이면 n분 전
 
-        const betweenTimeHour = Math.floor(betweenTime / 60); // 시
-        if (betweenTimeHour < 24) return `${betweenTimeHour}시간 전`; // 24시간 미만이면 n시간 전
+    const betweenTimeHour = Math.floor(betweenTime / 60); // 시
+    if (betweenTimeHour < 24) return `${betweenTimeHour}시간 전`; // 24시간 미만이면 n시간 전
 
-        const betweenTimeDay = Math.floor(betweenTime / 60 / 24); //일
-        if (betweenTimeDay < 7) return `${betweenTimeDay}일 전`; // 7일 미만이면 n일 전
-        if (betweenTimeDay < 365)
-            return `${timeValue.getMonth() + 1}월 ${timeValue.getDate()}일`; //365일 미만이면 년을 제외하고 월 일만
+    const betweenTimeDay = Math.floor(betweenTime / 60 / 24); //일
+    if (betweenTimeDay < 7) return `${betweenTimeDay}일 전`; // 7일 미만이면 n일 전
+    if (betweenTimeDay < 365)
+        return `${timeValue.getMonth() + 1}월 ${timeValue.getDate()}일`; //365일 미만이면 년을 제외하고 월 일만
 
-        return `${timeValue.getFullYear()}년 ${
-            timeValue.getMonth() + 1
-        }월 ${timeValue.getDate()}일`; // 365일 이상이면 년 월 일
-    }
+    return `${timeValue.getFullYear()}년 ${
+        timeValue.getMonth() + 1
+    }월 ${timeValue.getDate()}일`; // 365일 이상이면 년 월 일
+}
 
 //===============================================================================================
 
 // 소켓 시작
 io.on('connection', (socket) => {
-    io.emit('firstEvent', '소켓 연결 성공!');
+io.emit('firstEvent', '소켓 연결 성공!');
 
 //소켓 연결 시 Connect에 저장 및 연결상태 나타내기
 socket.on('newUser', async ({ userId, nickname }) => {
@@ -99,7 +99,7 @@ socket.on('inviteMember', async ({ userId, guestName, roomId }) => {
     for (let i = 0; i < guestName.length; i++) {
         const CheckAlert = await Alert.findOne({
             senderName: senderName,
-            guestId: guestName[i],
+            userId: guestName[i],
             roomName: roomName,
             type: type,
         });
@@ -115,96 +115,131 @@ socket.on('inviteMember', async ({ userId, guestName, roomId }) => {
             });
             const findUserAlertDB = await Alert.findOne({
                 senderName: senderName,
-                guestId: guestName[i],
+                userId: guestName[i],
                 roomName: roomName,
-                type: type
+                type: type,
             });
+
+            if(findUserAlertDB && findUserAlertDB.type === type){
             findUserAlertDB.createdAt = timeForToday(createdAt);
 
             const receiver = getUser(guestName[i]);
 
             io.to(receiver.socketId).emit('newInviteDB', {
                 findUserAlertDB: [findUserAlertDB],
-            });
-        } else {
-            socket.emit('errorMessage', '이미 초대한 회원입니다.');
-            return;
+            }
+        )};
         }
     }
 });
 
 // 방에 맛집 추가 시 알림
-socket.on('TheStore', async ({ roomId, userId, memberId, storeName }) => {
-    console.log('맛집이름',storeName)
-    if (roomId && userId) {
-        const user = await getUser(userId);
-        const findRoom = await Room.findById(roomId).exec();
-        const roomName = findRoom.roomName;
-        const createdAt = new Date();
-        const type = '맛집등록';
+socket.on(
+    'TheStore',
+    async ({ roomId, userId, memberId, storeName }) => {
+        if (roomId && userId) {
+            const createdAt = new Date();
+            const type = '맛집등록';
 
-        for (let i = 0; i < memberId.length; i++) {
-            if (findRoom) {
-                const findAlertDB = await Alert.findOne({
-                    roomId: roomId,
-                    senderName: userId,
-                    userId: memberId[i],
-                    storeName: storeName,
-                    type: type,
-                }).exec();
-                console.log('2',findAlertDB)
-                if (!findAlertDB || findAlertDB === undefined || findAlertDB == null) {
-                    await Alert.create({
-                        userId: memberId[i],
-                        senderName: userId,
-                        roomName: roomName,
-                        storeName:storeName,
+            const findUser = await User.findById(userId);
+            const senderName = findUser.nickname;
+
+            const findRoom = await Room.findById(roomId);
+            const roomName = findRoom.roomName;
+
+            for (let i = 0; i < memberId.length; i++) {
+                if (findRoom) {
+                    const findAlertDB = await Alert.findOne({
                         roomId: roomId,
-                        type,
-                        createdAt,
+                        senderName: senderName,
+                        userId: memberId[i],
+                        storeName: storeName,
+                        type: type,
                     });
-                }
 
-                const TheAlertDB = await Alert.findOne({
-                    roomId: roomId,
-                    senderName: userId,
-                    userId: memberId[i],
-                    storeName: storeName,
-                    type: type,
-                }).exec();
+                    if (!findAlertDB) {
+                        await Alert.create({
+                            userId: memberId[i],
+                            senderName: senderName,
+                            roomName: roomName,
+                            storeName: storeName,
+                            roomId: roomId,
+                            type,
+                            createdAt,
+                        });
+                    }
 
-                if (TheAlertDB && TheAlertDB.type === type) {
-                    console.log("들어오나")
-                    findAlertDB.createdAt = timeForToday(createdAt);
-                    const members = await getUser(memberId[i]);
-
-                    io.to(members.socketId).emit('AddStore', {
-                        senderName: user.nickname,
-                        roomName,
-                        type: findAlertDB.type,
-                        roomId,
+                    const TheAlertDB = await Alert.findOne({
+                        roomId: roomId,
+                        senderName: senderName,
+                        userId: memberId[i],
+                        storeName: storeName,
+                        type: type,
                     });
+
+                    if (TheAlertDB && TheAlertDB.type === type) {
+                        TheAlertDB.createdAt = timeForToday(createdAt);
+                        const members = getUser(memberId[i]);
+
+                        io.to(members.socketId).emit('AddStore', {
+                            TheAlertDB: [TheAlertDB]
+                        });
+                    }
                 }
             }
         }
     }
+);
+
+//알림 삭제
+socket.on('delete', async (alertId) => {
+    await Alert.findByIdAndDelete(alertId);
 });
 
 // 알림 목록 보내기
 socket.on('getAlert', async ({ receiverId }) => {
     if (receiverId) {
         const receiver = getUser(receiverId);
-        const findUserAlertDB = await Alert.find({
+        let findUserAlertDB = await Alert.find({
             userId: receiverId,
         });
-        if (findUserAlertDB.length !== 0) {
+
+        try{
             for (let alretDB of findUserAlertDB) {
                 alretDB.createdAt = timeForToday(alretDB.createdAt);
             }
             io.to(receiver.socketId).emit('getNotification', {
                 findAlertDB: findUserAlertDB,
             });
+
+        } catch (err) {
+            console.log(err)
         }
+    }
+});
+
+
+//로그아웃 시 연결 해제
+socket.on('userOut', async (userId) => {
+    const socketInUser = getUser(userId);
+    const socketId = socketInUser.socketId;
+
+    const findUserAlertDB = await Connect.findOne({ userId: userId, socketId: socketId });
+    const createdAt = new Date();
+
+    if (findUserAlertDB) {
+        await Connect.findByIdAndUpdate(
+            { _id: findUserAlertDB._id },
+            {
+                $set: [
+                    {
+                        connected: false,
+                        connectedAt: createdAt,
+                    },
+                ],
+            }
+        );
+        removeUser(socketId);
     }
 });
 
@@ -219,6 +254,6 @@ socket.on('disconnect', async () => {
         );
     }
     removeUser(socket.id);
-});
-});
+       });
+    });
 };
