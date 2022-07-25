@@ -344,10 +344,6 @@ module.exports = {
 
         try {
             const theRoom = await Room.findById(roomId);
-            const inviteUser = await User.find({
-                $or: [{ userId: guestId }],
-            });
-
             const existUser = theRoom.guestId;
             
             if (existUser.length > 20) {
@@ -369,20 +365,15 @@ module.exports = {
                 return res.status(400).send({ errorMessage: "이미 초대되었습니다"})
             }
 
-            for (let i = 0; i < inviteGuest.length; i++) {                
-                if (
-                    theRoom &&
-                    inviteUser &&
-                    theRoom.ownerId !== inviteGuest[i] &&
-                    !existUser.includes(inviteGuest[i])
-                ) {
+            for (let i = 0; i < inviteGuest.length; i++) {              
+                if (theRoom) {
                     await theRoom.updateOne({
                         $push: {
                             guestId: inviteGuest,
                         },
                     });
 
-                    await UsersRoom.findOneAndUpdate({ userId: inviteGues[i]}, {
+                    await UsersRoom.findOneAndUpdate({ userId: inviteGuest[i] }, {
                         $push: { roomSeq: roomId },
                     }, { upsert: true });
                 }
