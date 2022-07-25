@@ -43,7 +43,7 @@ router.post('/:madiId/like', authMiddleware, storeController.likeMatmadi);
 router.delete('/:madiId/like', authMiddleware, storeController.unlikeMatmadi);
 
 // 특정 맛집의 맛태그 조회
-router.get('/:storeId/mattag', authMiddleware, storeController.mattag);
+router.get('/:storeId/tag', authMiddleware, storeController.tag);
 
 // 특정 맛집의 추천 메뉴 조회
 router.get('/:storeId/menu', authMiddleware, storeController.viewMenu);
