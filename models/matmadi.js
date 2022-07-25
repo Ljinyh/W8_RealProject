@@ -7,6 +7,12 @@ const MatmadiSchema = new mongoose.Schema({
     star: String,
     imgURL: [String],
     createdAt: Date,
+    tagMenu : String, 
+    tagTasty : String,
+    tagPoint : String, 
+    ratingTasty : Number, 
+    ratingPrice : Number, 
+    ratingService: Number,
 });
 MatmadiSchema.virtual('madiId').get(function() {
     return this._id.toHexString();
