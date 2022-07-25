@@ -16,7 +16,7 @@ allRoom: async (req, res) => {
             userId: userId,
         }).exec();
 
-        if (!existRoom) {
+        if (!existRoom || existRoom.length === 0) {
             return res.status(200).send({
                 result: true,
                 total: 0,
