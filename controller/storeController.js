@@ -635,7 +635,7 @@ module.exports = {
         try {
             //
             const existTag = await Tag.find({ storeId, category: 'menu' });
-            
+
             // 메뉴의 좋아요 수 찾아서 배열 생성
             const menuLikeNum = [];
             for (i = 0; i < existTag.length; i++) {
@@ -649,7 +649,7 @@ module.exports = {
                 menuName: a.tagMenu,
                 menuLikeNum: menuLikeNum[idx],
             }));
-       
+
             return res
                 .status(200)
                 .send({ result: result, message: '맛집 추천메뉴 조회 완료' });
