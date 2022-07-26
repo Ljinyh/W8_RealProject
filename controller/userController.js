@@ -468,7 +468,7 @@ exports.deleteUser = async(req, res) => {
                 await Connect.findByIdAndDelete(existConnect._id);
             }
             if (existAlert) {
-                await Alert.delete({ userId: userId });
+                await Alert.deleteMany({ userId: userId });
             }
 
             if(!theRoom && !existUsersRoom || existUsersRoom.roomSeq.length === 0 && !existLike){
@@ -479,7 +479,7 @@ exports.deleteUser = async(req, res) => {
 
             if(!theRoom && !existUsersRoom && existLike.length !== 0 && existLike) {
                 
-                await Like.delete({ userId: userId });
+                await Like.deleteMany({ userId: userId });
                 await User.deleteOne({_id: userId});
                 return res.status(200).send({errorMessage: '회원탈퇴 성공!'});
             }
@@ -509,7 +509,7 @@ exports.deleteUser = async(req, res) => {
                 }
 
                 if (existLike) {
-                    await Like.delete({ userId: userId });
+                    await Like.deleteMany({ userId: userId });
                 }
 
             }
