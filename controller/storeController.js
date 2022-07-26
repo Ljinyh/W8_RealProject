@@ -542,19 +542,19 @@ module.exports = {
     // 맛마디 좋아요 토글
     likeMatmadi: async (req, res) => {
         const { userId } = res.locals.user;
-        const { madiId } = req.body;
+        const { madiId } = req.params;
         try {
-            const likeDone = await Like.findOne({ userId, madiId });
+            const likeDone = await Like.findOne({ userId, madiId});
             if (likeDone) {
                 return res.status(400).send({
                     result: false,
                     message: '이미 좋아요를 눌렀습니다.',
                 });
             }
-            await Like.create({ userId, madiId });
+            await Like.create({ userId:userId, madiId:madiId });
 
             // 해당 게시글 좋아요 개수 다시 출력해주기 (갱신)
-            const likes = await Like.find({ tagId });
+            const likes = await Like.find({ madiId });
             const likeNum = likes.length;
             return res
                 .status(200)
@@ -567,7 +567,7 @@ module.exports = {
     // 맛마디 좋아요 취소
     unlikeMatmadi: async (req, res) => {
         const { userId } = res.locals.user;
-        const { madiId } = req.body;
+        const { madiId } = req.params;
         try {
             const cancleLike = await Like.findOneAndDelete({ userId, madiId });
             if (!cancleLike) {
@@ -587,23 +587,26 @@ module.exports = {
             });
         }
     },
-    // 특정 맛집의 태그 조회 //태그와 추천메뉴 같이 출력해야함. 아래 API 제거하기
+    // 특정 맛집의 태그 조회
     tag: async (req, res) => {
         const { storeId } = req.params;
         try {
-            // const existTag = await Tag.find({storeId});
-            // const tagMenu = [];
-            // const tagTasty = [];
-            // const tagPoint = [];
-            // console.log(existTag);
+            const existTag = await Tag.find({storeId});
+            const tagMenu = [];
+            const tagTasty = [];
+            const tagPoint = [];
 
-            // for (i = 0; i < existTag.length; i++) {
-            //     tagMenu.push(existTag[i].tagMenu);
-            //     tagTasty.push(existTag[i].tagTasty);
-            //     tagPoint.push(existTag[i].tagPoint);
-            // }
-
-            // const result = {};
+            for (i = 0; i < existTag.length; i++) {
+                if(existTag[i].tagMenu){
+                    tagMenu.push(existTag[i].tagMenu);
+                }else if(existTag[i].tagTasty){
+                    tagTasty.push(existTag[i].tagTasty);
+                }else if(existTag[i].tagPoint){
+                    tagPoint.push(existTag[i].tagPoint);
+                }
+            }
+    
+            const result = {tagMenu, tagTasty, tagPoint};
             return res
                 .status(200)
                 .send({ result: result, message: '맛집 태그 조회 완료' });
