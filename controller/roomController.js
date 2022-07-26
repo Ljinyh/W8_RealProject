@@ -18,7 +18,6 @@ allRoom: async (req, res) => {
 
         if (!existRoom || existRoom.length === 0) {
             return res.status(200).send({
-                result: true,
                 total: 0,
                 myRooms: [],
                 Message: '사용자의 방이 존재하지 않습니다',
@@ -51,7 +50,7 @@ allRoom: async (req, res) => {
             }
             myroom.push(status);
         }
-
+        if (arrTheRoom.length === existRoom.roomSeq.length) {
         const result = arrTheRoom.map((room, idx) => ({
             roomId: room.roomId,
             roomName: room.roomName,
@@ -62,12 +61,13 @@ allRoom: async (req, res) => {
             status: myroom[idx],
             roomCode: room.roomCode,
         }));
-
+    
         res.status(200).send({
             result: true,
             total: existRoom.roomSeq.length,
             myRooms: result,
         });
+    }
     } catch (err) {
         console.log(err);
         res.status(400).send({
