@@ -34,6 +34,12 @@ router.post('/findPass', userController.findPass);
 //사용자 정보 수정
 router.put('/edit', authMiddleware, userController.userinfoEdit);
 
+//비밀번호 수정
+router.put('/passSet', authMiddleware, userController.passSet);
+
+//회원 탈퇴
+router.delete('/deleteUser', authMiddleware, userController.deleteUser);
+
 // 사용자 정보 조회 API, 로그인 시 사용
 router.get('/me', authMiddleware, userController.userInfo);
 

@@ -6,7 +6,6 @@ const UsersRoom = require('../models/usersRoom');
 const Matmadi = require('../models/matmadi');
 const Like = require('../models/like');
 const Tag = require('../models/tag');
-const { deleteMany } = require('../models/user');
 
 //
 module.exports = {
@@ -250,7 +249,6 @@ module.exports = {
             const findStarAvg = []; // 별점 평균을 맛집의 순서대로 쌓는다.
 
             for (let i = 0; i < findStoreList.length; i++) {
-                //console.log(findStoreList[i].userId)
                 let stores = await Store.findById(findStoreList[i].storeId);
                 let users = await User.findById(findStoreList[i].userId);
                 findStoreInfo.push(stores);
@@ -274,8 +272,6 @@ module.exports = {
                     findStarAvg.push(0); // 등록한 리뷰(별점)가 없다면 0를 표시한다.
                 }
             }
-
-            console.log('findStoreList', findStoreList);
             // 해당 가게에 같은 맛방 멤버가 쓴 가장 최신 코멘트를 출력할 것.
             const commentList = [];
             // for (j = 0; j < roomInfo.guestId.length; j++) {
@@ -351,21 +347,29 @@ module.exports = {
                 let a = tagMenu[i];
                 let hey = await Tag.findOne({ tagMenu: a });
                 if (hey === null) {
-                    await Tag.create({ storeId, tagMenu: a });
+                    await Tag.create({ storeId, tagMenu: a, category: 'menu' });
                 }
             }
             for (i = 0; i < tagTasty.length; i++) {
                 let a = tagTasty[i];
                 let hey = await Tag.findOne({ tagTasty: a });
                 if (hey === null) {
-                    await Tag.create({ storeId, tagTasty: a });
+                    await Tag.create({
+                        storeId,
+                        tagTasty: a,
+                        category: 'tasty',
+                    });
                 }
             }
             for (i = 0; i < tagPoint.length; i++) {
                 let a = tagPoint[i];
                 let hey = await Tag.findOne({ tagPoint: a });
                 if (hey === null) {
-                    await Tag.create({ storeId, tagPoint: a });
+                    await Tag.create({
+                        storeId,
+                        tagPoint: a,
+                        category: 'point',
+                    });
                 }
             }
 
@@ -396,7 +400,8 @@ module.exports = {
     allMatmadi: async (req, res) => {
         const { storeId } = req.params;
         try {
-            const existMatmadi = await Matmadi.find(storeId).exec();
+            const existMatmadi = await Matmadi.find({ storeId });
+
             //리뷰별 좋아요 갯수 찾아서 배열에 넣음.
             const likeNum = [];
             for (i = 0; i < existMatmadi.length; i++) {
@@ -405,7 +410,7 @@ module.exports = {
             }
             // map 함수로 찾은 리뷰 데이터와 좋아요 개수 출력
             const result = existMatmadi.map((a, idx) => ({
-                commentId: a.madiId,
+                madiId: a.madiId,
                 imgURL: a.imgURL,
                 comment: a.comment,
                 star: a.star,
@@ -459,6 +464,17 @@ module.exports = {
     updateMatmadi: async (req, res) => {
         const { userId } = res.locals.user;
         const { madiId } = req.params;
+        const {
+            comment,
+            star,
+            imgURL,
+            tagMenu,
+            tagTasty,
+            tagPoint,
+            ratingTasty,
+            ratingPrice,
+            ratingService,
+        } = req.body;
         try {
             const existMatmadi = await Matmadi.findById(madiId);
             if (userId !== existMatmadi.userId) {
@@ -467,22 +483,25 @@ module.exports = {
                     message: '사용자 작성한 리뷰가 아닙니다.',
                 });
             }
-            const result = await Matmadi.findByIdAndUpdate(madiId, {
-                $set: {
-                    comment,
-                    star,
-                    imgURL,
-                    tagMenu,
-                    tagTasty,
-                    tagPoint,
-                    ratingTasty,
-                    ratingPrice,
-                    ratingService,
-                },
-            });
+            await Matmadi.findByIdAndUpdate(
+                { _id: madiId },
+                {
+                    $set: {
+                        comment,
+                        star,
+                        imgURL,
+                        tagMenu,
+                        tagTasty,
+                        tagPoint,
+                        ratingTasty,
+                        ratingPrice,
+                        ratingService,
+                    },
+                }
+            );
             return res
                 .status(200)
-                .send({ result: result, message: '리뷰 수정 완료' });
+                .send({ result: true, message: '리뷰 수정 완료' });
         } catch (err) {
             console.log(err);
             res.status(400).send({ result: false, message: '리뷰 수정 실패' });
@@ -534,7 +553,7 @@ module.exports = {
     // 맛마디 좋아요 토글
     likeMatmadi: async (req, res) => {
         const { userId } = res.locals.user;
-        const { madiId } = req.body;
+        const { madiId } = req.params;
         try {
             const likeDone = await Like.findOne({ userId, madiId });
             if (likeDone) {
@@ -543,10 +562,10 @@ module.exports = {
                     message: '이미 좋아요를 눌렀습니다.',
                 });
             }
-            await Like.create({ userId, madiId });
+            await Like.create({ userId: userId, madiId: madiId });
 
             // 해당 게시글 좋아요 개수 다시 출력해주기 (갱신)
-            const likes = await Like.find({ tagId });
+            const likes = await Like.find({ madiId });
             const likeNum = likes.length;
             return res
                 .status(200)
@@ -559,7 +578,7 @@ module.exports = {
     // 맛마디 좋아요 취소
     unlikeMatmadi: async (req, res) => {
         const { userId } = res.locals.user;
-        const { madiId } = req.body;
+        const { madiId } = req.params;
         try {
             const cancleLike = await Like.findOneAndDelete({ userId, madiId });
             if (!cancleLike) {
@@ -579,23 +598,26 @@ module.exports = {
             });
         }
     },
-    // 특정 맛집의 태그 조회 //태그와 추천메뉴 같이 출력해야함. 아래 API 제거하기
+    // 특정 맛집의 태그 조회
     tag: async (req, res) => {
         const { storeId } = req.params;
         try {
-            const existTag = await Tag.find({ storeId, category });
+            const existTag = await Tag.find({ storeId });
             const tagMenu = [];
             const tagTasty = [];
             const tagPoint = [];
-            console.log(existTag);
 
             for (i = 0; i < existTag.length; i++) {
-                tagMenu.push(existTag[i].tagMenu);
-                tagTasty.push(existTag[i].tagTasty);
-                tagPoint.push(existTag[i].tagPoint);
+                if (existTag[i].tagMenu) {
+                    tagMenu.push(existTag[i].tagMenu);
+                } else if (existTag[i].tagTasty) {
+                    tagTasty.push(existTag[i].tagTasty);
+                } else if (existTag[i].tagPoint) {
+                    tagPoint.push(existTag[i].tagPoint);
+                }
             }
 
-            const result = {};
+            const result = { tagMenu, tagTasty, tagPoint };
             return res
                 .status(200)
                 .send({ result: result, message: '맛집 태그 조회 완료' });
@@ -611,21 +633,31 @@ module.exports = {
     viewMenu: async (req, res) => {
         const { storeId } = req.params;
         try {
-            const existTag = await Tag.find({ storeId });
-            const result = [];
+            //
+            const existTag = await Tag.find({ storeId, category: 'menu' });
+
+            // 메뉴의 좋아요 수 찾아서 배열 생성
+            const menuLikeNum = [];
             for (i = 0; i < existTag.length; i++) {
-                if (existTag[i]) {
-                    result.push(existTag[i].tagMenu);
-                }
+                let likes = await Like.find({ menuId: existTag[i]._id });
+                menuLikeNum.push(likes.length);
             }
+
+            // map 함수로 필요한 부분 정리해서 출력
+            const result = existTag.map((a, idx) => ({
+                menuId: a.id,
+                menuName: a.tagMenu,
+                menuLikeNum: menuLikeNum[idx],
+            }));
+
             return res
                 .status(200)
-                .send({ result: result, message: '맛집 태그 조회 완료' });
+                .send({ result: result, message: '맛집 추천메뉴 조회 완료' });
         } catch (err) {
             console.log(err);
             res.status(400).send({
                 result: false,
-                message: '맛집 태그 조회 실패',
+                message: '맛집 추천메뉴 조회 실패',
             });
         }
     },
@@ -633,18 +665,18 @@ module.exports = {
     // 태그 좋아요 토글
     likeMenu: async (req, res) => {
         const { userId } = res.locals.user;
-        const { tagId } = req.body;
+        const { menuId } = req.params;
         try {
-            const likeDone = await Like.findOne({ userId, tagId });
+            const likeDone = await Like.findOne({ userId, menuId });
             if (likeDone) {
                 return res.status(400).send({
                     result: false,
                     message: '이미 좋아요를 눌렀습니다.',
                 });
             }
-            await Like.create({ userId, tagId });
+            await Like.create({ userId, menuId });
             // 해당 게시글 좋아요 개수 다시 출력해주기 (갱신)
-            const likes = await Like.find({ tagId });
+            const likes = await Like.find({ menuId });
             const likeNum = likes.length;
 
             return res
@@ -658,9 +690,9 @@ module.exports = {
     // 태그 좋아요 취소
     unlikeMenu: async (req, res) => {
         const { userId } = res.locals.user;
-        const { tagId } = req.body;
+        const { menuId } = req.params;
         try {
-            const cancleLike = await Like.findOneAndDelete({ userId, tagId });
+            const cancleLike = await Like.findOneAndDelete({ userId, menuId });
             if (!cancleLike) {
                 return res.status(400).send({
                     result: false,
@@ -682,8 +714,8 @@ module.exports = {
     tagMapViewer: async (req, res) => {
         try {
             return res.status(200).send({ result: true, message: ' ' });
-            console.log(err);
         } catch (err) {
+            console.log(err);
             res.status(400).send({ result: false, message: ' ' });
         }
     },
