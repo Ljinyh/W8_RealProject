@@ -91,13 +91,9 @@ module.exports = {
         const { storeName, address, LatLon, tag } = req.body;
 
         try {
+            //이미 저장한 맛집인지 체크해야함. 미구현
             const existStore = await Store.find({ LatLon, storeName });
-            if (existStore) {
-                return res.status(400).send({
-                    result: false,
-                    message: '이미 존재하는 맛집입니다.',
-                });
-            }
+
             // 정보를 가게 DB에 저장
             const save = await Store.create({
                 userId,
