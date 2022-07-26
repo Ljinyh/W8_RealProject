@@ -6,7 +6,6 @@ const UsersRoom = require('../models/usersRoom');
 const Matmadi = require('../models/matmadi');
 const Like = require('../models/like');
 const Tag = require('../models/tag');
-const { deleteMany } = require('../models/user');
 
 //
 module.exports = {
@@ -250,7 +249,6 @@ module.exports = {
             const findStarAvg = []; // 별점 평균을 맛집의 순서대로 쌓는다.
 
             for (let i = 0; i < findStoreList.length; i++) {
-                //console.log(findStoreList[i].userId)
                 let stores = await Store.findById(findStoreList[i].storeId);
                 let users = await User.findById(findStoreList[i].userId);
                 findStoreInfo.push(stores);
@@ -274,8 +272,6 @@ module.exports = {
                     findStarAvg.push(0); // 등록한 리뷰(별점)가 없다면 0를 표시한다.
                 }
             }
-
-            console.log('findStoreList', findStoreList);
             // 해당 가게에 같은 맛방 멤버가 쓴 가장 최신 코멘트를 출력할 것.
             const commentList = [];
             // for (j = 0; j < roomInfo.guestId.length; j++) {
@@ -396,7 +392,9 @@ module.exports = {
     allMatmadi: async (req, res) => {
         const { storeId } = req.params;
         try {
-            const existMatmadi = await Matmadi.find(storeId).exec();
+            console.log(storeId)
+            const existMatmadi = await Matmadi.find({storeId})
+            
             //리뷰별 좋아요 갯수 찾아서 배열에 넣음.
             const likeNum = [];
             for (i = 0; i < existMatmadi.length; i++) {
@@ -583,19 +581,19 @@ module.exports = {
     tag: async (req, res) => {
         const { storeId } = req.params;
         try {
-            const existTag = await Tag.find({ storeId, category });
-            const tagMenu = [];
-            const tagTasty = [];
-            const tagPoint = [];
-            console.log(existTag);
+            // const existTag = await Tag.find({storeId});
+            // const tagMenu = [];
+            // const tagTasty = [];
+            // const tagPoint = [];
+            // console.log(existTag);
 
-            for (i = 0; i < existTag.length; i++) {
-                tagMenu.push(existTag[i].tagMenu);
-                tagTasty.push(existTag[i].tagTasty);
-                tagPoint.push(existTag[i].tagPoint);
-            }
+            // for (i = 0; i < existTag.length; i++) {
+            //     tagMenu.push(existTag[i].tagMenu);
+            //     tagTasty.push(existTag[i].tagTasty);
+            //     tagPoint.push(existTag[i].tagPoint);
+            // }
 
-            const result = {};
+            // const result = {};
             return res
                 .status(200)
                 .send({ result: result, message: '맛집 태그 조회 완료' });
