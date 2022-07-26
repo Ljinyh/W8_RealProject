@@ -4,7 +4,7 @@ const MatmadiSchema = new mongoose.Schema({
     storeId: String,
     userId: String,
     comment: String,
-    star: String,
+    star: Number,
     imgURL: [String],
     createdAt: Date,
     tagMenu : [String], 
