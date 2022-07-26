@@ -6,7 +6,7 @@ const mailer = require('../models/mail');
 const User = require('../models/user');
 const Room = require('../models/room');
 const UsersRoom = require('../models/usersRoom');
-const Alert = require('../models/alret');
+const Alert = require('../models/alert');
 const Like = require('../models/like');
 const Connect = require('../models/connect');
 
