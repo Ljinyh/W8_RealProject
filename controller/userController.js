@@ -468,16 +468,18 @@ exports.deleteUser = async(req, res) => {
                 await Connect.findByIdAndDelete(existConnect._id);
             }
             if (existAlert) {
-                await Alert.deleteMany({ userId: userId });
+                await Alert.delete({ userId: userId });
             }
 
-            if(!theRoom && !existUsersRoom && existLike.length === 0 && !existLike){
+            if(!theRoom && !existUsersRoom || existUsersRoom.roomSeq.length === 0 && !existLike){
+                await UsersRoom.deleteOne({ userId: userId })
                 await User.deleteOne({_id: userId});
                 return res.status(200).send({errorMessage: '회원탈퇴 성공!'});
             }
 
             if(!theRoom && !existUsersRoom && existLike.length !== 0 && existLike) {
-                await Like.deleteMany({ userId: userId });
+                
+                await Like.delete({ userId: userId });
                 await User.deleteOne({_id: userId});
                 return res.status(200).send({errorMessage: '회원탈퇴 성공!'});
             }
@@ -506,12 +508,8 @@ exports.deleteUser = async(req, res) => {
 
                 }
 
-                if (existUsersRoom.roomSeq.length === 0 ) {
-                    await UsersRoom.deleteOne({ userId: userId })
-                }
-
                 if (existLike) {
-                    await Like.deleteMany({ userId: userId });
+                    await Like.delete({ userId: userId });
                 }
 
             }
