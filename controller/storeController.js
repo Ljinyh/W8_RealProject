@@ -91,9 +91,17 @@ module.exports = {
         const { storeName, address, LatLon, tag } = req.body;
 
         try {
-            //이미 저장한 맛집인지 체크해야함. 미구현
-            const existStore = await Store.find({ LatLon, storeName });
-
+            // 이미 저장한 맛집인지 체크
+            const existStore = await Store.findOne({ storeName });
+            if (
+                existStore !== null &&
+                existStore.storeName === storeName &&
+                JSON.stringify(existStore.LatLon) === JSON.stringify(LatLon)
+            ) {
+                return res
+                    .status(400)
+                    .send({ errorMessage: '이미 저장된 맛집입니다.' });
+            }
             // 정보를 가게 DB에 저장
             const save = await Store.create({
                 userId,
@@ -269,7 +277,7 @@ module.exports = {
 
             console.log('findStoreList', findStoreList);
             // 해당 가게에 같은 맛방 멤버가 쓴 가장 최신 코멘트를 출력할 것.
-             const commentList = [];
+            const commentList = [];
             // for (j = 0; j < roomInfo.guestId.length; j++) {
             //     findComment = await Matmadi.findOne({
             //         storeId: findStoreList[j].storeId,
