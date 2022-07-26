@@ -345,6 +345,30 @@ module.exports = {
                     message: '사용자가 이미 리뷰를 작성했습니다.',
                 });
             }
+
+            // 태그 DB에 해당 태그 데이터가 있는지 확인하고 없으면 create
+            for (i = 0; i < tagMenu.length; i++) {
+                let a = tagMenu[i];
+                let hey = await Tag.findOne({ tagMenu: a });
+                if (hey === null) {
+                    await Tag.create({ storeId, tagMenu: a });
+                }
+            }
+            for (i = 0; i < tagTasty.length; i++) {
+                let a = tagTasty[i];
+                let hey = await Tag.findOne({ tagTasty: a });
+                if (hey === null) {
+                    await Tag.create({ storeId, tagTasty: a });
+                }
+            }
+            for (i = 0; i < tagPoint.length; i++) {
+                let a = tagPoint[i];
+                let hey = await Tag.findOne({ tagPoint: a });
+                if (hey === null) {
+                    await Tag.create({ storeId, tagPoint: a });
+                }
+            }
+
             await Matmadi.create({
                 storeId,
                 userId,
@@ -357,17 +381,8 @@ module.exports = {
                 ratingTasty,
                 ratingPrice,
                 ratingService,
-                createdAt,
             });
-            // 태그 DB에 해당 태그 데이터가 있는지 확인하고 없으면 create
-            // 그냥 찾고 if문으로 없으면 생성할까..
-            for (i = 0; i < tagMenu.length; i++) {
-                await Tag.findOneAndUpdate(
-                    { storeId, tagMenu: tagMenu[i] },
-                    { $push: { tagMenu, storeId, category: 'tagMenu' } },
-                    { upsert: true }
-                );
-            }
+
             return res
                 .status(200)
                 .send({ result: true, message: '리뷰 작성 완료!' });
