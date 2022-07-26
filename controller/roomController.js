@@ -27,7 +27,7 @@ allRoom: async (req, res) => {
         // roomSeq로 RoomDB에서 정보찾기. 배열로 생성
         const arrTheRoom = [];
         for (i = 0; i < existRoom.roomSeq.length; i++) {
-            roomInfo = await Room.findById(existRoom.roomSeq[i]);
+            let roomInfo = await Room.findById(existRoom.roomSeq[i]);
             arrTheRoom.push(roomInfo);
         }
 
@@ -50,7 +50,7 @@ allRoom: async (req, res) => {
             }
             myroom.push(status);
         }
-        if (arrTheRoom.length === existRoom.roomSeq.length) {
+       
         const result = arrTheRoom.map((room, idx) => ({
             roomId: room.roomId,
             roomName: room.roomName,
@@ -61,13 +61,13 @@ allRoom: async (req, res) => {
             status: myroom[idx],
             roomCode: room.roomCode,
         }));
-    
+
         res.status(200).send({
             result: true,
             total: existRoom.roomSeq.length,
             myRooms: result,
         });
-    }
+    
     } catch (err) {
         console.log(err);
         res.status(400).send({
