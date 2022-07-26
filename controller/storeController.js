@@ -91,9 +91,17 @@ module.exports = {
         const { storeName, address, LatLon, tag } = req.body;
 
         try {
-            //이미 저장한 맛집인지 체크해야함. 미구현
-            const existStore = await Store.find({ LatLon, storeName });
-
+            // 이미 저장한 맛집인지 체크
+            const existStore = await Store.findOne({ storeName });
+            if (
+                existStore !== null &&
+                existStore.storeName === storeName &&
+                JSON.stringify(existStore.LatLon) === JSON.stringify(LatLon)
+            ) {
+                return res
+                    .status(400)
+                    .send({ errorMessage: '이미 저장된 맛집입니다.' });
+            }
             // 정보를 가게 DB에 저장
             const save = await Store.create({
                 userId,
@@ -269,7 +277,7 @@ module.exports = {
 
             console.log('findStoreList', findStoreList);
             // 해당 가게에 같은 맛방 멤버가 쓴 가장 최신 코멘트를 출력할 것.
-             const commentList = [];
+            const commentList = [];
             // for (j = 0; j < roomInfo.guestId.length; j++) {
             //     findComment = await Matmadi.findOne({
             //         storeId: findStoreList[j].storeId,
@@ -337,6 +345,30 @@ module.exports = {
                     message: '사용자가 이미 리뷰를 작성했습니다.',
                 });
             }
+
+            // 태그 DB에 해당 태그 데이터가 있는지 확인하고 없으면 create
+            for (i = 0; i < tagMenu.length; i++) {
+                let a = tagMenu[i];
+                let hey = await Tag.findOne({ tagMenu: a });
+                if (hey === null) {
+                    await Tag.create({ storeId, tagMenu: a });
+                }
+            }
+            for (i = 0; i < tagTasty.length; i++) {
+                let a = tagTasty[i];
+                let hey = await Tag.findOne({ tagTasty: a });
+                if (hey === null) {
+                    await Tag.create({ storeId, tagTasty: a });
+                }
+            }
+            for (i = 0; i < tagPoint.length; i++) {
+                let a = tagPoint[i];
+                let hey = await Tag.findOne({ tagPoint: a });
+                if (hey === null) {
+                    await Tag.create({ storeId, tagPoint: a });
+                }
+            }
+
             await Matmadi.create({
                 storeId,
                 userId,
@@ -349,17 +381,8 @@ module.exports = {
                 ratingTasty,
                 ratingPrice,
                 ratingService,
-                createdAt,
             });
-            // 태그 DB에 해당 태그 데이터가 있는지 확인하고 없으면 create
-            // 그냥 찾고 if문으로 없으면 생성할까..
-            for (i = 0; i < tagMenu.length; i++) {
-                await Tag.findOneAndUpdate(
-                    { storeId, tagMenu: tagMenu[i] },
-                    { $push: { tagMenu, storeId, category: 'tagMenu' } },
-                    { upsert: true }
-                );
-            }
+
             return res
                 .status(200)
                 .send({ result: true, message: '리뷰 작성 완료!' });
