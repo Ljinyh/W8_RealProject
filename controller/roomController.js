@@ -16,9 +16,8 @@ allRoom: async (req, res) => {
             userId: userId,
         }).exec();
 
-        if (!existRoom) {
+        if (!existRoom || existRoom.length === 0) {
             return res.status(200).send({
-                result: true,
                 total: 0,
                 myRooms: [],
                 Message: '사용자의 방이 존재하지 않습니다',
@@ -28,7 +27,7 @@ allRoom: async (req, res) => {
         // roomSeq로 RoomDB에서 정보찾기. 배열로 생성
         const arrTheRoom = [];
         for (i = 0; i < existRoom.roomSeq.length; i++) {
-            roomInfo = await Room.findById(existRoom.roomSeq[i]);
+            let roomInfo = await Room.findById(existRoom.roomSeq[i]);
             arrTheRoom.push(roomInfo);
         }
 
@@ -51,7 +50,7 @@ allRoom: async (req, res) => {
             }
             myroom.push(status);
         }
-
+       
         const result = arrTheRoom.map((room, idx) => ({
             roomId: room.roomId,
             roomName: room.roomName,
@@ -68,6 +67,7 @@ allRoom: async (req, res) => {
             total: existRoom.roomSeq.length,
             myRooms: result,
         });
+    
     } catch (err) {
         console.log(err);
         res.status(400).send({
@@ -333,7 +333,7 @@ writeRoom: async (req, res) => {
         }
         return res
             .status(200)
-            .json({ result: true, message: '맛방 만들기 성공' });
+            .json({ result: true, message: '맛방 만들기 성공', roomId: createdRoom.roomId, guestId: guestId });
     } catch (err) {
         console.log(err);
         res.status(400).send({
