@@ -392,8 +392,8 @@ module.exports = {
     allMatmadi: async (req, res) => {
         const { storeId } = req.params;
         try {
-            const existMatmadi = await Matmadi.find({storeId})
-            
+            const existMatmadi = await Matmadi.find({ storeId });
+
             //리뷰별 좋아요 갯수 찾아서 배열에 넣음.
             const likeNum = [];
             for (i = 0; i < existMatmadi.length; i++) {
@@ -456,6 +456,17 @@ module.exports = {
     updateMatmadi: async (req, res) => {
         const { userId } = res.locals.user;
         const { madiId } = req.params;
+        const {
+            comment,
+            star,
+            imgURL,
+            tagMenu,
+            tagTasty,
+            tagPoint,
+            ratingTasty,
+            ratingPrice,
+            ratingService,
+        } = req.body;
         try {
             const existMatmadi = await Matmadi.findById(madiId);
             if (userId !== existMatmadi.userId) {
@@ -464,7 +475,7 @@ module.exports = {
                     message: '사용자 작성한 리뷰가 아닙니다.',
                 });
             }
-            const result = await Matmadi.findByIdAndUpdate(madiId, {
+            await Matmadi.findByIdAndUpdate({_id:madiId}, {
                 $set: {
                     comment,
                     star,
@@ -479,7 +490,7 @@ module.exports = {
             });
             return res
                 .status(200)
-                .send({ result: result, message: '리뷰 수정 완료' });
+                .send({ result: true, message: '리뷰 수정 완료' });
         } catch (err) {
             console.log(err);
             res.status(400).send({ result: false, message: '리뷰 수정 실패' });
