@@ -11,5 +11,6 @@ router.use('/auth', require('./socialRouter'));
 router.use('/rooms', require('./roomRouter'));
 router.use('/store', require('./storeRouter'));
 router.use('/upload', require('./uploadRouter'));
+router.use('/review', require('./reviewRouter'));
 
 module.exports = router;
