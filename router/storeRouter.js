@@ -40,11 +40,11 @@ router.get('/:storeId/tag', authMiddleware, storeController.tag);
 router.get('/:storeId/menu', authMiddleware, storeController.viewMenu);
 
 // 추천 메뉴 좋아요 토글
-router.post('/:storeId/menu/:menuId', authMiddleware, storeController.likeMenu);
+router.post('/menu/:menuId', authMiddleware, storeController.likeMenu);
 
 // 추천 메뉴 좋아요 취소
 router.delete(
-    '/:storeId/menu/:menuId',
+    '/menu/:menuId',
     authMiddleware,
     storeController.unlikeMenu
 );

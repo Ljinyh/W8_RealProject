@@ -7,7 +7,7 @@ const TagSchema = new mongoose.Schema({
     tagPoint: String,
     category: String,
 });
-TagSchema.virtual('tagId').get(function () {
+TagSchema.virtual('menuId').get(function () {
     return this._id.toHexString();
 });
 TagSchema.set('toJSON', { virtuals: true });
