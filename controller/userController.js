@@ -419,7 +419,7 @@ exports.userinfoEdit = async(req, res) => {
 // 비밀번호 수정
 exports.passSet = async(req, res) => {
     const { user } = res.locals;
-    let { thePassword, password } = await checkUserPass.validateAsync(
+    let { customerId, thePassword, password } = await checkUserPass.validateAsync(
         req.body
     );
 
@@ -427,8 +427,8 @@ exports.passSet = async(req, res) => {
         const theUser = await User.findById(user.userId);
         const userCompared = await bcrypt.compare(thePassword, theUser.password);
 
-        if (!theUser || !userCompared) {
-            return res.status(400).send({ errorMessage: '비밀번호가 맞지 않거나 회원이 존재하지 않습니다!' });
+        if (!theUser || !userCompared || customerId !== theUser.customerId) {
+            return res.status(400).send({ errorMessage: '비밀번호나 아이디가 맞지 않거나 회원이 존재하지 않습니다!' });
         }
 
         if (theUser && userCompared) {
