@@ -633,47 +633,6 @@ setSequenceRoom: async (req, res) => {
 },
 
 //==============================================================
-// 맛방에 맛집 저장
-saveStore: async (req, res) => {
-    const { roomId } = req.params;
-    const { userId } = res.locals.user;
-    const { storeId, comment, tag, imgURL, price, star } = req.body;
-
-    const theRoom = await Room.findById(roomId).exec();
-    const theStore = await Store.findById(storeId).exec();
-    const existSavelist = await Savelist.findOne({ storeId, roomId });
-    try {
-        if (existSavelist) {
-            return res
-                .status(400)
-                .send({
-                    errorMessage: '이미 맛방에 저장되어 있는 맛집입니다.',
-                });
-        }
-        if (theRoom && theStore) {
-            Savelist.create({
-                userId,
-                roomId,
-                storeId: theStore.storeId,
-                comment,
-                star,
-                price,
-                tag,
-                imgURL,
-                createdAt: Date.now(),
-            });
-
-            return res.status(200).send({ msg: '성공!' });
-        }
-
-        res.status(400).send({ errorMessage: '실패' });
-    } catch (err) {
-        console.log(err);
-        res.status(400).send({ result: false });
-    }
-},
-
-//==============================================================
 // 룸코드 생성 코드
 findRoomCode: async (req, res) => {
     const { roomId } = req.params;

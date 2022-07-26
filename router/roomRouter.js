@@ -51,7 +51,5 @@ router.delete('/:roomId', authMiddleware, roomController.deleteRoom);
 // 맛방 나가기
 router.put('/:roomId/exit', authMiddleware, roomController.exitRoom);
 
-// 맛방에 저장
-router.post('/:roomId/storeList', authMiddleware, roomController.saveStore);
 
 module.exports = router;
