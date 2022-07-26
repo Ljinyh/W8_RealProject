@@ -392,7 +392,6 @@ module.exports = {
     allMatmadi: async (req, res) => {
         const { storeId } = req.params;
         try {
-            console.log(storeId)
             const existMatmadi = await Matmadi.find({storeId})
             
             //리뷰별 좋아요 갯수 찾아서 배열에 넣음.
@@ -403,7 +402,7 @@ module.exports = {
             }
             // map 함수로 찾은 리뷰 데이터와 좋아요 개수 출력
             const result = existMatmadi.map((a, idx) => ({
-                commentId: a.madiId,
+                madiId: a.madiId,
                 imgURL: a.imgURL,
                 comment: a.comment,
                 star: a.star,
