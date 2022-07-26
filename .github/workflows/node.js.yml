@@ -25,6 +25,7 @@ jobs:
       with:
         node-version: ${{ matrix.node-version }}
         cache: 'npm'
+    - run : npm install
     - run: npm run build --if-present
     
     - name: zip file
@@ -45,3 +46,5 @@ jobs:
         --deployment-config-name CodeDeployDefault.AllAtOnce 
         --deployment-group-name w8cd
         --s3-location bucket=w8codepipline,bundleType=zip,key=deploy/hous.zip
+    - name: pm2 start
+      run: sudo pm2 restart server
