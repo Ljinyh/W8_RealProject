@@ -3,9 +3,13 @@ const userDB = require('../models/user');
 const Joi = require('joi');
 const bcrypt = require('bcrypt');
 const mailer = require('../models/mail');
-//const secret = require('../config/secret.json');
 const User = require('../models/user');
-require("dotenv").config();
+const Room = require('../models/room');
+const UsersRoom = require('../models/usersRoom');
+const Alert = require('../models/alret');
+const Like = require('../models/like');
+const Connect = require('../models/connect');
+
 // const send_message = require('../module/sms'); //sms module
 
 require('dotenv').config();
@@ -28,6 +32,45 @@ const UserSchema = Joi.object({
 
     birthDay: Joi.string().min(8),
 }).unknown(); // 정의되지 않은 key도 허용
+
+//비밀번호 validation
+const checkUserPass = Joi.object({
+    password: Joi.string()
+        .required()
+        .min(6)
+        .pattern(new RegExp('^(?=.*[@$!%*#?&])[A-Za-z0-9@$!%*#?&]{6,}$'))
+        .messages({
+            'string.empty': '{{#label}}를 채워주세요.',
+            'string.min': `{{#label}}를 최소 6자이상 써주세요!`,
+            'string.pattern.base': '특수문자가 들어가야합니다.',
+        }),
+
+    confirmPassword: Joi.string().min(3).messages({
+        'string.empty': '{{#label}} 를 채워주세요.',
+        'string.min': '{{#label}}은 최소 3글자 이상입니다.',
+    }),
+}).unknown();
+
+//ID validation
+const checkUser = Joi.object({
+    customerId: Joi.string()
+        .required()
+        .min(3)
+        .max(11)
+        .pattern(new RegExp('^[ㄱ-ㅎ가-힣0-9a-zA-Z]{3,11}$'))
+        .messages({
+            'string.empty': '{{#label}}를 채워주세요.',
+            'string.min': `{{#label}}를 최소 3자이상 써주세요!`,
+            'string.max': '{{#label}}는 최대 11글자입니다.',
+        }),
+}).unknown();
+
+//email validation
+const emailValidation = Joi.object({
+    email: Joi.string()
+        .required()
+        .pattern(new RegExp('^[0-9a-zA-Z]+@+[0-9a-zA-Z]+.+[a-zA-Z]$')),
+}).unknown();
 
 //================================================================================
 //회원가입
@@ -77,19 +120,6 @@ exports.signUp = async(req, res) => {
 
 //================================================================================
 //아이디 중복확인API
-const checkUser = Joi.object({
-    customerId: Joi.string()
-        .required()
-        .min(3)
-        .max(11)
-        .pattern(new RegExp('^[ㄱ-ㅎ가-힣0-9a-zA-Z]{3,11}$'))
-        .messages({
-            'string.empty': '{{#label}}를 채워주세요.',
-            'string.min': `{{#label}}를 최소 3자이상 써주세요!`,
-            'string.max': '{{#label}}는 최대 11글자입니다.',
-        }),
-}).unknown();
-
 exports.check = async(req, res) => {
     try {
         const { customerId } = await checkUser.validateAsync(req.body);
@@ -113,23 +143,6 @@ exports.check = async(req, res) => {
 
 //================================================================================
 //비밀번호 중복확인API
-const checkUserPass = Joi.object({
-    password: Joi.string()
-        .required()
-        .min(6)
-        .pattern(new RegExp('^(?=.*[@$!%*#?&])[A-Za-z0-9@$!%*#?&]{6,}$'))
-        .messages({
-            'string.empty': '{{#label}}를 채워주세요.',
-            'string.min': `{{#label}}를 최소 6자이상 써주세요!`,
-            'string.pattern.base': '특수문자가 들어가야합니다.',
-        }),
-
-    confirmPassword: Joi.string().required().min(3).messages({
-        'string.empty': '{{#label}} 를 채워주세요.',
-        'string.min': '{{#label}}은 최소 3글자 이상입니다.',
-    }),
-}).unknown();
-
 exports.PassCehck = async(req, res) => {
     try {
         const { password, confirmPassword } = await checkUserPass.validateAsync(
@@ -150,12 +163,6 @@ exports.PassCehck = async(req, res) => {
 
 //================================================================================
 // 이메일 중복확인 및 인증번호 메일로 보내기
-const emailValidation = Joi.object({
-    email: Joi.string()
-        .required()
-        .pattern(new RegExp('^[0-9a-zA-Z]+@+[0-9a-zA-Z]+.+[a-zA-Z]$')),
-}).unknown();
-
 exports.sendMail = async(req, res) => {
     const { email } = await emailValidation.validateAsync(req.body);
 
@@ -372,7 +379,7 @@ exports.findPass = async(req, res) => {
 //유저 정보 수정
 exports.userinfoEdit = async(req, res) => {
     const { userId } = res.locals.user;
-    const { nickname, name, birthDay, password, faceColor, eyes } = req.body;
+    const { nickname, name, birthDay, faceColor, eyes } = req.body;
 
     const users = await userDB.findById(userId).exec();
 
@@ -386,7 +393,7 @@ exports.userinfoEdit = async(req, res) => {
             }
         }
 
-        if (users && !password) {
+        if (users) {
             await userDB.findByIdAndUpdate({ _id: users._id }, {
                 $set: {
                     nickname: nickname,
@@ -396,23 +403,6 @@ exports.userinfoEdit = async(req, res) => {
                     eyes: eyes,
                 },
             });
-            return res.status(201).json({
-                msg: '회원정보가 수정되었습니다.',
-            });
-        }
-
-        if (users && password) {
-            await userDB.findByIdAndUpdate({ _id: users._id }, {
-                $set: {
-                    nickname: nickname,
-                    name: name,
-                    birthDay: birthDay,
-                    faceColor: faceColor,
-                    eyes: eyes,
-                    password: bcrypt.hashSync(password, 10),
-                },
-            });
-
             return res.status(201).json({
                 msg: '회원정보가 수정되었습니다.',
             });
@@ -422,6 +412,107 @@ exports.userinfoEdit = async(req, res) => {
     } catch (error) {
         console.log(error);
         res.status(500).send({ errorMessage: '예외처리 에러' });
+    }
+};
+
+//================================================================================
+// 비밀번호 수정
+exports.passSet = async(req, res) => {
+    const { user } = res.locals;
+    let { thePassword, password } = await checkUserPass.validateAsync(
+        req.body
+    );
+
+    try {
+        const theUser = await User.findById(user.userId);
+        const userCompared = await bcrypt.compare(thePassword, theUser.password);
+
+        if (!theUser || !userCompared) {
+            return res.status(400).send({ errorMessage: '비밀번호가 맞지 않거나 회원이 존재하지 않습니다!' });
+        }
+
+        if (theUser && userCompared) {
+            await User.findByIdAndUpdate(user.userId, {
+                $set: { password: bcrypt.hashSync(password, 10) }
+            });
+
+            return res.status(200).send({ msg: '비밀번호 바꾸기 성공!' })
+        }
+
+        res.status(400).send({ errorMessage: '비밀번호 바꾸기 실패!' })
+
+    } catch (err) {
+        console.log(err)
+        res.status(400).send({ errorMessage: 'ERROR!' })
+    }
+};
+
+//================================================================================
+//회원 탈퇴
+exports.deleteUser = async(req, res) => {
+    const { userId } = res.locals.user;
+    const findUser = await User.findById(userId);
+    const theRoom = await Room.find({ $or: [{ ownerId: userId }, { guestId: userId }] });
+    const existAlert = await Alert.find({ userId: userId });
+    const existUsersRoom = await UsersRoom.findOne({ userId: userId });
+    const existConnect = await Connect.findOne({ userId: userId });
+    const existLike = await Like.find({ userId: userId });
+
+    try {
+        if (!findUser) {
+            return res.status(400).send({ errorMessage: '회원이 존재하지 않습니다!' });
+        }
+
+        if (findUser) {
+            if (existConnect) {
+                await Connect.findByIdAndDelete(existConnect._id);
+            }
+            if (existAlert) {
+                await Alert.deleteMany({ userId: userId });
+            }
+
+            if (theRoom) {
+                const ownerRoom = theRoom.filter((e) => e.ownerId === userId);
+                const guestRoom = theRoom.filter((e) => e.guestId.includes(userId));
+
+                if (guestRoom !== 0 || ownerRoom !== 0) {
+                    for (let i = 0; i < guestRoom.length; i++) {
+                        await UsersRoom.findOneAndUpdate({ roomSeq: guestRoom[i]._id }, {
+                            $pull: { roomSeq: guestRoom[i]._id }
+                        })
+
+                        await Room.findByIdAndUpdate(guestRoom[i]._id, {
+                            $pull: { guestId: userId }
+                        })
+                    };
+
+                    for (let i = 0; i < ownerRoom.length; i++) {
+                        await UsersRoom.findOneAndUpdate({ roomSeq: ownerRoom[i]._id }, {
+                            $pull: { roomSeq: ownerRoom[i]._id }
+                        })
+                        await Room.findByIdAndDelete(ownerRoom[i]._id);
+                    }
+
+                }
+
+                if (existUsersRoom.roomSeq.length === 0) {
+                    await UsersRoom.deleteOne({ userId: userId })
+                }
+
+                if (existLike) {
+                    await Like.deleteMany({ userId: userId });
+                }
+
+            }
+
+            await User.findByIdAndDelete(userId);
+            return res.status(200).send({ msg: '회원 삭제 성공!' });
+        }
+
+        res.status(400).send({ errorMessage: '회원 삭제 실패!' });
+    } catch (err) {
+        console.log(err);
+        res.status(400).send({ errorMessage: 'error!' });
     }
 };
 
