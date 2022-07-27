@@ -7,6 +7,26 @@ const Matmadi = require('../models/matmadi');
 const Like = require('../models/like');
 const Tag = require('../models/tag');
 
+// 두개의 좌표 거리 계산 함수
+function getDistance(lat1, lng1, lat2, lng2) {
+    function deg2rad(deg) {
+        return deg * (Math.PI / 180);
+    }
+    const R = 6371; // Radius of the earth in km
+    const dLat = deg2rad(lat2 - lat1); // deg2rad below
+    const dLon = deg2rad(lng2 - lng1);
+    const a =
+        Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+        Math.cos(deg2rad(lat1)) *
+            Math.cos(deg2rad(lat2)) *
+            Math.sin(dLon / 2) *
+            Math.sin(dLon / 2);
+    const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+    const distance = Math.round(R * c*1000)/1000; // Distance in km
+
+    return distance;
+}
+
 module.exports = {
     // 지도에 맛집 보여주기 (현재 위치기반 검색)
     mapViewer: async (req, res) => {
@@ -65,6 +85,7 @@ module.exports = {
                     address: allStore[i].address,
                     lon: allStore[i].location.coordinates[0],
                     lat: allStore[i].location.coordinates[1],
+                    distance: getDistance(lat,lon,allStore[i].location.coordinates[1],allStore[i].location.coordinates[0]),
                     tag: allStore[i].mainTag,
                     nickname: findUser.nickname,
                     faceColor: findUser.faceColor,
@@ -85,7 +106,7 @@ module.exports = {
         }
     },
     // 맛방에 맛집 저장
-    saveStore: async(req, res) => {
+    saveStore: async (req, res) => {
         const { userId } = res.locals.user;
         const { storeId, selectedRooms } = req.body;
         try {
@@ -130,7 +151,7 @@ module.exports = {
     },
 
     // 맛집 생성 (첫 기록하기), 방장의 맛방에 맛집 추가까지
-    createStore: async(req, res) => {
+    createStore: async (req, res) => {
         const { userId } = res.locals.user; // JWT 인증 정보
         const { storeName, address, tag } = req.body;
         const { lon, lat } = req.body;
@@ -169,20 +190,22 @@ module.exports = {
     },
 
     // 맛집 상세 조회 말풍선 (내가 소속된 맛방별로 검색)
-    detailStore: async(req, res) => {
+    detailStore: async (req, res) => {
         const { storeId } = req.params;
+        const { lon, lat } = req.query;
 
         try {
             const existStore = await Store.findById(storeId);
             const storefinder = await User.findById(existStore.userId);
-            const list = await Savelist.find({ storeId: storeId });
+            const list = await Matmadi.find({ storeId: storeId });
             let allStarArr = []; // null 값이 들어오면 에러가 나기 때문에 빈 배열 선언
             allStarArr = list.map((a) => a.star);
             const starAvg =
                 allStarArr.reduce(function add(sum, currValue) {
                     return sum + currValue;
                 }, 0) / allStarArr.length;
-
+            //사용자 위치에서 맛집까지의 거리 계산
+            const distance = getDistance(lat,lon,existStore.location.coordinates[1],existStore.location.coordinates[0])
             res.status(200).send({
                 message: '맛집 정보 조회 완료',
                 result: {
@@ -192,6 +215,7 @@ module.exports = {
                     faceColor: storefinder.faceColor,
                     eyes: storefinder.eyes,
                     tag: existStore.mainTag,
+                    distance,
                     // starAvg : Math.round(starAvg), //소수점 반올림 정수 반환
                     starAvg: Math.round(starAvg * 2) / 2, // 소수점 0.5 단위로 반올림 반환
                     comment: existStore.comment,
@@ -206,7 +230,7 @@ module.exports = {
         }
     },
     // 사용자의 맛방 목록 조회 (내가 소속된 맛방 별로 검색)
-    allMatBang: async(req, res) => {
+    allMatBang: async (req, res) => {
         const { userId } = res.locals.user;
         try {
             //userRoom 데이터 테이블에서 찾기
@@ -285,8 +309,9 @@ module.exports = {
         }
     },
     // 특정 맛방의 맛집 태그 아이콘
-    roomTagIcon: async(req, res) => {
+    roomTagIcon: async (req, res) => {
         const { roomId } = req.params;
+        const { lon, lat } = req.query;
         try {
             //
             const findStoreList = await Savelist.find({ roomId });
@@ -327,6 +352,7 @@ module.exports = {
                 storeName: findStoreInfo[idx].storeName,
                 lon: findStoreInfo[idx].location.coordinates[0],
                 lat: findStoreInfo[idx].location.coordinates[1],
+                distance : getDistance(lat,lon,findStoreInfo[idx].location.coordinates[1],findStoreInfo[idx].location.coordinates[0]),
                 nickname: findUserIcon[idx].nickname,
                 faceColor: findUserIcon[idx].faceColor,
                 eyes: findUserIcon[idx].eyes,
@@ -345,7 +371,7 @@ module.exports = {
     },
 
     // 리뷰 남기기 (맛마디 작성)
-    writeMatmadi: async(req, res) => {
+    writeMatmadi: async (req, res) => {
         const { userId } = res.locals.user;
         const { storeId } = req.params;
         const {
@@ -420,7 +446,10 @@ module.exports = {
             });
 
             // 사용자가 해당 맛집을 "첫 기록하기"하는 유저라면 Store에 메인코멘트 추가
-            await Store.findOneAndUpdate({ userId, storeId }, { $set: { mainComment: comment } });
+            await Store.findOneAndUpdate(
+                { userId, storeId },
+                { $set: { mainComment: comment } }
+            );
             return res
                 .status(200)
                 .send({ result: true, message: '리뷰 작성 완료!' });
@@ -431,7 +460,7 @@ module.exports = {
     },
 
     // 맛마디 전체 조회
-    allMatmadi: async(req, res) => {
+    allMatmadi: async (req, res) => {
         const { storeId } = req.params;
         const { userId } = res.locals.user;
         try {
@@ -480,7 +509,7 @@ module.exports = {
         }
     },
     // 맛마디 상세 조회
-    detailMatmadi: async(req, res) => {
+    detailMatmadi: async (req, res) => {
         const { userId } = res.locals.user;
         const { madiId } = req.params;
         try {
@@ -518,7 +547,7 @@ module.exports = {
     },
     // 맛마디 수정
     // 리뷰 수정시 태그가 바뀌는데, 지운 태그가 태그DB의 마지막 태그라면 데이터를 지워야한다.
-    updateMatmadi: async(req, res) => {
+    updateMatmadi: async (req, res) => {
         const { userId } = res.locals.user;
         const { madiId } = req.params;
         const {
@@ -542,19 +571,22 @@ module.exports = {
                 });
             }
             //해당 리뷰를 찾아서 업데이트
-            await Matmadi.findByIdAndUpdate({ _id: madiId }, {
-                $set: {
-                    comment,
-                    star,
-                    imgURL,
-                    tagMenu,
-                    tagTasty,
-                    tagPoint,
-                    ratingTasty,
-                    ratingPrice,
-                    ratingService,
-                },
-            });
+            await Matmadi.findByIdAndUpdate(
+                { _id: madiId },
+                {
+                    $set: {
+                        comment,
+                        star,
+                        imgURL,
+                        tagMenu,
+                        tagTasty,
+                        tagPoint,
+                        ratingTasty,
+                        ratingPrice,
+                        ratingService,
+                    },
+                }
+            );
             // 태그 DB에 해당 태그 데이터가 있는지 확인하고 없으면 create
             for (i = 0; i < tagMenu.length; i++) {
                 let arrValue = tagMenu[i];
@@ -599,7 +631,7 @@ module.exports = {
     },
     // 맛마디 삭제
     // 삭제할 태그는 배열로 저장되어있지만 TagDB는 일반 문자열 데이터임.
-    deleteMatmadi: async(req, res) => {
+    deleteMatmadi: async (req, res) => {
         const { userId } = res.locals.user;
         const { madiId } = req.params;
         try {
@@ -657,7 +689,7 @@ module.exports = {
     },
 
     // 특정 맛집의 태그 조회
-    tag: async(req, res) => {
+    tag: async (req, res) => {
         const { storeId } = req.params;
         try {
             const tagMenu = [];
@@ -691,7 +723,7 @@ module.exports = {
         }
     },
     // 특정 맛집의 추천 메뉴 조회
-    viewMenu: async(req, res) => {
+    viewMenu: async (req, res) => {
         const { storeId } = req.params;
         try {
             //
@@ -779,12 +811,19 @@ module.exports = {
                     address: allStore[i].address,
                     lon: allStore[i].location.coordinates[0],
                     lat: allStore[i].location.coordinates[1],
+                    distance: getDistance(
+                        lat,
+                        lon,
+                        allStore[i].location.coordinates[1],
+                        allStore[i].location.coordinates[0]
+                    ),
                     tag: allStore[i].mainTag,
                     nickname: findUser.nickname,
                     faceColor: findUser.faceColor,
                     eyes: findUser.eyes,
                 });
             }
+
             res.status(200).send({
                 result: true,
                 message: '지도에 맛집 보여주기 성공',
