@@ -4,10 +4,10 @@ const Like = require('../models/like');
 
 module.exports = {
     // 유저가 작성한 맛마디 전체 불러오기
-    getReviews: async (req, res) => {
+    getReviews: async(req, res) => {
         const { userId } = res.locals.user;
         const existReviews = await Reviews.find({ userId: userId });
-        
+
         if (existReviews) {
             const TheReviews = existReviews.map((review) => ({
                 madiId: review.madiId,
@@ -16,11 +16,11 @@ module.exports = {
                 star: review.star,
                 imgURL: review.imgURL,
             }));
-            
+
             let theMadi = [];
             let storeName = [];
             for (let i = 0; i < TheReviews.length; i++) {
-                const existLike = await Like.find({userId: userId, madiId: TheReviews[i].madiId});
+                const existLike = await Like.find({ userId: userId, madiId: TheReviews[i].madiId });
                 const TheStoreName = await Store.findById(
                     TheReviews[i].storeId
                 );
@@ -29,6 +29,7 @@ module.exports = {
             }
 
             const TheReview = TheReviews.map((review, idx) => ({
+                madiId: review.madiId,
                 storeName: storeName[idx],
                 comment: review.comment,
                 star: review.star,
@@ -36,7 +37,7 @@ module.exports = {
                 LikeNum: theMadi[idx],
             }));
 
-            return res.status(200).send({result : true, TheReview})
+            return res.status(200).send({ result: true, TheReview })
         }
     },
 };
