@@ -10,10 +10,22 @@ const Tag = require('../models/tag');
 module.exports = {
     // 지도에 맛집 보여주기 (현재 위치기반 검색)
     mapViewer: async (req, res) => {
-        //const { LatLon } = req.query.LatLon;
-        try {
-            const allStore = await Store.find().exec();
+        const { lon, lat, distance } = req.body;
 
+        try {
+            //사용자의 현재위치 2km반경 내의 맛집 전체 검색
+            const allStore = await Store.find({
+                location: {
+                    $near: {
+                        //해당하는 포인트로부터 최대 범위. 1000 = 1km, 2000 = 2km
+                        $maxDistance: 2000, //distance를 받아서 사용자가 고르게 해도 좋을듯
+                        $geometry: {
+                            type: 'Point',
+                            coordinates: [lon, lat],
+                        },
+                    },
+                },
+            });
             const storeMap = [];
             for (i = 0; i < allStore.length; i++) {
                 findUser = await User.findById(allStore[i].userId);
@@ -21,13 +33,13 @@ module.exports = {
                     storeId: allStore[i].storeId,
                     storeName: allStore[i].storeName,
                     address: allStore[i].address,
-                    LatLon: allStore[i].LatLon,
+                    lon: allStore[i].lon,
+                    lat: allStore[i].lat,
                     nickname: findUser.nickname,
                     faceColor: findUser.faceColor,
                     eyes: findUser.eyes,
                 });
             }
-
             res.status(200).send({
                 result: true,
                 message: '지도에 맛집 보여주기 성공',
@@ -89,7 +101,8 @@ module.exports = {
     // 맛집 생성 (첫 기록하기), 방장의 맛방에 맛집 추가까지
     createStore: async (req, res) => {
         const { userId } = res.locals.user; // JWT 인증 정보
-        const { storeName, address, LatLon, tag } = req.body;
+        const { storeName, address, tag } = req.body;
+        const { lon, lat } = req.body;
 
         try {
             // 이미 저장한 맛집인지 체크
@@ -97,7 +110,7 @@ module.exports = {
             if (
                 existStore !== null &&
                 existStore.storeName === storeName &&
-                JSON.stringify(existStore.LatLon) === JSON.stringify(LatLon)
+                existStore.address === address
             ) {
                 return res
                     .status(400)
@@ -108,7 +121,7 @@ module.exports = {
                 userId,
                 storeName,
                 address,
-                LatLon,
+                location: { type: 'Point', coordinates: [lon, lat] },
                 mainTag: tag,
                 createdAt: Date.now(),
             });
@@ -247,11 +260,6 @@ module.exports = {
             //
             const findStoreList = await Savelist.find({ roomId });
 
-            // 미사용 - 해당 맛방의 멤버(게스트와 오너)를 배열로 생성
-            const roomInfo = await Room.findById(roomId);
-            const guests = roomInfo.guestId;
-            const memberArr = guests.push(roomInfo.ownerId);
-
             // 맛방에 등록된 맛집리스트 찾기
             const findStoreInfo = []; // 맛집의 정보를 순서대로 쌓는다.
             const findUserIcon = []; // 처음 등록한 유저의 정보를 맛집 순서대로 쌓는다.
@@ -286,7 +294,8 @@ module.exports = {
             const result = findStoreList.map((a, idx) => ({
                 storeId: a.storeId,
                 storeName: findStoreInfo[idx].storeName,
-                LatLon: findStoreInfo[idx].LatLon,
+                lon:findStoreInfo[idx].lon,
+                lat:findStoreInfo[idx].lat,
                 nickname: findUserIcon[idx].nickname,
                 faceColor: findUserIcon[idx].faceColor,
                 eyes: findUserIcon[idx].eyes,

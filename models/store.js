@@ -4,14 +4,20 @@ const StoreSchema = new mongoose.Schema({
     userId: String,
     storeName: String,
     address: String,
-    LatLon: [Number],
-    mainTag:[String],
-    mainComment : String,
+    location: {
+        type: { type: String, enum: ['Point'], required: true },
+        coordinates: { type: [Number], required: true },
+    }, 
+    //latitude 위도, longitude 경도
+    mainTag: [String],
+    mainComment: String,
     createdAt: Date,
 });
-StoreSchema.virtual('storeId').get(function() {
+StoreSchema.virtual('storeId').get(function () {
     return this._id.toHexString();
 });
 StoreSchema.set('toJSON', { virtuals: true });
+
+StoreSchema.index({location:'2dsphere'}); // 경도위도 인덱스를 2차원 구형(sphere)으로 설정
 
 module.exports = mongoose.model('store', StoreSchema);
