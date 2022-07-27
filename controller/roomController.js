@@ -240,15 +240,14 @@ detailRoomStoreList: async (req, res) => {
             for (let i = 0; i < storeId.length; i++) {
                 const storeInfo = await Store.findById(storeId[i]).exec();
                 theStores.push(storeInfo);
-
                 const theStoreList = {
                     storeName: theStores[i].storeName,
                     comment: theStore[i].comment,
                     imgURL: theStore[i].imgURL,
                     tag: theStore[i].tag,
                     address: theStores[i].address,
-                    lon: theStore[i].lon,
-                    lat: theStore[i].lat,
+                    lon: theStores[i].location.coordinates[0],
+                    lat: theStores[i].location.coordinates[1],
                 };
                 result.push(theStoreList);
             }

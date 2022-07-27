@@ -9,12 +9,14 @@ const Tag = require('../models/tag');
 
 module.exports = {
     // 지도에 맛집 보여주기 (현재 위치기반 검색)
-    mapViewer: async(req, res) => {
-        const { lon, lat, distance } = req.body;
-
+    mapViewer: async (req, res) => {
+        const { lon, lat, distance } = req.query
         try {
+            //console.log(lon, lat)
             //사용자의 현재위치 2km반경 내의 맛집 전체 검색
-            const allStore = await Store.find({
+            const allStore = []
+            if(lat !== undefined && lon!==undefined){
+                allStore.push(...await Store.find({
                 location: {
                     $near: {
                         //해당하는 포인트로부터 최대 범위. 1000 = 1km, 2000 = 2km
@@ -25,7 +27,12 @@ module.exports = {
                         },
                     },
                 },
-            });
+            })
+            )
+        }else{
+                allStore.push(...await Store.find())
+            }
+
             const storeMap = [];
             for (i = 0; i < allStore.length; i++) {
                 findUser = await User.findById(allStore[i].userId);
@@ -33,8 +40,8 @@ module.exports = {
                     storeId: allStore[i].storeId,
                     storeName: allStore[i].storeName,
                     address: allStore[i].address,
-                    lon: allStore[i].lon,
-                    lat: allStore[i].lat,
+                    lon: allStore[i].location.coordinates[0],
+                    lat: allStore[i].location.coordinates[1],
                     nickname: findUser.nickname,
                     faceColor: findUser.faceColor,
                     eyes: findUser.eyes,
@@ -294,8 +301,8 @@ module.exports = {
             const result = findStoreList.map((a, idx) => ({
                 storeId: a.storeId,
                 storeName: findStoreInfo[idx].storeName,
-                lon: findStoreInfo[idx].lon,
-                lat: findStoreInfo[idx].lat,
+                lon:findStoreInfo[idx].location.coordinates[0],
+                lat:findStoreInfo[idx].location.coordinates[1],
                 nickname: findUserIcon[idx].nickname,
                 faceColor: findUserIcon[idx].faceColor,
                 eyes: findUserIcon[idx].eyes,
