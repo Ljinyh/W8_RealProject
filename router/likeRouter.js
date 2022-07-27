@@ -1,7 +1,7 @@
 const express = require('express');
 const router = express();
 const authMiddleware = require('../middlewares/auth-middleware');
-const likeController = require('../controller');
+const likeController = require('../controller/likeController');
 
 // 추천 메뉴 좋아요 토글
 router.post('/menu/:menuId', authMiddleware, likeController.likeMenu);
