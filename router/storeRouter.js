@@ -27,27 +27,11 @@ router.put('/matmadi/:madiId', authMiddleware, storeController.updateMatmadi);
 // 맛마디 삭제
 router.delete('/matmadi/:madiId', authMiddleware, storeController.deleteMatmadi);
 
-// 맛마디 좋아요 토글
-router.post('/:madiId/like', authMiddleware, storeController.likeMatmadi);
-
-// 맛마디 좋아요 취소
-router.delete('/:madiId/like', authMiddleware, storeController.unlikeMatmadi);
-
 // 특정 맛집의 맛태그 조회
 router.get('/:storeId/tag', authMiddleware, storeController.tag);
 
 // 특정 맛집의 추천 메뉴 조회
 router.get('/:storeId/menu', authMiddleware, storeController.viewMenu);
-
-// 추천 메뉴 좋아요 토글
-router.post('/menu/:menuId', authMiddleware, storeController.likeMenu);
-
-// 추천 메뉴 좋아요 취소
-router.delete(
-    '/menu/:menuId',
-    authMiddleware,
-    storeController.unlikeMenu
-);
 
 // 맛집 상세 조회 말풍선
 router.get('/:storeId', authMiddleware, storeController.detailStore);

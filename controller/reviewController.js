@@ -8,36 +8,51 @@ module.exports = {
         const { userId } = res.locals.user;
         const existReviews = await Reviews.find({ userId: userId });
 
-        if (existReviews) {
-            const TheReviews = existReviews.map((review) => ({
-                madiId: review.madiId,
-                storeId: review.storeId,
-                comment: review.comment,
-                star: review.star,
-                imgURL: review.imgURL,
-            }));
-
-            let theMadi = [];
-            let storeName = [];
-            for (let i = 0; i < TheReviews.length; i++) {
-                const existLike = await Like.find({ userId: userId, madiId: TheReviews[i].madiId });
-                const TheStoreName = await Store.findById(
-                    TheReviews[i].storeId
-                );
-                storeName.push(TheStoreName.storeName);
-                theMadi.push(existLike.length);
+        try {
+            if (existReviews === 0) {
+                return res.status(200).send({ reuslt: [] });
             }
 
-            const TheReview = TheReviews.map((review, idx) => ({
-                madiId: review.madiId,
-                storeName: storeName[idx],
-                comment: review.comment,
-                star: review.star,
-                imgURL: review.imgURL,
-                LikeNum: theMadi[idx],
-            }));
+            if (existReviews && existReviews !== 0) {
+                const TheReviews = existReviews.map((review) => ({
+                    madiId: review.madiId,
+                    storeId: review.storeId,
+                    comment: review.comment,
+                    star: review.star,
+                    imgURL: review.imgURL,
+                }));
 
-            return res.status(200).send({ result: true, TheReview })
+                let theMadi = [];
+                let existStoreName = [];
+                let MyLikes = [];
+                for (let i = 0; i < TheReviews.length; i++) {
+                    const existLike = await Like.find({ userId: userId, madiId: TheReviews[i].madiId });
+                    const TheMyLike = await Like.findOne({ userId: userId, maidId: TheReviews[i].madiId })
+                    const TheStoreName = await Store.findById(
+                        TheReviews[i].storeId
+                    );
+                    existStoreName.push(TheStoreName.storeName);
+                    theMadi.push(existLike.length);
+                    MyLikes.push(TheMyLike ? true : false);
+                }
+
+
+
+                const TheReview = TheReviews.map((review, idx) => ({
+                    madiId: review.madiId,
+                    storeName: existStoreName[idx],
+                    comment: review.comment,
+                    star: review.star,
+                    imgURL: review.imgURL,
+                    LikeNum: theMadi[idx],
+                    LikeDone: MyLikes[idx],
+                }));
+
+                return res.status(200).send({ result: true, TheReview })
+            }
+        } catch (err) {
+            console.log(err);
+            res.status(400).send('error!')
         }
     },
 };
