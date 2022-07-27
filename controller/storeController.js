@@ -10,27 +10,50 @@ const Tag = require('../models/tag');
 module.exports = {
     // 지도에 맛집 보여주기 (현재 위치기반 검색)
     mapViewer: async (req, res) => {
-        const { lon, lat, distance } = req.query
+        const { lon, lat, distance } = req.query;
+        const { tag } = req.body;
         try {
-            //console.log(lon, lat)
             //사용자의 현재위치 2km반경 내의 맛집 전체 검색
-            const allStore = []
-            if(lat !== undefined && lon!==undefined){
-                allStore.push(...await Store.find({
-                location: {
-                    $near: {
-                        //해당하는 포인트로부터 최대 범위. 1000 = 1km, 2000 = 2km
-                        $maxDistance: 2000, //distance를 받아서 사용자가 고르게 해도 좋을듯
-                        $geometry: {
-                            type: 'Point',
-                            coordinates: [lon, lat],
+            const allStore = [];
+            if (lat !== undefined && lon !== undefined && tag !== undefined) {
+                for (i = 0; i < tag.length; i++) {
+                    allStore.push(
+                        ...(await Store.find({
+                            mainTag: tag[i],
+                            location: {
+                                $near: {
+                                    //해당하는 포인트로부터 최대 범위. 1000 = 1km, 2000 = 2km
+                                    $maxDistance: 2000, //distance를 받아서 사용자가 고르게 해도 좋을듯
+                                    $geometry: {
+                                        type: 'Point',
+                                        coordinates: [lon, lat],
+                                    },
+                                },
+                            },
+                        }))
+                    );
+                }
+            } else if (
+                lat !== undefined &&
+                lon !== undefined &&
+                tag === undefined
+            ) {
+                allStore.push(
+                    ...(await Store.find({
+                        location: {
+                            $near: {
+                                //해당하는 포인트로부터 최대 범위. 1000 = 1km, 2000 = 2km
+                                $maxDistance: 2000,
+                                $geometry: {
+                                    type: 'Point',
+                                    coordinates: [lon, lat],
+                                },
+                            },
                         },
-                    },
-                },
-            })
-            )
-        }else{
-                allStore.push(...await Store.find())
+                    }))
+                );
+            } else {
+                allStore.push(...(await Store.find()));
             }
 
             const storeMap = [];
@@ -42,6 +65,7 @@ module.exports = {
                     address: allStore[i].address,
                     lon: allStore[i].location.coordinates[0],
                     lat: allStore[i].location.coordinates[1],
+                    tag: allStore[i].mainTag,
                     nickname: findUser.nickname,
                     faceColor: findUser.faceColor,
                     eyes: findUser.eyes,
@@ -301,8 +325,8 @@ module.exports = {
             const result = findStoreList.map((a, idx) => ({
                 storeId: a.storeId,
                 storeName: findStoreInfo[idx].storeName,
-                lon:findStoreInfo[idx].location.coordinates[0],
-                lat:findStoreInfo[idx].location.coordinates[1],
+                lon: findStoreInfo[idx].location.coordinates[0],
+                lat: findStoreInfo[idx].location.coordinates[1],
                 nickname: findUserIcon[idx].nickname,
                 faceColor: findUserIcon[idx].faceColor,
                 eyes: findUserIcon[idx].eyes,
@@ -807,13 +831,78 @@ module.exports = {
     },
     // 태그 필터 검색
     tagMapViewer: async (req, res) => {
+        const { lon, lat, distance } = req.query;
+        const { tag } = req.body;
         try {
-            return res
-                .status(200)
-                .send({ result: true, message: '필터 검색 성공' });
+            //사용자의 현재위치 2km반경 내의 맛집 전체 검색
+            const allStore = [];
+            if (lat !== undefined && lon !== undefined && tag !== undefined) {
+                for (i = 0; i < tag.length; i++) {
+                    allStore.push(
+                        ...(await Store.find({
+                            mainTag: tag[i],
+                            location: {
+                                $near: {
+                                    //해당하는 포인트로부터 최대 범위. 1000 = 1km, 2000 = 2km
+                                    $maxDistance: 2000, //distance를 받아서 사용자가 고르게 해도 좋을듯
+                                    $geometry: {
+                                        type: 'Point',
+                                        coordinates: [lon, lat],
+                                    },
+                                },
+                            },
+                        }))
+                    );
+                }
+            } else if (
+                lat !== undefined &&
+                lon !== undefined &&
+                tag === undefined
+            ) {
+                allStore.push(
+                    ...(await Store.find({
+                        location: {
+                            $near: {
+                                //해당하는 포인트로부터 최대 범위. 1000 = 1km, 2000 = 2km
+                                $maxDistance: 2000,
+                                $geometry: {
+                                    type: 'Point',
+                                    coordinates: [lon, lat],
+                                },
+                            },
+                        },
+                    }))
+                );
+            } else {
+                allStore.push(...(await Store.find()));
+            }
+
+            const storeMap = [];
+            for (i = 0; i < allStore.length; i++) {
+                findUser = await User.findById(allStore[i].userId);
+                storeMap.push({
+                    storeId: allStore[i].storeId,
+                    storeName: allStore[i].storeName,
+                    address: allStore[i].address,
+                    lon: allStore[i].location.coordinates[0],
+                    lat: allStore[i].location.coordinates[1],
+                    tag: allStore[i].mainTag,
+                    nickname: findUser.nickname,
+                    faceColor: findUser.faceColor,
+                    eyes: findUser.eyes,
+                });
+            }
+            res.status(200).send({
+                result: true,
+                message: '지도에 맛집 보여주기 성공',
+                storeMap: storeMap,
+            });
         } catch (err) {
             console.log(err);
-            res.status(400).send({ result: false, message: '필터 검색 실패' });
+            res.status(400).send({
+                result: false,
+                message: '지도에 맛집 보여주기 실패',
+            });
         }
     },
 };
