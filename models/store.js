@@ -5,9 +5,9 @@ const StoreSchema = new mongoose.Schema({
     storeName: String,
     address: String,
     LatLon: [Number],
-    mainTag:[String],
-    mainComment : String,
-    createdAt: Date,
+    mainTag: [String],
+    mainComment: String,
+    createdAt: String,
 });
 StoreSchema.virtual('storeId').get(function() {
     return this._id.toHexString();
