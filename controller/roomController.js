@@ -247,7 +247,8 @@ detailRoomStoreList: async (req, res) => {
                     imgURL: theStore[i].imgURL,
                     tag: theStore[i].tag,
                     address: theStores[i].address,
-                    LatLon: theStores[i].LatLon,
+                    lon: theStore[i].lon,
+                    lat: theStore[i].lat,
                 };
                 result.push(theStoreList);
             }
