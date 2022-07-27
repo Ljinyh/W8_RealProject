@@ -6,12 +6,12 @@ const MatmadiSchema = new mongoose.Schema({
     comment: String,
     star: Number,
     imgURL: [String],
-    createdAt: Date,
-    tagMenu : [String], 
-    tagTasty : [String],
-    tagPoint : [String], 
-    ratingTasty : Number, 
-    ratingPrice : Number, 
+    createdAt: String,
+    tagMenu: [String],
+    tagTasty: [String],
+    tagPoint: [String],
+    ratingTasty: Number,
+    ratingPrice: Number,
     ratingService: Number,
 });
 MatmadiSchema.virtual('madiId').get(function() {
