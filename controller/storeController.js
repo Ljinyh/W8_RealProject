@@ -10,8 +10,9 @@ const Tag = require('../models/tag');
 module.exports = {
     // 지도에 맛집 보여주기 (현재 위치기반 검색)
     mapViewer: async (req, res) => {
-        const { lon, lat, distance } = req.body || req.query
+        const { lon, lat, distance } = req.query
         try {
+            //console.log(lon, lat)
             //사용자의 현재위치 2km반경 내의 맛집 전체 검색
             const allStore = []
             if(lat !== undefined && lon!==undefined){
