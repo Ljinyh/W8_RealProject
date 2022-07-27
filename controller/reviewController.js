@@ -23,19 +23,19 @@ module.exports = {
                 }));
 
                 let theMadi = [];
-                let storeName = [];
+                let existStoreName = [];
                 for (let i = 0; i < TheReviews.length; i++) {
                     const existLike = await Like.find({ userId: userId, madiId: TheReviews[i].madiId });
                     const TheStoreName = await Store.findById(
                         TheReviews[i].storeId
                     );
-                    storeName.push(TheStoreName.storeName);
+                    existStoreName.push(TheStoreName.storeName);
                     theMadi.push(existLike.length);
                 }
 
                 const TheReview = TheReviews.map((review, idx) => ({
                     madiId: review.madiId,
-                    storeName: storeName[idx],
+                    storeName: existStoreName[idx],
                     comment: review.comment,
                     star: review.star,
                     imgURL: review.imgURL,
