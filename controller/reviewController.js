@@ -24,14 +24,19 @@ module.exports = {
 
                 let theMadi = [];
                 let existStoreName = [];
+                let MyLikes = [];
                 for (let i = 0; i < TheReviews.length; i++) {
                     const existLike = await Like.find({ userId: userId, madiId: TheReviews[i].madiId });
+                    const TheMyLike = await Like.findOne({ userId: userId, maidId: TheReviews[i].madiId })
                     const TheStoreName = await Store.findById(
                         TheReviews[i].storeId
                     );
                     existStoreName.push(TheStoreName.storeName);
                     theMadi.push(existLike.length);
+                    MyLikes.push(TheMyLike ? true : false);
                 }
+
+
 
                 const TheReview = TheReviews.map((review, idx) => ({
                     madiId: review.madiId,
@@ -40,6 +45,7 @@ module.exports = {
                     star: review.star,
                     imgURL: review.imgURL,
                     LikeNum: theMadi[idx],
+                    LikeDone: MyLikes[idx],
                 }));
 
                 return res.status(200).send({ result: true, TheReview })
