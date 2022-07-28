@@ -63,7 +63,7 @@ module.exports = {
                         location: {
                             $near: {
                                 //해당하는 포인트로부터 최대 범위. 1000 = 1km, 2000 = 2km
-                                $maxDistance: 2000,
+                                $maxDistance: 20000,
                                 $geometry: {
                                     type: 'Point',
                                     coordinates: [parseInt(lon), parseInt(lat)],
@@ -776,7 +776,7 @@ module.exports = {
                             location: {
                                 $near: {
                                     //해당하는 포인트로부터 최대 범위. 1000 = 1km, 2000 = 2km
-                                    $maxDistance: 2000, //distance를 받아서 사용자가 고르게 해도 좋을듯
+                                    $maxDistance: 20000, //distance를 받아서 사용자가 고르게 해도 좋을듯
                                     $geometry: {
                                         type: 'Point',
                                         coordinates: [lon, lat],
@@ -796,7 +796,7 @@ module.exports = {
                         location: {
                             $near: {
                                 //해당하는 포인트로부터 최대 범위. 1000 = 1km, 2000 = 2km
-                                $maxDistance: 2000,
+                                $maxDistance: 20000,
                                 $geometry: {
                                     type: 'Point',
                                     coordinates: [lon, lat],

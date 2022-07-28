@@ -18,7 +18,7 @@ module.exports = {
             s3: s3,
             bucket: 'xoxokss', // 버킷 이름
             // limits: { fileSize: 5 * 1024 * 1024 }, // 용량제한
-            acl: 'public-read',
+            acl: 'public-read-write',
             contentType: multerS3.AUTO_CONTENT_TYPE, // 컨텐츠 타입 자동 지정
             key: function (req, file, cb) {
                 cb(
