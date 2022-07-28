@@ -39,7 +39,7 @@ module.exports = {
             if (lat !== undefined && lon !== undefined && tag !== undefined) {
                 for (i = 0; i < tag.length; i++) {
                     allStore.push(
-                        ...await Store.find({
+                        ...(await Store.find({
                             mainTag: tag[i],
                             location: {
                                 $near: {
@@ -47,11 +47,11 @@ module.exports = {
                                     $maxDistance: 20000, //distance를 받아서 사용자가 고르게 해도 좋을듯
                                     $geometry: {
                                         type: 'Point',
-                                        coordinates: [lon,lat],
+                                        coordinates: [lon, lat],
                                     },
                                 },
                             },
-                        }).limit(limitValue)
+                        }).limit(limitValue))
                     );
                 }
             } else if (
@@ -67,7 +67,7 @@ module.exports = {
                                 $maxDistance: 20000,
                                 $geometry: {
                                     type: 'Point',
-                                    coordinates: [lon,lat],
+                                    coordinates: [lon, lat],
                                 },
                             },
                         },
@@ -225,7 +225,7 @@ module.exports = {
                 result: {
                     storeId,
                     storeName: existStore.storeName,
-                    address : existStore.address,
+                    address: existStore.address,
                     placeURL: existStore.placeURL,
                     phone: existStore.phone,
                     nickname: storefinder.nickname,
@@ -388,7 +388,10 @@ module.exports = {
             });
         } catch (err) {
             console.log(err);
-            res.status(400).send({ result: false, message: '맛방의 맛집 조회 실패' });
+            res.status(400).send({
+                result: false,
+                message: '맛방의 맛집 조회 실패',
+            });
         }
     },
 
@@ -488,7 +491,7 @@ module.exports = {
         const { userId } = res.locals.user;
         try {
             const existMatmadi = await Matmadi.find({ storeId });
-
+            console.log(existMatmadi)
             //리뷰별 좋아요 갯수 찾아서 배열에 넣음.
             const likeNum = [];
             const likeDone = [];
@@ -518,7 +521,8 @@ module.exports = {
 
             // 좋아요 순으로 정렬
             const result = output.sort(
-                (a, b) => parseFloat(a.likeNum) - parseFloat(b.likeNum))
+                (a, b) => parseFloat(a.likeNum) - parseFloat(b.likeNum)
+            );
 
             return res.status(200).send({
                 // likeNum(좋아요) 많은 순서로 배열 정렬
@@ -863,6 +867,94 @@ module.exports = {
             res.status(400).send({
                 result: false,
                 message: '지도에 맛집 보여주기 실패',
+            });
+        }
+    },
+
+    getRoom: async (req, res) => {
+        const { storeId } = req.params;
+        const { userId } = res.locals.user;
+        try {
+            const existRoom = await UsersRoom.findOne({
+                userId: userId,
+            }).exec();
+
+            if (!existRoom) {
+                return res.status(200).send({
+                    result: true,
+                    total: 0,
+                    myRooms: [],
+                    Message: '사용자의 방이 존재하지 않습니다',
+                });
+            }
+
+            // roomSeq로 RoomDB에서 정보찾기. 배열로 생성
+            const arrTheRoom = [];
+            const storeNum = [];
+            const saveDone = [];
+            for (i = 0; i < existRoom.roomSeq.length; i++) {
+                roomInfo = await Room.findById(existRoom.roomSeq[i]);
+                allStorelist = await Savelist.find({
+                    roomId: existRoom.roomSeq[i],
+                });
+                arrTheRoom.push(roomInfo);
+                storeNum.push(allStorelist.length); // 맛방에 등록된 맛집 개수
+                function findstore(element) {
+                    if (element.storeId === storeId) {
+                        return true;
+                    }
+                }
+                saveDone.push(allStorelist.some(findstore));
+            }
+
+            // 방 목록 배열에, 조건에 해당하는 status 키값 집어넣기
+            let status = '';
+            const myroom = [];
+            const counter = [];
+            for (let i = 0; i < arrTheRoom.length; i++) {
+                const name = arrTheRoom[i];
+
+                const ownerCheck = name.ownerId === userId;
+                const guestCheck = name.guestId.includes(userId);
+                const guestNumCheck = name.guestId.length;
+
+                if (ownerCheck && guestNumCheck === 0) {
+                    status = 'private';
+                } else if (!ownerCheck && guestCheck) {
+                    status = 'publicGuest';
+                } else if (ownerCheck && !guestCheck) {
+                    status = 'publicOwner';
+                }
+                myroom.push(status);
+                // 하나씩 증가하는 숫자 넣어서 주기
+                counter.push(i);
+            }
+
+            const result = arrTheRoom.map((room, idx) => ({
+                order: counter[idx],
+                roomId: room.roomId,
+                roomName: room.roomName,
+                emoji: room.emoji,
+                memberNum: room.guestId.length + 1,
+                status: myroom[idx],
+                roomCode: room.roomCode,
+                saveDone: saveDone[idx],
+            }));
+            //전체 방 개수 중 해당 맛집을 갖고있는 방의 갯수
+            const total =
+                saveDone.reduce((cnt, element) => cnt + (true === element), 0) +
+                '/' +
+                saveDone.length;
+            res.status(200).send({
+                result: true,
+                total,
+                myRooms: result,
+            });
+        } catch (err) {
+            console.log(err);
+            res.status(400).send({
+                result: false,
+                message: '맛집을 저장한 맛방 목록 조회 실패',
             });
         }
     },

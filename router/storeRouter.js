@@ -45,4 +45,7 @@ router.post('/matmadi', authMiddleware, storeController.writeMatmadi);
 // 맛마디 전체 조회
 router.get('/:storeId/matmadi', authMiddleware, storeController.allMatmadi);
 
+// 맛집을 저장한 맛방 목록
+router.get('/getroom/:storeId', authMiddleware, storeController.getRoom);
+
 module.exports = router;
