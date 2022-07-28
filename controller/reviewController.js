@@ -16,6 +16,7 @@ module.exports = {
             if (existReviews && existReviews !== 0) {
                 const TheReviews = existReviews.map((review) => ({
                     madiId: review.madiId,
+                    userId: review.userId,
                     storeId: review.storeId,
                     comment: review.comment,
                     star: review.star,
@@ -41,6 +42,7 @@ module.exports = {
 
                 const TheReview = TheReviews.map((review, idx) => ({
                     madiId: review.madiId,
+                    userId: review.userId,
                     storeName: existStoreName[idx],
                     comment: review.comment,
                     star: review.star,
