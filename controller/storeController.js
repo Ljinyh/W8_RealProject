@@ -553,7 +553,6 @@ module.exports = {
             );
 
             return res.status(200).send({
-                // likeNum(좋아요) 많은 순서로 배열 정렬
                 result: result,
                 message: '리뷰 전체 조회 완료',
             });
@@ -573,6 +572,7 @@ module.exports = {
             const existMatmadi = await Matmadi.findById(madiId);
             const author = await User.findById(existMatmadi.userId);
             const likes = await Like.find({ madiId });
+            const existStore = await Store.findById(existMatmadi.storeId);
 
             // 사용자가 좋아요 했는지 확인. 좋아요 눌렀으면 1==true || 0==false
             const userlike = await Like.find({
@@ -584,6 +584,7 @@ module.exports = {
                 imgURL: existMatmadi.imgURL,
                 comment: existMatmadi.comment,
                 star: existMatmadi.star,
+                storeName : existStore.storeName,
                 ratingPrice: existMatmadi.ratingPrice,
                 ratingTasty: existMatmadi.ratingTasty,
                 ratingService: existMatmadi.ratingService,
