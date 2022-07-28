@@ -153,7 +153,7 @@ module.exports = {
     // 맛집 생성 (첫 기록하기), 방장의 맛방에 맛집 추가까지
     createStore: async (req, res) => {
         const { userId } = res.locals.user; // JWT 인증 정보
-        const { storeName, address, tag } = req.body;
+        const { storeName, address, tag, phone, placeURL } = req.body;
         const { lon, lat } = req.body;
 
         try {
@@ -172,6 +172,8 @@ module.exports = {
             const save = await Store.create({
                 userId,
                 storeName,
+                phone,
+                placeURL,
                 address,
                 location: { type: 'Point', coordinates: [lon, lat] },
                 mainTag: tag,
@@ -211,6 +213,8 @@ module.exports = {
                 result: {
                     storeId,
                     storeName: existStore.storeName,
+                    placeURL : existStore.placeURL,
+                    phone : existStore.phone,
                     nickname: storefinder.nickname,
                     faceColor: storefinder.faceColor,
                     eyes: storefinder.eyes,
@@ -373,7 +377,7 @@ module.exports = {
     // 리뷰 남기기 (맛마디 작성)
     writeMatmadi: async (req, res) => {
         const { userId } = res.locals.user;
-        const { storeId } = req.params;
+        const { storeId } = req.body;
         const {
             comment,
             star,

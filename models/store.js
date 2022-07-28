@@ -12,6 +12,8 @@ const StoreSchema = new mongoose.Schema({
     mainTag: [String],
     mainComment: String,
     createdAt: String,
+    phone : String,
+    placeURL : String,
 });
 StoreSchema.virtual('storeId').get(function () {
     return this._id.toHexString();
