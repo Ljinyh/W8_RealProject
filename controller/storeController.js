@@ -424,34 +424,31 @@ module.exports = {
 
             // 태그 DB에 해당 태그 데이터가 있는지 확인하고 없으면 create
             for (i = 0; i < tagMenu.length; i++) {
-                let arrValue = tagMenu[i];
-                let findTag = await Tag.findOne({ tagMenu: arrValue });
-                if (findTag === null) {
+                let findTagMenu = await Tag.findOne({ tagMenu: tagMenu[i],storeId:storeId });
+                if (!findTagMenu) {
                     await Tag.create({
                         storeId,
-                        tagMenu: arrValue,
+                        tagMenu: tagMenu[i],
                         category: 'menu',
                     });
                 }
             }
             for (i = 0; i < tagTasty.length; i++) {
-                let arrValue = tagTasty[i];
-                let findTag = await Tag.findOne({ tagTasty: arrValue });
-                if (findTag === null) {
+                let findTagTasty = await Tag.findOne({ tagTasty: tagTasty[i],storeId: storeId});
+                if (!findTagTasty) {
                     await Tag.create({
                         storeId,
-                        tagTasty: arrValue,
+                        tagTasty: tagTasty[i],
                         category: 'tasty',
                     });
                 }
             }
             for (i = 0; i < tagPoint.length; i++) {
-                let arrValue = tagPoint[i];
-                let findTag = await Tag.findOne({ tagPoint: arrValue });
-                if (findTag === null) {
+                let findTagPoint = await Tag.findOne({ tagPoint: tagPoint[i], storeId: storeId });
+                if (!findTagPoint) {
                     await Tag.create({
                         storeId,
-                        tagPoint: arrValue,
+                        tagPoint: tagPoint[i],
                         category: 'point',
                     });
                 }
@@ -530,7 +527,7 @@ module.exports = {
                 } else {
                     plag.push(false);
                 }
-                findUser.push(await User.findById(existMatmadi[i].userId))
+                findUser.push(await User.findById(existMatmadi[i].userId));
             }
 
             // map 함수로 찾은 리뷰 데이터와 좋아요 개수 출력
@@ -583,18 +580,17 @@ module.exports = {
             // 리뷰 작성자가 첫 기록하기 작성자면 true
             let plag = '';
             if (existMatmadi.userId === existStore.userId) {
-                plag=true;
+                plag = true;
             } else {
-                plag=false;
+                plag = false;
             }
-
 
             const result = {
                 plag,
                 imgURL: existMatmadi.imgURL,
                 comment: existMatmadi.comment,
                 star: existMatmadi.star,
-                storeName : existStore.storeName,
+                storeName: existStore.storeName,
                 ratingPrice: existMatmadi.ratingPrice,
                 ratingTasty: existMatmadi.ratingTasty,
                 ratingService: existMatmadi.ratingService,
@@ -808,7 +804,7 @@ module.exports = {
                 // 좋아요 갯수 찾기
                 let likes = await Like.find({ menuId: existTag[i]._id });
                 menuLikeNum.push(likes.length);
-                
+
                 // 현재 사용자가 추천메뉴에 좋아요를 눌렀는지 확인. {likeDone : true || false}
                 userlike = await Like.find({
                     menuId: existTag[i]._id,
@@ -920,7 +916,7 @@ module.exports = {
             });
         }
     },
-
+    // 사용자의 맛방 목록 (어떤 맛방이 특정 맛집을 저장했는지 표시)
     getRoom: async (req, res) => {
         const { storeId } = req.params;
         const { userId } = res.locals.user;
@@ -1005,6 +1001,43 @@ module.exports = {
             res.status(400).send({
                 result: false,
                 message: '맛집을 저장한 맛방 목록 조회 실패',
+            });
+        }
+    },
+    // 특정 맛집의 맛태그
+    getTag: async (req, res) => {
+        const { storeId } = req.params;
+        try {
+            // store의 모든 태그 찾아서 배열에 저장
+            const existTag = await Matmadi.find({ storeId });
+            const alltag = [];
+            for (i = 0; i < existTag.length; i++) {
+                alltag.push(
+                    ...existTag[i].tagMenu,
+                    ...existTag[i].tagPoint,
+                    ...existTag[i].tagTasty
+                );
+            }
+
+            // 배열 안의 중복 값을 찾아서 객체로 반환
+            const detaildata = {};
+            alltag.forEach((x) => {
+                detaildata[x] = (detaildata[x] || 0) + 1;
+            });
+
+            // 객체의 KEY만 출력
+            const data = Object.keys(detaildata);
+            res.status(200).send({
+                message: '맛태그 조회 성공',
+                result: true,
+                data,
+                detaildata,
+            });
+        } catch (err) {
+            console.log(err);
+            res.status(400).send({
+                result: false,
+                message: '맛태그 조회 실패',
             });
         }
     },
