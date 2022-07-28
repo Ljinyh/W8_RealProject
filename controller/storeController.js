@@ -491,12 +491,12 @@ module.exports = {
         const { userId } = res.locals.user;
         try {
             const existMatmadi = await Matmadi.find({ storeId });
-            const existStore= await Store.findById(storeId)
-            console.log(existMatmadi)
+            const existStore = await Store.findById(storeId);
+
             //리뷰별 좋아요 갯수 찾아서 배열에 넣음.
             const likeNum = [];
             const likeDone = [];
-            const plag = []
+            const plag = [];
             for (i = 0; i < existMatmadi.length; i++) {
                 likes = await Like.find({ madiId: existMatmadi[i].madiId });
                 likeNum.push(likes.length);
@@ -508,9 +508,11 @@ module.exports = {
                 });
                 likeDone.push(!!userlike.length); //느낌표 두개는 Number를 Boolean으로 변환한다.
 
-                if(existMatmadi[i].userId===existStore.userId){
-                    plag.push(true)
-                }else{plag.push(false)}
+                if (existMatmadi[i].userId === existStore.userId) {
+                    plag.push(true);
+                } else {
+                    plag.push(false);
+                }
             }
 
             // map 함수로 찾은 리뷰 데이터와 좋아요 개수 출력
@@ -523,7 +525,7 @@ module.exports = {
                 likeDone: likeDone[idx],
                 faceColor: a.faceColor,
                 eyes: a.eyes,
-                plag: plag[idx]
+                plag: plag[idx],
             }));
 
             // 좋아요 순으로 정렬
@@ -944,17 +946,14 @@ module.exports = {
                 emoji: room.emoji,
                 memberNum: room.guestId.length + 1,
                 status: myroom[idx],
-                roomCode: room.roomCode,
                 saveDone: saveDone[idx],
             }));
             //전체 방 개수 중 해당 맛집을 갖고있는 방의 갯수
-            const total =
-                saveDone.reduce((cnt, element) => cnt + (true === element), 0) +
-                '/' +
-                saveDone.length;
+            const saveNum = saveDone.reduce((cnt, element) => cnt + (true === element),0);
+
             res.status(200).send({
                 result: true,
-                total,
+                total: saveNum,
                 myRooms: result,
             });
         } catch (err) {
