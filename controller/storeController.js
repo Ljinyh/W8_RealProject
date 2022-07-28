@@ -451,9 +451,10 @@ module.exports = {
 
             // 사용자가 해당 맛집을 "첫 기록하기"하는 유저라면 Store에 메인코멘트 추가
             await Store.findOneAndUpdate(
-                { userId, storeId },
-                { $set: { mainComment: comment } }
+                { userId: userId, _id:storeId },
+                {$set:{mainComment:comment}},
             );
+        
             return res
                 .status(200)
                 .send({ result: true, message: '리뷰 작성 완료!' });

@@ -20,7 +20,7 @@ router.post('/map', authMiddleware, storeController.tagMapViewer);
 
 // 맛마디 상세 조회
 router.get('/matmadi/:madiId', authMiddleware, storeController.detailMatmadi);
-``
+
 // 맛마디 수정
 router.put('/matmadi/:madiId', authMiddleware, storeController.updateMatmadi);
 
