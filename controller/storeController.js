@@ -43,10 +43,10 @@ module.exports = {
                             location: {
                                 $near: {
                                     //해당하는 포인트로부터 최대 범위. 1000 = 1km, 2000 = 2km
-                                    $maxDistance: 2000, //distance를 받아서 사용자가 고르게 해도 좋을듯
+                                    $maxDistance: 20000, //distance를 받아서 사용자가 고르게 해도 좋을듯
                                     $geometry: {
                                         type: 'Point',
-                                        coordinates: [lon, lat],
+                                        coordinates: [parseInt(lon), parseInt(lat)],
                                     },
                                 },
                             },
@@ -66,7 +66,7 @@ module.exports = {
                                 $maxDistance: 2000,
                                 $geometry: {
                                     type: 'Point',
-                                    coordinates: [lon, lat],
+                                    coordinates: [parseInt(lon), parseInt(lat)],
                                 },
                             },
                         },
@@ -85,7 +85,7 @@ module.exports = {
                     address: allStore[i].address,
                     lon: allStore[i].location.coordinates[0],
                     lat: allStore[i].location.coordinates[1],
-                    distance: getDistance(lat,lon,allStore[i].location.coordinates[1],allStore[i].location.coordinates[0]),
+                    distance: getDistance(parseInt(lat),parseInt(lon),allStore[i].location.coordinates[1],allStore[i].location.coordinates[0]),
                     tag: allStore[i].mainTag,
                     nickname: findUser.nickname,
                     faceColor: findUser.faceColor,
