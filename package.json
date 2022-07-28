@@ -5,7 +5,9 @@
     "scripts": {
         "test": "jest",
         "start": "node server.js",
-        "build": ""
+        "build": "",
+        "dev": "nodemon --watch \"./**/*.js\" --exec \"npm start\"",
+        "prettify": "prettier --write *.js **/*.js"
     },
     "repository": {
         "type": "git",
