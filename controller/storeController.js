@@ -580,7 +580,17 @@ module.exports = {
                 userId: userId,
             });
 
+            // 리뷰 작성자가 첫 기록하기 작성자면 true
+            let plag = '';
+            if (existMatmadi.userId === existStore.userId) {
+                plag=true;
+            } else {
+                plag=false;
+            }
+
+
             const result = {
+                plag,
                 imgURL: existMatmadi.imgURL,
                 comment: existMatmadi.comment,
                 star: existMatmadi.star,
