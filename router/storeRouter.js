@@ -48,4 +48,7 @@ router.get('/:storeId/matmadi', authMiddleware, storeController.allMatmadi);
 // 맛집을 저장한 맛방 목록
 router.get('/getroom/:storeId', authMiddleware, storeController.getRoom);
 
+// 특정 맛집의 맛 태그 (가장 많은 태그)
+router.get('/mattag/:storeId', authMiddleware, storeController.getTag);
+
 module.exports = router;
