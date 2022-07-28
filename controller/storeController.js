@@ -527,6 +527,9 @@ module.exports = {
                 imgURL: existMatmadi.imgURL,
                 comment: existMatmadi.comment,
                 star: existMatmadi.star,
+                ratingPrice: existMatmadi.ratingPrice,
+                ratingTasty: existMatmadi.ratingTasty,
+                ratingService: existMatmadi.ratingService,
                 likeNum: likes.length,
                 likeDone: !!userlike.length, //느낌표 두개는 숫자 1과 0을 boolean으로 변환한다.
                 nickname: author.nickname,
