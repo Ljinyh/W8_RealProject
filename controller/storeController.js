@@ -26,6 +26,8 @@ function getDistance(lat1, lng1, lat2, lng2) {
 
     return distance;
 }
+
+// 지도에 보여지는 맛집 개수를 제한하는 변수
 const limitValue = 20;
 
 module.exports = {
@@ -455,26 +457,12 @@ module.exports = {
                 }
             }
 
-            console.log(imgURL);
-            const imgURLreplacer = [];
-            if (imgURL === undefined) {
-                imgURLreplacer.push(
-                    'https://xoxokss.s3.ap-northeast-2.amazonaws.com/image/1659031440439_no-image-icon.jpeg'
-                );
-            } else if (imgURL && imgURL.length === 0) {
-                imgURLreplacer.push(
-                    'https://xoxokss.s3.ap-northeast-2.amazonaws.com/image/1659031440439_no-image-icon.jpeg'
-                );
-            } else {
-                imgURLreplacer.concat(imgURL);
-            }
-
             await Matmadi.create({
                 storeId,
                 userId,
                 comment,
                 star,
-                imgURL: imgURLreplacer,
+                imgURL,
                 tagMenu,
                 tagTasty,
                 tagPoint,
