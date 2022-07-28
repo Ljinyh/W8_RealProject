@@ -118,7 +118,7 @@ module.exports = {
             const TheRank = Object.keys(rank).sort((a, b) => rank[b] - rank[a]);
 
             const FirstUser = await User.findById(TheRank[0]);
-            console.log(FirstUser);
+
             res.status(200).send({
                 result: true,
                 nickname: FirstUser.nickname,
