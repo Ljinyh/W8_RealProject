@@ -7,17 +7,26 @@ module.exports = {
 
     // 이미지 업로더
     imageUploader: async (req, res) => {
-        const image = req.files;
-        const path = image.map((img) => img.location); // map 함수 사용. 여러개의 업로드 파일 URL을 배열로 출력.
-        if (image === undefined) {
-            return res
-                .status(400)
-                .send({ message: '이미지가 존재하지 않습니다.' });
+        try {
+            const image = req.files;
+            const path = image.map((img) => img.location); // map 함수 사용. 여러개의 업로드 파일 URL을 배열로 출력.
+            console.log(path)
+            if (path.length===0) {
+                return res
+                    .status(400)
+                    .send({ message: '이미지가 업로드 되지 않았습니다.' });
+            }
+            res.status(200).send({
+                message: '업로드 요청 완료',
+                imageCount: image.length + '개',
+                imgUrl: path,
+            });
+        } catch (err) {
+            console.log(err);
+            res.status(400).send({
+                message: '업로드 요청 실패',
+            });
         }
-        res.status(200).send({
-            message: '업로드 성공',
-            data: { imgUrl: path },
-        });
     },
 
     // 사운드 업로더
