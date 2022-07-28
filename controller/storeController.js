@@ -22,15 +22,16 @@ function getDistance(lat1, lng1, lat2, lng2) {
             Math.sin(dLon / 2) *
             Math.sin(dLon / 2);
     const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
-    const distance = Math.round(R * c*1000)/1000; // Distance in km
+    const distance = Math.round(R * c * 1000) / 1000; // Distance in km
 
     return distance;
 }
+const limitValue = 20;
 
 module.exports = {
     // 지도에 맛집 보여주기 (현재 위치기반 검색)
     mapViewer: async (req, res) => {
-        const { lon, lat, distance } = req.query;
+        const { lon, lat } = req.query;
         const { tag } = req.body;
         try {
             //사용자의 현재위치 2km반경 내의 맛집 전체 검색
@@ -38,7 +39,7 @@ module.exports = {
             if (lat !== undefined && lon !== undefined && tag !== undefined) {
                 for (i = 0; i < tag.length; i++) {
                     allStore.push(
-                        ...(await Store.find({
+                        ...await Store.find({
                             mainTag: tag[i],
                             location: {
                                 $near: {
@@ -46,11 +47,11 @@ module.exports = {
                                     $maxDistance: 20000, //distance를 받아서 사용자가 고르게 해도 좋을듯
                                     $geometry: {
                                         type: 'Point',
-                                        coordinates: [parseInt(lon), parseInt(lat)],
+                                        coordinates: [lon,lat],
                                     },
                                 },
                             },
-                        }))
+                        }).limit(limitValue)
                     );
                 }
             } else if (
@@ -66,14 +67,14 @@ module.exports = {
                                 $maxDistance: 20000,
                                 $geometry: {
                                     type: 'Point',
-                                    coordinates: [parseInt(lon), parseInt(lat)],
+                                    coordinates: [lon,lat],
                                 },
                             },
                         },
-                    }))
+                    }).limit(limitValue))
                 );
             } else {
-                allStore.push(...(await Store.find()));
+                allStore.push(...(await Store.find().limit(limitValue)));
             }
 
             const storeMap = [];
@@ -85,7 +86,12 @@ module.exports = {
                     address: allStore[i].address,
                     lon: allStore[i].location.coordinates[0],
                     lat: allStore[i].location.coordinates[1],
-                    distance: getDistance(parseInt(lat),parseInt(lon),allStore[i].location.coordinates[1],allStore[i].location.coordinates[0]),
+                    distance: getDistance(
+                        parseInt(lat),
+                        parseInt(lon),
+                        allStore[i].location.coordinates[1],
+                        allStore[i].location.coordinates[0]
+                    ),
                     tag: allStore[i].mainTag,
                     nickname: findUser.nickname,
                     faceColor: findUser.faceColor,
@@ -95,6 +101,7 @@ module.exports = {
             res.status(200).send({
                 result: true,
                 message: '지도에 맛집 보여주기 성공',
+                total: storeMap.length,
                 storeMap: storeMap,
             });
         } catch (err) {
@@ -207,14 +214,20 @@ module.exports = {
                     return sum + currValue;
                 }, 0) / allStarArr.length;
             //사용자 위치에서 맛집까지의 거리 계산
-            const distance = getDistance(lat,lon,existStore.location.coordinates[1],existStore.location.coordinates[0])
+            const distance = getDistance(
+                lat,
+                lon,
+                existStore.location.coordinates[1],
+                existStore.location.coordinates[0]
+            );
             res.status(200).send({
                 message: '맛집 정보 조회 완료',
                 result: {
                     storeId,
                     storeName: existStore.storeName,
-                    placeURL : existStore.placeURL,
-                    phone : existStore.phone,
+                    address : existStore.address,
+                    placeURL: existStore.placeURL,
+                    phone: existStore.phone,
                     nickname: storefinder.nickname,
                     faceColor: storefinder.faceColor,
                     eyes: storefinder.eyes,
@@ -356,7 +369,12 @@ module.exports = {
                 storeName: findStoreInfo[idx].storeName,
                 lon: findStoreInfo[idx].location.coordinates[0],
                 lat: findStoreInfo[idx].location.coordinates[1],
-                distance : getDistance(lat,lon,findStoreInfo[idx].location.coordinates[1],findStoreInfo[idx].location.coordinates[0]),
+                distance: getDistance(
+                    lat,
+                    lon,
+                    findStoreInfo[idx].location.coordinates[1],
+                    findStoreInfo[idx].location.coordinates[0]
+                ),
                 nickname: findUserIcon[idx].nickname,
                 faceColor: findUserIcon[idx].faceColor,
                 eyes: findUserIcon[idx].eyes,
@@ -370,7 +388,7 @@ module.exports = {
             });
         } catch (err) {
             console.log(err);
-            res.status(400).send({ result: false, message: ' ' });
+            res.status(400).send({ result: false, message: '맛방의 맛집 조회 실패' });
         }
     },
 
@@ -451,10 +469,10 @@ module.exports = {
 
             // 사용자가 해당 맛집을 "첫 기록하기"하는 유저라면 Store에 메인코멘트 추가
             await Store.findOneAndUpdate(
-                { userId: userId, _id:storeId },
-                {$set:{mainComment:comment}},
+                { userId: userId, _id: storeId },
+                { $set: { mainComment: comment } }
             );
-        
+
             return res
                 .status(200)
                 .send({ result: true, message: '리뷰 작성 완료!' });
@@ -487,7 +505,7 @@ module.exports = {
             }
 
             // map 함수로 찾은 리뷰 데이터와 좋아요 개수 출력
-            const result = existMatmadi.map((a, idx) => ({
+            const output = existMatmadi.map((a, idx) => ({
                 madiId: a.madiId,
                 imgURL: a.imgURL,
                 comment: a.comment,
@@ -498,11 +516,13 @@ module.exports = {
                 eyes: a.eyes,
             }));
 
+            // 좋아요 순으로 정렬
+            const result = output.sort(
+                (a, b) => parseFloat(a.likeNum) - parseFloat(b.likeNum))
+
             return res.status(200).send({
                 // likeNum(좋아요) 많은 순서로 배열 정렬
-                result: result.sort(
-                    (a, b) => parseFloat(a.likeNum) - parseFloat(b.likeNum)
-                ),
+                result: result,
                 message: '리뷰 전체 조회 완료',
             });
         } catch (err) {
@@ -784,7 +804,7 @@ module.exports = {
                                     },
                                 },
                             },
-                        }))
+                        }).limit(limitValue))
                     );
                 }
             } else if (
@@ -804,10 +824,10 @@ module.exports = {
                                 },
                             },
                         },
-                    }))
+                    }).limit(limitValue))
                 );
             } else {
-                allStore.push(...(await Store.find()));
+                allStore.push(...(await Store.find().limit(limitValue)));
             }
 
             const storeMap = [];
@@ -835,6 +855,7 @@ module.exports = {
             res.status(200).send({
                 result: true,
                 message: '지도에 맛집 보여주기 성공',
+                total: storeMap.length,
                 storeMap: storeMap,
             });
         } catch (err) {
