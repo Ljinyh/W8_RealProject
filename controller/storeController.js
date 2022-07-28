@@ -424,34 +424,31 @@ module.exports = {
 
             // 태그 DB에 해당 태그 데이터가 있는지 확인하고 없으면 create
             for (i = 0; i < tagMenu.length; i++) {
-                let arrValue = tagMenu[i];
-                let findTag = await Tag.findOne({ tagMenu: arrValue });
-                if (findTag === null) {
+                let findTagMenu = await Tag.findOne({ tagMenu: tagMenu[i],storeId:storeId });
+                if (!findTagMenu) {
                     await Tag.create({
                         storeId,
-                        tagMenu: arrValue,
+                        tagMenu: tagMenu[i],
                         category: 'menu',
                     });
                 }
             }
             for (i = 0; i < tagTasty.length; i++) {
-                let arrValue = tagTasty[i];
-                let findTag = await Tag.findOne({ tagTasty: arrValue });
-                if (findTag === null) {
+                let findTagTasty = await Tag.findOne({ tagTasty: tagTasty[i],storeId: storeId});
+                if (!findTagTasty) {
                     await Tag.create({
                         storeId,
-                        tagTasty: arrValue,
+                        tagTasty: tagTasty[i],
                         category: 'tasty',
                     });
                 }
             }
             for (i = 0; i < tagPoint.length; i++) {
-                let arrValue = tagPoint[i];
-                let findTag = await Tag.findOne({ tagPoint: arrValue });
-                if (findTag === null) {
+                let findTagPoint = await Tag.findOne({ tagPoint: tagPoint[i], storeId: storeId });
+                if (!findTagPoint) {
                     await Tag.create({
                         storeId,
-                        tagPoint: arrValue,
+                        tagPoint: tagPoint[i],
                         category: 'point',
                     });
                 }
@@ -1027,7 +1024,7 @@ module.exports = {
             alltag.forEach((x) => {
                 detaildata[x] = (detaildata[x] || 0) + 1;
             });
-            
+
             // 객체의 KEY만 출력
             const data = Object.keys(detaildata);
             res.status(200).send({
