@@ -455,12 +455,26 @@ module.exports = {
                 }
             }
 
+            console.log(imgURL);
+            const imgURLreplacer = [];
+            if (imgURL === undefined) {
+                imgURLreplacer.push(
+                    'https://xoxokss.s3.ap-northeast-2.amazonaws.com/image/1659031440439_no-image-icon.jpeg'
+                );
+            } else if (imgURL && imgURL.length === 0) {
+                imgURLreplacer.push(
+                    'https://xoxokss.s3.ap-northeast-2.amazonaws.com/image/1659031440439_no-image-icon.jpeg'
+                );
+            } else {
+                imgURLreplacer.concat(imgURL);
+            }
+
             await Matmadi.create({
                 storeId,
                 userId,
                 comment,
                 star,
-                imgURL,
+                imgURL: imgURLreplacer,
                 tagMenu,
                 tagTasty,
                 tagPoint,
@@ -765,16 +779,26 @@ module.exports = {
     },
     // 특정 맛집의 추천 메뉴 조회
     viewMenu: async (req, res) => {
+        const { userId } = res.locals.user;
         const { storeId } = req.params;
         try {
-            //
+            // 카테고리가 menu인 맛집의 태그 찾기
             const existTag = await Tag.find({ storeId, category: 'menu' });
 
             // 메뉴의 좋아요 수 찾아서 배열 생성
             const menuLikeNum = [];
+            const likeDone = [];
             for (i = 0; i < existTag.length; i++) {
+                // 좋아요 갯수 찾기
                 let likes = await Like.find({ menuId: existTag[i]._id });
                 menuLikeNum.push(likes.length);
+                
+                // 현재 사용자가 추천메뉴에 좋아요를 눌렀는지 확인. {likeDone : true || false}
+                userlike = await Like.find({
+                    menuId: existTag[i]._id,
+                    userId: userId,
+                });
+                likeDone.push(!!userlike.length); //느낌표 두개는 Number를 Boolean으로 변환한다.
             }
 
             // map 함수로 필요한 부분 정리해서 출력
@@ -782,6 +806,7 @@ module.exports = {
                 menuId: a.id,
                 menuName: a.tagMenu,
                 menuLikeNum: menuLikeNum[idx],
+                likeDone: likeDone[idx],
             }));
 
             return res
@@ -797,7 +822,7 @@ module.exports = {
     },
     // 태그 필터 검색
     tagMapViewer: async (req, res) => {
-        const { lon, lat, distance } = req.query;
+        const { lon, lat } = req.query;
         const { tag } = req.body;
         try {
             //사용자의 현재위치 2km반경 내의 맛집 전체 검색
@@ -949,7 +974,10 @@ module.exports = {
                 saveDone: saveDone[idx],
             }));
             //전체 방 개수 중 해당 맛집을 갖고있는 방의 갯수
-            const saveNum = saveDone.reduce((cnt, element) => cnt + (true === element),0);
+            const saveNum = saveDone.reduce(
+                (cnt, element) => cnt + (true === element),
+                0
+            );
 
             res.status(200).send({
                 result: true,
