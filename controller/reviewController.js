@@ -27,14 +27,14 @@ module.exports = {
                 let MyLikes = [];
                 for (let i = 0; i < TheReviews.length; i++) {
                     const existLike = await Like.find({ userId: userId, madiId: TheReviews[i].madiId });
-                    const TheMyLike = await Like.find({ maidId: TheReviews[i].madiId, userId: userId })
+                    const TheMyLike = existLike.find((e) => (e.madiId === TheReviews[i].madiId))
                     const TheStoreName = await Store.findById(
                         TheReviews[i].storeId
                     );
 
                     existStoreName.push(TheStoreName.storeName);
                     theMadi.push(existLike.length);
-                    MyLikes.push(TheMyLike[i] ? true : false);
+                    MyLikes.push(TheMyLike  ? true : false);
                 }
 
 
