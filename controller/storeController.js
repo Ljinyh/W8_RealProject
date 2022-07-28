@@ -491,10 +491,12 @@ module.exports = {
         const { userId } = res.locals.user;
         try {
             const existMatmadi = await Matmadi.find({ storeId });
+            const existStore= await Store.findById(storeId)
             console.log(existMatmadi)
             //리뷰별 좋아요 갯수 찾아서 배열에 넣음.
             const likeNum = [];
             const likeDone = [];
+            const plag = []
             for (i = 0; i < existMatmadi.length; i++) {
                 likes = await Like.find({ madiId: existMatmadi[i].madiId });
                 likeNum.push(likes.length);
@@ -505,6 +507,10 @@ module.exports = {
                     userId: userId,
                 });
                 likeDone.push(!!userlike.length); //느낌표 두개는 Number를 Boolean으로 변환한다.
+
+                if(existMatmadi[i].userId===existStore.userId){
+                    plag.push(true)
+                }else{plag.push(false)}
             }
 
             // map 함수로 찾은 리뷰 데이터와 좋아요 개수 출력
@@ -517,6 +523,7 @@ module.exports = {
                 likeDone: likeDone[idx],
                 faceColor: a.faceColor,
                 eyes: a.eyes,
+                plag: plag[idx]
             }));
 
             // 좋아요 순으로 정렬
