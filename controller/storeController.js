@@ -457,12 +457,26 @@ module.exports = {
                 }
             }
 
+            // 들어온 imgURL이 없을 때 디폴트 이미지로 저장
+            const imgURLreplacer = [];
+            if (imgURL === undefined) {
+                imgURLreplacer.push(
+                    'https://xoxokss.s3.ap-northeast-2.amazonaws.com/image/1659031440439_no-image-icon.jpeg'
+                );
+            } else if (imgURL && imgURL.length === 0) {
+                imgURLreplacer.push(
+                    'https://xoxokss.s3.ap-northeast-2.amazonaws.com/image/1659031440439_no-image-icon.jpeg'
+                );
+            } else {
+                imgURLreplacer.push(...imgURL);
+            }
+
             await Matmadi.create({
                 storeId,
                 userId,
                 comment,
                 star,
-                imgURL,
+                imgURL: imgURLreplacer,
                 tagMenu,
                 tagTasty,
                 tagPoint,
@@ -499,6 +513,7 @@ module.exports = {
             const likeNum = [];
             const likeDone = [];
             const plag = [];
+            const findUser = [];
             for (i = 0; i < existMatmadi.length; i++) {
                 likes = await Like.find({ madiId: existMatmadi[i].madiId });
                 likeNum.push(likes.length);
@@ -515,6 +530,7 @@ module.exports = {
                 } else {
                     plag.push(false);
                 }
+                findUser.push(await User.findById(existMatmadi[i].userId))
             }
 
             // map 함수로 찾은 리뷰 데이터와 좋아요 개수 출력
@@ -525,8 +541,9 @@ module.exports = {
                 star: a.star,
                 likeNum: likeNum[idx],
                 likeDone: likeDone[idx],
-                faceColor: a.faceColor,
-                eyes: a.eyes,
+                nickname: findUser[idx].nickname,
+                faceColor: findUser[idx].faceColor,
+                eyes: findUser[idx].eyes,
                 plag: plag[idx],
             }));
 
