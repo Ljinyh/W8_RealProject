@@ -28,7 +28,7 @@ function getDistance(lat1, lng1, lat2, lng2) {
 }
 
 // 지도에 보여지는 맛집 개수를 제한하는 변수
-const limitValue = 20;
+const limitValue = 150;
 
 module.exports = {
     // 지도에 맛집 보여주기 (현재 위치기반 검색)
@@ -76,7 +76,7 @@ module.exports = {
                     }).limit(limitValue))
                 );
             } else {
-                allStore.push(...(await Store.find().limit(limitValue)));
+                allStore.push(...(await Store.find()));
             }
 
             const storeMap = [];
@@ -871,7 +871,7 @@ module.exports = {
                     }).limit(limitValue))
                 );
             } else {
-                allStore.push(...(await Store.find().limit(limitValue)));
+                allStore.push(...(await Store.find()));
             }
 
             const storeMap = [];
