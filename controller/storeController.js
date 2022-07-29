@@ -88,7 +88,12 @@ module.exports = {
                     address: allStore[i].address,
                     lon: allStore[i].location.coordinates[0],
                     lat: allStore[i].location.coordinates[1],
-                    distance: getDistance(lat,lon, allStore[i].location.coordinates[1], allStore[i].location.coordinates[0]),
+                    distance: getDistance(
+                        lat,
+                        lon,
+                        allStore[i].location.coordinates[1],
+                        allStore[i].location.coordinates[0]
+                    ),
                     tag: allStore[i].mainTag,
                     nickname: findUser.nickname,
                     faceColor: findUser.faceColor,
@@ -210,7 +215,7 @@ module.exports = {
                 allStarArr.reduce(function add(sum, currValue) {
                     return sum + currValue;
                 }, 0) / allStarArr.length;
-  
+
             res.status(200).send({
                 message: '맛집 정보 조회 완료',
                 result: {
@@ -401,7 +406,10 @@ module.exports = {
 
             // 태그 DB에 해당 태그 데이터가 있는지 확인하고 없으면 create
             for (i = 0; i < tagMenu.length; i++) {
-                let findTagMenu = await Tag.findOne({ tagMenu: tagMenu[i],storeId:storeId });
+                let findTagMenu = await Tag.findOne({
+                    tagMenu: tagMenu[i],
+                    storeId: storeId,
+                });
                 if (!findTagMenu) {
                     await Tag.create({
                         storeId,
@@ -411,7 +419,10 @@ module.exports = {
                 }
             }
             for (i = 0; i < tagTasty.length; i++) {
-                let findTagTasty = await Tag.findOne({ tagTasty: tagTasty[i],storeId: storeId});
+                let findTagTasty = await Tag.findOne({
+                    tagTasty: tagTasty[i],
+                    storeId: storeId,
+                });
                 if (!findTagTasty) {
                     await Tag.create({
                         storeId,
@@ -421,7 +432,10 @@ module.exports = {
                 }
             }
             for (i = 0; i < tagPoint.length; i++) {
-                let findTagPoint = await Tag.findOne({ tagPoint: tagPoint[i], storeId: storeId });
+                let findTagPoint = await Tag.findOne({
+                    tagPoint: tagPoint[i],
+                    storeId: storeId,
+                });
                 if (!findTagPoint) {
                     await Tag.create({
                         storeId,
@@ -561,8 +575,16 @@ module.exports = {
             } else {
                 plag = false;
             }
-
-            const result = {
+            
+            // createdAt 형식 변환 example: 2022.02.04
+            const getDate =
+                existMatmadi.createdAt.getFullYear() +
+                '.' +
+                ('0' + (existMatmadi.createdAt.getMonth() + 1)).slice(-2) +
+                '.' +
+                ('0' + existMatmadi.createdAt.getDate()).slice(-2);
+                
+                const result = {
                 plag,
                 imgURL: existMatmadi.imgURL,
                 comment: existMatmadi.comment,
@@ -576,7 +598,7 @@ module.exports = {
                 nickname: author.nickname,
                 faceColor: author.faceColor,
                 eyes: author.eyes,
-                createdAt: existMatmadi.createdAt, //숫자로 바꿔서 출력하기
+                createdAt: getDate,
             };
             return res
                 .status(200)
@@ -633,7 +655,10 @@ module.exports = {
             );
             // 태그 DB에 해당 태그 데이터가 있는지 확인하고 없으면 create
             for (i = 0; i < tagMenu.length; i++) {
-                let findTagMenu = await Tag.findOne({ tagMenu: tagMenu[i],storeId:storeId });
+                let findTagMenu = await Tag.findOne({
+                    tagMenu: tagMenu[i],
+                    storeId: storeId,
+                });
                 if (!findTagMenu) {
                     await Tag.create({
                         storeId,
@@ -643,7 +668,10 @@ module.exports = {
                 }
             }
             for (i = 0; i < tagTasty.length; i++) {
-                let findTagTasty = await Tag.findOne({ tagTasty: tagTasty[i],storeId: storeId});
+                let findTagTasty = await Tag.findOne({
+                    tagTasty: tagTasty[i],
+                    storeId: storeId,
+                });
                 if (!findTagTasty) {
                     await Tag.create({
                         storeId,
@@ -653,7 +681,10 @@ module.exports = {
                 }
             }
             for (i = 0; i < tagPoint.length; i++) {
-                let findTagPoint = await Tag.findOne({ tagPoint: tagPoint[i], storeId: storeId });
+                let findTagPoint = await Tag.findOne({
+                    tagPoint: tagPoint[i],
+                    storeId: storeId,
+                });
                 if (!findTagPoint) {
                     await Tag.create({
                         storeId,
@@ -691,7 +722,8 @@ module.exports = {
                 });
                 if (data.length === 1) {
                     await Tag.findOneAndDelete({
-                        tagMenu: existMatmadi.tagMenu[i], storeId : existMatmadi.storeId
+                        tagMenu: existMatmadi.tagMenu[i],
+                        storeId: existMatmadi.storeId,
                     });
                 }
             }
@@ -702,7 +734,8 @@ module.exports = {
                 });
                 if (data.length === 1) {
                     await Tag.findOneAndDelete({
-                        tagTasty: existMatmadi.tagTasty[i], storeId : existMatmadi.storeId
+                        tagTasty: existMatmadi.tagTasty[i],
+                        storeId: existMatmadi.storeId,
                     });
                 }
             }
@@ -713,7 +746,8 @@ module.exports = {
                 });
                 if (data.length === 1) {
                     await Tag.findOneAndDelete({
-                        tagPoint: existMatmadi.tagPoint[i], storeId : existMatmadi.storeId
+                        tagPoint: existMatmadi.tagPoint[i],
+                        storeId: existMatmadi.storeId,
                     });
                 }
             }
@@ -978,5 +1012,4 @@ module.exports = {
             });
         }
     },
-  
 };
