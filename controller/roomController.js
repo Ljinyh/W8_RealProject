@@ -3,6 +3,7 @@ const User = require('../models/user');
 const Savelist = require('../models/savelist');
 const Store = require('../models/store');
 const UsersRoom = require('../models/usersRoom');
+const Reivew = require('../models/matmadi');
 const Joi = require('joi');
 
 module.exports = {
@@ -227,35 +228,44 @@ detailRoomStoreList: async (req, res) => {
 
     try {
         if (existRoom) {
-            const result = [];
             const theStores = [];
-            //맛방에 등록된 정보 찾기
+            const writerName = [];
+            const TheImg = [];
+            
             const theStore = await Savelist.find({ roomId: roomId });
-            //밋빙에 등록된 맛집의 수
-            const total = theStore.length;
-            // 맛집 id 빼오기
-            const storeId = theStore.map((e) => e.storeId);
 
+            const total = theStore.length;
             // 맛집 정보가져오기 및 response 값 정리
-            for (let i = 0; i < storeId.length; i++) {
-                const storeInfo = await Store.findById(storeId[i]).exec();
+            for(let i = 0; i< theStore.length; i++) {
+                const storeInfo = await Store.findById(theStore[i].storeId).exec(); 
                 theStores.push(storeInfo);
-                const theStoreList = {
-                    storeName: theStores[i].storeName,
-                    comment: theStore[i].comment,
-                    imgURL: theStore[i].imgURL,
-                    tag: theStore[i].tag,
-                    address: theStores[i].address,
-                    lon: theStores[i].location.coordinates[0],
-                    lat: theStores[i].location.coordinates[1],
-                };
-                result.push(theStoreList);
+
+                const findImg = await Reivew.findOne({storeId: theStores[i].storeId ,userId: theStores[i].userId}).exec();
+                TheImg.push(findImg ? findImg.imgURL : [] );
+
+                const writerInfo = await User.findById(theStores[i].userId).exec();
+                writerName.push(writerInfo.nickname);
+
+                
             }
 
+                const theStoreList = theStores.map((store, idx) => ({
+                    writer: writerName[idx],
+                    storeId: store.storeId,
+                    storeName: store.storeName,
+                    comment: store.comment,
+                    imgURL: TheImg[idx],
+                    tag: store.mainTag,
+                    address: store.address,
+                    lon: store.location.coordinates[0],
+                    lat: store.location.coordinates[1],
+                }));
+
+            
             return res.status(200).send({
                 msg: '맛집리스트 가져오기 성공',
                 total: total,
-                result,
+                theStoreList,
             });
         }
 
