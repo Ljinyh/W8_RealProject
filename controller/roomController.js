@@ -240,11 +240,13 @@ detailRoomStoreList: async (req, res) => {
                 const storeInfo = await Store.findById(theStore[i].storeId).exec(); 
                 theStores.push(storeInfo);
 
-                const writerInfo = await User.findById(theStores[i].userId).exec();
-                writerName.push(writerInfo.nickname)
+                const findImg = await Reivew.findOne({storeId: theStores[i].storeId ,userId: theStores[i].userId}).exec();
+                TheImg.push(findImg ? findImg.imgURL : [] );
 
-                const findImg = await Reivew.findOne({userId: theStores[i].userId}).exec();
-                TheImg.push(findImg.length !== 0 ? findImg.imgURL : [] );
+                const writerInfo = await User.findById(theStores[i].userId).exec();
+                writerName.push(writerInfo.nickname);
+
+                
             }
 
                 const theStoreList = theStores.map((store, idx) => ({
