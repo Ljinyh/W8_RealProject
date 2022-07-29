@@ -10,8 +10,8 @@ const mailSender = {
             secure: true,
             requireTLS: true,
             auth: {
-                user: process.env.USER, // 보내는 메일의 주소
-                pass: process.env.PASS, // 보내는 메일의 비밀번호
+                user: process.env.MAILUSER, // 보내는 메일의 주소
+                pass: process.env.MAILPASS, // 보내는 메일의 비밀번호
             },
         });
         // 메일 옵션
