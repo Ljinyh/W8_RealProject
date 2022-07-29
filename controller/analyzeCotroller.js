@@ -167,13 +167,17 @@ module.exports = {
                 return res.status(200).send({ result: [] });
             }
 
+            const alltag = [];
             if (findStoreReview && findStoreReview.length !== 0) {
-                const TheTasty = findStoreReview.map((tag) => tag.tagTasty);
-                const THePoint = findStoreReview.map((tag) => tag.tagPoint);
+                for (i = 0; i < findStoreReview.length; i++) {
+                    alltag.push(
+                        ...findStoreReview[i].tagMenu,
+                        ...findStoreReview[i].tagPoint,
+                        ...findStoreReview[i].tagTasty
+                    );
+                }
 
-                const TheTags = [].concat(TheTasty, THePoint);
-                const tagArray = TheTags.reduce((acc, cur) => acc.concat(cur));
-                const Tags = tagArray.reduce((accu, curr) => {
+                const Tags = alltag.reduce((accu, curr) => {
                     accu[curr] = (accu[curr] || 0) + 1;
                     return accu;
                 }, {});
