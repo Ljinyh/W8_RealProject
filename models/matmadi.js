@@ -6,7 +6,7 @@ const MatmadiSchema = new mongoose.Schema({
     comment: String,
     star: Number,
     imgURL: [String],
-    createdAt: Date,
+    createdAt: String,
     tagMenu: [String],
     tagTasty: [String],
     tagPoint: [String],
