@@ -445,26 +445,12 @@ module.exports = {
                 }
             }
 
-            // 들어온 imgURL이 없을 때 디폴트 이미지로 저장
-            const imgURLreplacer = [];
-            if (imgURL === undefined) {
-                imgURLreplacer.push(
-                    'https://xoxokss.s3.ap-northeast-2.amazonaws.com/image/1659031440439_no-image-icon.jpeg'
-                );
-            } else if (imgURL && imgURL.length === 0) {
-                imgURLreplacer.push(
-                    'https://xoxokss.s3.ap-northeast-2.amazonaws.com/image/1659031440439_no-image-icon.jpeg'
-                );
-            } else {
-                imgURLreplacer.push(...imgURL);
-            }
-
             await Matmadi.create({
                 storeId,
                 userId,
                 comment,
                 star,
-                imgURL: imgURLreplacer,
+                imgURL,
                 tagMenu,
                 tagTasty,
                 tagPoint,
