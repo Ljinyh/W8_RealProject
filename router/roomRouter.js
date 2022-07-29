@@ -51,5 +51,7 @@ router.delete('/:roomId', authMiddleware, roomController.deleteRoom);
 // 맛방 나가기
 router.put('/:roomId/exit', authMiddleware, roomController.exitRoom);
 
+//맛방 detail - 맛방에서 맛집 삭제
+router.delete('/:roomId/removal/:storeId', authMiddleware, roomController.deleteRoomStoreList);
 
 module.exports = router;
