@@ -3,6 +3,7 @@ const User = require('../models/user');
 const Savelist = require('../models/savelist');
 const Store = require('../models/store');
 const UsersRoom = require('../models/usersRoom');
+const Reivew = require('../models/matmadi');
 const Joi = require('joi');
 
 module.exports = {
@@ -229,10 +230,11 @@ detailRoomStoreList: async (req, res) => {
         if (existRoom) {
             const theStores = [];
             const writerName = [];
-            const total = theStore.length;
-
+            const TheImg = [];
+            
             const theStore = await Savelist.find({ roomId: roomId });
-    
+
+            const total = theStore.length;
             // 맛집 정보가져오기 및 response 값 정리
             for(let i = 0; i< theStore.length; i++) {
                 const storeInfo = await Store.findById(theStore[i].storeId).exec(); 
@@ -240,6 +242,9 @@ detailRoomStoreList: async (req, res) => {
 
                 const writerInfo = await User.findById(theStores[i].userId).exec();
                 writerName.push(writerInfo.nickname)
+
+                const findImg = await Reivew.findOne({userId: theStores[i].userId}).exec();
+                TheImg.push(findImg.length !== 0 ? findImg.imgURL : [] );
             }
 
                 const theStoreList = theStores.map((store, idx) => ({
@@ -247,7 +252,7 @@ detailRoomStoreList: async (req, res) => {
                     storeId: store.storeId,
                     storeName: store.storeName,
                     comment: store.comment,
-                    imgURL: store.imgURL,
+                    imgURL: TheImg[idx],
                     tag: store.mainTag,
                     address: store.address,
                     lon: store.location.coordinates[0],
