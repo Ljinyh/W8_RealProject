@@ -147,7 +147,7 @@ module.exports = {
                     userId,
                     roomId: selectedRooms[i],
                     storeId,
-                    createdAt: Date.now(),
+                    createdAt: new Date(),
                 });
             }
             res.status(200).send({
@@ -187,7 +187,7 @@ module.exports = {
                 address,
                 location: { type: 'Point', coordinates: [lon, lat] },
                 mainTag: tag,
-                createdAt: Date.now(),
+                createdAt: new Date(),
             });
 
             res.status(200).send({
@@ -575,16 +575,16 @@ module.exports = {
             } else {
                 plag = false;
             }
-            
-            // createdAt 형식 변환 example: 2022.02.04
+
+            //createdAt 형식 변환 example: 2022.02.04
             const getDate =
                 existMatmadi.createdAt.getFullYear() +
                 '.' +
                 ('0' + (existMatmadi.createdAt.getMonth() + 1)).slice(-2) +
                 '.' +
                 ('0' + existMatmadi.createdAt.getDate()).slice(-2);
-                
-                const result = {
+
+            const result = {
                 plag,
                 imgURL: existMatmadi.imgURL,
                 comment: existMatmadi.comment,

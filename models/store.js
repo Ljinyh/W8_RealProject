@@ -11,7 +11,7 @@ const StoreSchema = new mongoose.Schema({
     //latitude 위도, longitude 경도
     mainTag: [String],
     mainComment: String,
-    createdAt: String,
+    createdAt: Date,
     phone : String,
     placeURL : String,
 });
