@@ -125,8 +125,9 @@ exports.check = async(req, res) => {
         const { customerId } = await checkUser.validateAsync(req.body);
 
         const existUsers = await userDB.findOne({ customerId: customerId });
+        console.log(existUsers)
 
-        if (existUsers.customerId === customerId) {
+        if (existUsers) {
             return res
                 .status(400)
                 .send({ errorMessage: '중복된 아이디입니다.' });
