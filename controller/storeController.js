@@ -88,16 +88,12 @@ module.exports = {
                     address: allStore[i].address,
                     lon: allStore[i].location.coordinates[0],
                     lat: allStore[i].location.coordinates[1],
-                    distance: getDistance(
-                        parseInt(lat),
-                        parseInt(lon),
-                        allStore[i].location.coordinates[1],
-                        allStore[i].location.coordinates[0]
-                    ),
+                    distance: getDistance(lat,lon, allStore[i].location.coordinates[1], allStore[i].location.coordinates[0]),
                     tag: allStore[i].mainTag,
                     nickname: findUser.nickname,
                     faceColor: findUser.faceColor,
                     eyes: findUser.eyes,
+                    comment: allStore[i].mainComment,
                 });
             }
             res.status(200).send({
@@ -203,7 +199,6 @@ module.exports = {
     // 맛집 상세 조회 말풍선 (내가 소속된 맛방별로 검색)
     detailStore: async (req, res) => {
         const { storeId } = req.params;
-        const { lon, lat } = req.query;
 
         try {
             const existStore = await Store.findById(storeId);
@@ -215,13 +210,7 @@ module.exports = {
                 allStarArr.reduce(function add(sum, currValue) {
                     return sum + currValue;
                 }, 0) / allStarArr.length;
-            //사용자 위치에서 맛집까지의 거리 계산
-            const distance = getDistance(
-                lat,
-                lon,
-                existStore.location.coordinates[1],
-                existStore.location.coordinates[0]
-            );
+  
             res.status(200).send({
                 message: '맛집 정보 조회 완료',
                 result: {
@@ -234,8 +223,6 @@ module.exports = {
                     faceColor: storefinder.faceColor,
                     eyes: storefinder.eyes,
                     tag: existStore.mainTag,
-                    distance,
-                    // starAvg : Math.round(starAvg), //소수점 반올림 정수 반환
                     starAvg: Math.round(starAvg * 2) / 2, // 소수점 0.5 단위로 반올림 반환
                     comment: existStore.comment,
                 },
@@ -306,11 +293,8 @@ module.exports = {
                 roomId: room.roomId,
                 roomName: room.roomName,
                 emoji: room.emoji,
-                ownerId: room.ownerId,
-                guestId: room.guestId,
                 memberNum: room.guestId.length + 1,
                 status: myroom[idx],
-                roomCode: room.roomCode,
                 storeNum: storeNum[idx],
             }));
 
@@ -330,7 +314,6 @@ module.exports = {
     // 특정 맛방의 맛집 태그 아이콘
     roomTagIcon: async (req, res) => {
         const { roomId } = req.params;
-        const { lon, lat } = req.query;
         try {
             //
             const findStoreList = await Savelist.find({ roomId });
@@ -371,12 +354,6 @@ module.exports = {
                 storeName: findStoreInfo[idx].storeName,
                 lon: findStoreInfo[idx].location.coordinates[0],
                 lat: findStoreInfo[idx].location.coordinates[1],
-                distance: getDistance(
-                    lat,
-                    lon,
-                    findStoreInfo[idx].location.coordinates[1],
-                    findStoreInfo[idx].location.coordinates[0]
-                ),
                 nickname: findUserIcon[idx].nickname,
                 faceColor: findUserIcon[idx].faceColor,
                 eyes: findUserIcon[idx].eyes,
@@ -599,7 +576,7 @@ module.exports = {
                 nickname: author.nickname,
                 faceColor: author.faceColor,
                 eyes: author.eyes,
-                createdAt: existMatmadi.createdAt,
+                createdAt: existMatmadi.createdAt, //숫자로 바꿔서 출력하기
             };
             return res
                 .status(200)
@@ -695,7 +672,6 @@ module.exports = {
         }
     },
     // 맛마디 삭제
-    // 삭제할 태그는 배열로 저장되어있지만 TagDB는 일반 문자열 데이터임.
     deleteMatmadi: async (req, res) => {
         const { userId } = res.locals.user;
         const { madiId } = req.params;
@@ -1002,41 +978,5 @@ module.exports = {
             });
         }
     },
-    // 특정 맛집의 맛태그
-    getTag: async (req, res) => {
-        const { storeId } = req.params;
-        try {
-            // store의 모든 태그 찾아서 배열에 저장
-            const existTag = await Matmadi.find({ storeId });
-            const alltag = [];
-            for (i = 0; i < existTag.length; i++) {
-                alltag.push(
-                    ...existTag[i].tagMenu,
-                    ...existTag[i].tagPoint,
-                    ...existTag[i].tagTasty
-                );
-            }
-
-            // 배열 안의 중복 값을 찾아서 객체로 반환
-            const detaildata = {};
-            alltag.forEach((x) => {
-                detaildata[x] = (detaildata[x] || 0) + 1;
-            });
-
-            // 객체의 KEY만 출력
-            const data = Object.keys(detaildata);
-            res.status(200).send({
-                message: '맛태그 조회 성공',
-                result: true,
-                data,
-                detaildata,
-            });
-        } catch (err) {
-            console.log(err);
-            res.status(400).send({
-                result: false,
-                message: '맛태그 조회 실패',
-            });
-        }
-    },
+  
 };
