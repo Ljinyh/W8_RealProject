@@ -404,6 +404,18 @@ exports.userinfoEdit = async(req, res) => {
             });
         }
 
+        if (!nickname && faceColor && eyes && users) {
+            await userDB.findByIdAndUpdate({ _id: users._id }, {
+                $set: {
+                    faceColor: faceColor,
+                    eyes: eyes,
+                },
+            });
+            return res.status(201).json({
+                msg: '회원정보가 수정되었습니다.',
+            });
+        }
+
         if (name || birthDay && users) {
             await userDB.findByIdAndUpdate({ _id: users._id }, {
                 $set: {
