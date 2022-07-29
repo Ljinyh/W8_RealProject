@@ -384,23 +384,31 @@ exports.userinfoEdit = async(req, res) => {
     const users = await userDB.findById(userId).exec();
 
     try {
-        if (nickname) {
+        if (nickname && users) {
             const existNickname = await userDB.findOne({ nickname: nickname });
             if (existNickname) {
                 return res
                     .status(400)
                     .send({ errorMessage: '중복된 닉네임입니다.' });
             }
-        }
 
-        if (users) {
             await userDB.findByIdAndUpdate({ _id: users._id }, {
                 $set: {
                     nickname: nickname,
-                    name: name,
-                    birthDay: birthDay,
                     faceColor: faceColor,
                     eyes: eyes,
+                },
+            });
+            return res.status(201).json({
+                msg: '회원정보가 수정되었습니다.',
+            });
+        }
+
+        if (name || birthDay && users) {
+            await userDB.findByIdAndUpdate({ _id: users._id }, {
+                $set: {
+                    name: name,
+                    birthDay: birthDay,
                 },
             });
             return res.status(201).json({
