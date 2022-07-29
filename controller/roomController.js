@@ -31,7 +31,7 @@ module.exports = {
                 let roomInfo = await Room.findById(existRoom.roomSeq[i]);
                 arrTheRoom.push(roomInfo);
             }
-
+            console.log(arrTheRoom)
             // 방 목록 배열에, 조건에 해당하는 status 키값 집어넣기
             let status = '';
             const myroom = [];
@@ -62,6 +62,7 @@ module.exports = {
                 status: myroom[idx],
                 roomCode: room.roomCode,
             }));
+            console.log(result)
 
             res.status(200).send({
                 result: true,
