@@ -9,26 +9,26 @@ module.exports = {
         try {
             const MyReivews = await Review.find({ userId: userId });
             const TheDates = new Date();
-            const value = TheDates.toDateString().split(' ')[1];
+            const value = TheDates.getMonth() +1
+            
             const TheMonthDate = await Store.find({
-                userId: userId,
-                createdAt: new RegExp(value),
+                userId: userId
             });
 
-            if (!TheMonthDate) {
-                return res
-                    .status(400)
-                    .send({ result: false, errorMessage: 'null!' });
-            }
-            if (TheMonthDate) {
-                return res.status(200).send({
-                    result: true,
-                    monthPost: TheMonthDate.length,
-                    MyReivewsNum: MyReivews.length,
-                });
+            const saveDate = TheMonthDate.map((date) => date.createdAt.getMonth() +1)
+    
+            let count = 0;
+
+            for(let i =0; i<saveDate.length; i++) {
+                saveDate[i] === value ? count++ : 0
             }
 
-            res.status(400).send({ errorMessage: '찾기 실패!' });
+                return res.status(200).send({
+                    result: true,
+                    monthPost: count,
+                    MyReivewsNum: MyReivews.length,
+                });
+
         } catch (err) {
             console.log(err);
             res.status(400).send({ errorMessage: 'error!' });
