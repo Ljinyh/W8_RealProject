@@ -6,6 +6,7 @@ const UsersRoom = require('../models/usersRoom');
 const Matmadi = require('../models/matmadi');
 const Like = require('../models/like');
 const Tag = require('../models/tag');
+const { findUser } = require('./roomController');
 
 // 두개의 좌표 거리 계산 함수
 function getDistance(lat1, lng1, lat2, lng2) {
@@ -81,7 +82,12 @@ module.exports = {
 
             const storeMap = [];
             for (i = 0; i < allStore.length; i++) {
-                findUser = await User.findById(allStore[i].userId);
+                let findUser = await User.findById(allStore[i].userId);
+                
+                 const TheNickname = findUser ? findUser.nickname : '탈퇴한 회원입니다.';
+                 const TheUserInfoFaceColor = findUser ? findUser.faceColor : '#56D4D4';
+                 const TheUserInfoEyes = findUser ? findUser.eyes : 'type1';
+
                 storeMap.push({
                     storeId: allStore[i].storeId,
                     storeName: allStore[i].storeName,
@@ -95,11 +101,13 @@ module.exports = {
                         allStore[i].location.coordinates[0]
                     ),
                     tag: allStore[i].mainTag,
-                    nickname: findUser.nickname,
-                    faceColor: findUser.faceColor,
-                    eyes: findUser.eyes,
+                    nickname: TheNickname,
+                    faceColor: TheUserInfoFaceColor,
+                    eyes: TheUserInfoEyes,
                     comment: allStore[i].mainComment,
                 });
+
+                console.log(storeMap)
             }
             res.status(200).send({
                 result: true,

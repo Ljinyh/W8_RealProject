@@ -17,7 +17,7 @@ module.exports = {
                 userId: userId,
             }).exec();
 
-            if (!existRoom || existRoom.length === 0) {
+            if (!existRoom || existRoom.roomSeq.length === 0) {
                 return res.status(200).send({
                     total: 0,
                     myRooms: [],
@@ -26,6 +26,7 @@ module.exports = {
             }
 
             // roomSeq로 RoomDB에서 정보찾기. 배열로 생성
+            if(existRoom.roomSeq !== 0) {
             const arrTheRoom = [];
             for (i = 0; i < existRoom.roomSeq.length; i++) {
                 let roomInfo = await Room.findById(existRoom.roomSeq[i]);
@@ -37,7 +38,7 @@ module.exports = {
             const myroom = [];
             for (let i = 0; i < arrTheRoom.length; i++) {
                 const name = arrTheRoom[i];
-
+                
                 const ownerCheck = name.ownerId === userId;
                 const guestCheck = name.guestId.includes(userId);
                 const guestNumCheck = name.guestId.length;
@@ -63,11 +64,12 @@ module.exports = {
                 roomCode: room.roomCode,
             }));
 
-            res.status(200).send({
+            return res.status(200).send({
                 result: true,
                 total: existRoom.roomSeq.length,
                 myRooms: result,
             });
+        }
         } catch (err) {
             console.log(err);
             res.status(400).send({

@@ -1,18 +1,17 @@
 const nodemailer = require('nodemailer');
-//const senderInfo = require('../config/senderInfo.json');
 require("dotenv").config();
 
 const mailSender = {
     sendEmail: function(param) {
         const transporter = nodemailer.createTransport({
             service: 'gmail', // 메일 보내는 곳
-            port: 587,
+            port: 465,
             host: 'smtp.gmlail.com',
-            secure: false,
+            secure: true,
             requireTLS: true,
             auth: {
-                user: process.env.USER, // 보내는 메일의 주소
-                pass: process.env.PASS, // 보내는 메일의 비밀번호
+                user: process.env.MAILUSER, // 보내는 메일의 주소
+                pass: process.env.MAILPASS, // 보내는 메일의 비밀번호
             },
         });
         // 메일 옵션
