@@ -29,7 +29,7 @@ function getDistance(lat1, lng1, lat2, lng2) {
 }
 
 // 지도에 보여지는 맛집 개수를 제한하는 변수
-const limitValue = 150;
+const limitValue = 50;
 
 module.exports = {
     // 지도에 맛집 보여주기 (현재 위치기반 검색)
@@ -83,31 +83,49 @@ module.exports = {
             const storeMap = [];
             for (i = 0; i < allStore.length; i++) {
                 let findUser = await User.findById(allStore[i].userId);
-                
-                 const TheNickname = findUser ? findUser.nickname : '탈퇴한 회원입니다.';
-                 const TheUserInfoFaceColor = findUser ? findUser.faceColor : '#56D4D4';
-                 const TheUserInfoEyes = findUser ? findUser.eyes : 'type1';
 
-                storeMap.push({
-                    storeId: allStore[i].storeId,
-                    storeName: allStore[i].storeName,
-                    address: allStore[i].address,
-                    lon: allStore[i].location.coordinates[0],
-                    lat: allStore[i].location.coordinates[1],
-                    distance: getDistance(
-                        lat,
-                        lon,
-                        allStore[i].location.coordinates[1],
-                        allStore[i].location.coordinates[0]
-                    ),
-                    tag: allStore[i].mainTag,
-                    nickname: TheNickname,
-                    faceColor: TheUserInfoFaceColor,
-                    eyes: TheUserInfoEyes,
-                    comment: allStore[i].mainComment,
-                });
+                const TheNickname = findUser
+                    ? findUser.nickname
+                    : '탈퇴한 회원입니다.';
+                const TheUserInfoFaceColor = findUser
+                    ? findUser.faceColor
+                    : '#56D4D4';
+                const TheUserInfoEyes = findUser ? findUser.eyes : 'type1';
 
-                console.log(storeMap)
+                if ((lat, lon)) {
+                    storeMap.push({
+                        storeId: allStore[i].storeId,
+                        storeName: allStore[i].storeName,
+                        address: allStore[i].address,
+                        lon: allStore[i].location.coordinates[0],
+                        lat: allStore[i].location.coordinates[1],
+                        distance: getDistance(
+                            lat,
+                            lon,
+                            allStore[i].location.coordinates[1],
+                            allStore[i].location.coordinates[0]
+                        ),
+                        tag: allStore[i].mainTag,
+                        nickname: TheNickname,
+                        faceColor: TheUserInfoFaceColor,
+                        eyes: TheUserInfoEyes,
+                        comment: allStore[i].mainComment,
+                    });
+                } else {
+                    storeMap.push({
+                        storeId: allStore[i].storeId,
+                        storeName: allStore[i].storeName,
+                        address: allStore[i].address,
+                        lon: allStore[i].location.coordinates[0],
+                        lat: allStore[i].location.coordinates[1],
+                        distance: 0,
+                        tag: allStore[i].mainTag,
+                        nickname: TheNickname,
+                        faceColor: TheUserInfoFaceColor,
+                        eyes: TheUserInfoEyes,
+                        comment: allStore[i].mainComment,
+                    });
+                }
             }
             res.status(200).send({
                 result: true,
@@ -215,7 +233,15 @@ module.exports = {
 
         try {
             const existStore = await Store.findById(storeId);
-            const storefinder = await User.findById(existStore.userId);
+            const findUser = await User.findById(existStore.userId);
+            const TheNickname = findUser
+                ? findUser.nickname
+                : '탈퇴한 회원입니다.';
+            const TheUserInfoFaceColor = findUser
+                ? findUser.faceColor
+                : '#56D4D4';
+            const TheUserInfoEyes = findUser ? findUser.eyes : 'type1';
+
             const list = await Matmadi.find({ storeId: storeId });
             let allStarArr = []; // null 값이 들어오면 에러가 나기 때문에 빈 배열 선언
             allStarArr = list.map((a) => a.star);
@@ -232,9 +258,9 @@ module.exports = {
                     address: existStore.address,
                     placeURL: existStore.placeURL,
                     phone: existStore.phone,
-                    nickname: storefinder.nickname,
-                    faceColor: storefinder.faceColor,
-                    eyes: storefinder.eyes,
+                    nickname: TheNickname,
+                    faceColor: TheUserInfoFaceColor,
+                    eyes: TheUserInfoEyes,
                     tag: existStore.mainTag,
                     starAvg: Math.round(starAvg * 2) / 2, // 소수점 0.5 단위로 반올림 반환
                     comment: existStore.comment,
@@ -338,7 +364,7 @@ module.exports = {
 
             for (let i = 0; i < findStoreList.length; i++) {
                 let stores = await Store.findById(findStoreList[i].storeId);
-                let users = await User.findById(findStoreList[i].userId);
+                let users = await User.findById(stores.userId);
                 findStoreInfo.push(stores);
                 findUserIcon.push(users);
 
@@ -552,7 +578,16 @@ module.exports = {
         const { madiId } = req.params;
         try {
             const existMatmadi = await Matmadi.findById(madiId);
-            const author = await User.findById(existMatmadi.userId);
+            const findUser = await User.findById(existMatmadi.userId);
+
+            const TheNickname = findUser
+                ? findUser.nickname
+                : '탈퇴한 회원입니다.';
+            const TheUserInfoFaceColor = findUser
+                ? findUser.faceColor
+                : '#56D4D4';
+            const TheUserInfoEyes = findUser ? findUser.eyes : 'type1';
+
             const likes = await Like.find({ madiId });
             const existStore = await Store.findById(existMatmadi.storeId);
 
@@ -589,9 +624,9 @@ module.exports = {
                 ratingService: existMatmadi.ratingService,
                 likeNum: likes.length,
                 likeDone: !!userlike.length, //느낌표 두개는 숫자 1과 0을 boolean으로 변환한다.
-                nickname: author.nickname,
-                faceColor: author.faceColor,
-                eyes: author.eyes,
+                nickname: TheNickname,
+                faceColor: TheUserInfoFaceColor,
+                eyes: TheUserInfoEyes,
                 createdAt: getDate,
             };
             return res
@@ -884,24 +919,49 @@ module.exports = {
 
             const storeMap = [];
             for (i = 0; i < allStore.length; i++) {
-                findUser = await User.findById(allStore[i].userId);
-                storeMap.push({
-                    storeId: allStore[i].storeId,
-                    storeName: allStore[i].storeName,
-                    address: allStore[i].address,
-                    lon: allStore[i].location.coordinates[0],
-                    lat: allStore[i].location.coordinates[1],
-                    distance: getDistance(
-                        lat,
-                        lon,
-                        allStore[i].location.coordinates[1],
-                        allStore[i].location.coordinates[0]
-                    ),
-                    tag: allStore[i].mainTag,
-                    nickname: findUser.nickname,
-                    faceColor: findUser.faceColor,
-                    eyes: findUser.eyes,
-                });
+                let findUser = await User.findById(allStore[i].userId);
+                const TheNickname = findUser
+                    ? findUser.nickname
+                    : '탈퇴한 회원입니다.';
+                const TheUserInfoFaceColor = findUser
+                    ? findUser.faceColor
+                    : '#56D4D4';
+                const TheUserInfoEyes = findUser ? findUser.eyes : 'type1';
+
+                if ((lat, lon)) {
+                    storeMap.push({
+                        storeId: allStore[i].storeId,
+                        storeName: allStore[i].storeName,
+                        address: allStore[i].address,
+                        lon: allStore[i].location.coordinates[0],
+                        lat: allStore[i].location.coordinates[1],
+                        distance: getDistance(
+                            lat,
+                            lon,
+                            allStore[i].location.coordinates[1],
+                            allStore[i].location.coordinates[0]
+                        ),
+                        tag: allStore[i].mainTag,
+                        nickname: TheNickname,
+                        faceColor: TheUserInfoFaceColor,
+                        eyes: TheUserInfoEyes,
+                        comment: allStore[i].mainComment,
+                    });
+                } else {
+                    storeMap.push({
+                        storeId: allStore[i].storeId,
+                        storeName: allStore[i].storeName,
+                        address: allStore[i].address,
+                        lon: allStore[i].location.coordinates[0],
+                        lat: allStore[i].location.coordinates[1],
+                        distance: 0,
+                        tag: allStore[i].mainTag,
+                        nickname: TheNickname,
+                        faceColor: TheUserInfoFaceColor,
+                        eyes: TheUserInfoEyes,
+                        comment: allStore[i].mainComment,
+                    });
+                }
             }
 
             res.status(200).send({
