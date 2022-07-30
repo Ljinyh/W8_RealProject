@@ -68,8 +68,8 @@ module.exports = {
                     : '#56D4D4';
                 const TheUserInfoEyes = findUser ? findUser.eyes : 'type1';
 
-                let distance = '';
-                if ((lat, lon)) {
+                let distance = 0;
+                if (lon&&lat) {
                     distance = getDistance(
                         lat,
                         lon,
@@ -171,6 +171,10 @@ module.exports = {
                     .status(400)
                     .send({ errorMessage: '이미 저장된 맛집입니다.' });
             }
+            const mainTag = [];
+            for (i = 0; i < tag.length; i++) {
+                mainTag.push(tag[i].trim());
+            }
             // 정보를 가게 DB에 저장
             const save = await Store.create({
                 userId,
@@ -179,7 +183,7 @@ module.exports = {
                 placeURL,
                 address,
                 location: { type: 'Point', coordinates: [lon, lat] },
-                mainTag: tag,
+                mainTag : mainTag,
                 createdAt: new Date(),
             });
 
@@ -414,7 +418,7 @@ module.exports = {
                 if (!findTagMenu) {
                     await Tag.create({
                         storeId,
-                        tagMenu: tagMenu[i].trim(), //앞뒤 공백제거,
+                        tagMenu: tagMenu[i].trim(),
                         category: 'menu',
                     });
                 }
@@ -841,49 +845,21 @@ module.exports = {
         const { lon, lat } = req.query;
         const { tag } = req.body;
         try {
-            //사용자의 현재위치 2km반경 내의 맛집 전체 검색
+            const findStore = await Store.find();
             const allStore = [];
-            if (lat !== undefined && lon !== undefined && tag !== undefined) {
-                for (i = 0; i < tag.length; i++) {
-                    allStore.push(
-                        ...(await Store.find({
-                            mainTag: tag[i],
-                            location: {
-                                $near: {
-                                    //해당하는 포인트로부터 최대 범위. 1000 = 1km, 2000 = 2km
-                                    $maxDistance: 20000, //distance를 받아서 사용자가 고르게 해도 좋을듯
-                                    $geometry: {
-                                        type: 'Point',
-                                        coordinates: [lon, lat],
-                                    },
-                                },
-                            },
-                        }).limit(limitValue))
-                    );
+
+            // request에 tag가 들어왔는지 확인하고 배열 포함하는지 검사.
+            if (Array.isArray(tag) && tag.length > 0) {
+                for (i = 0; i < findStore.length; i++) {
+                    if (findStore[i].mainTag.some((r) => tag.indexOf(r.trim()) >= 0)) {
+                        allStore.push(findStore[i]);
+                    }
                 }
-            } else if (
-                lat !== undefined &&
-                lon !== undefined &&
-                tag === undefined
-            ) {
-                allStore.push(
-                    ...(await Store.find({
-                        location: {
-                            $near: {
-                                //해당하는 포인트로부터 최대 범위. 1000 = 1km, 2000 = 2km
-                                $maxDistance: 20000,
-                                $geometry: {
-                                    type: 'Point',
-                                    coordinates: [lon, lat],
-                                },
-                            },
-                        },
-                    }).limit(limitValue))
-                );
             } else {
-                allStore.push(...(await Store.find()));
+                allStore.push(...findStore);
             }
 
+            // 맛집을 처음 저장한 유저 정보 찾기
             const storeMap = [];
             for (i = 0; i < allStore.length; i++) {
                 let findUser = await User.findById(allStore[i].userId);
@@ -896,8 +872,9 @@ module.exports = {
                     : '#56D4D4';
                 const TheUserInfoEyes = findUser ? findUser.eyes : 'type1';
 
+                // 사용자의 위치정보가 있으면 거리계산, 없으면 0으로 표시
                 let distance = '';
-                if ((lat, lon)) {
+                if (lon&&lat) {
                     distance = getDistance(
                         lat,
                         lon,
@@ -912,6 +889,8 @@ module.exports = {
                     storeId: allStore[i].storeId,
                     storeName: allStore[i].storeName,
                     address: allStore[i].address,
+                    phone: allStore[i].phone,
+                    placeURL : allStore[i].placeURL,
                     lon: allStore[i].location.coordinates[0],
                     lat: allStore[i].location.coordinates[1],
                     distance: distance,
