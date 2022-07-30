@@ -235,12 +235,12 @@ module.exports = {
             const existStore = await Store.findById(storeId);
             const findUser = await User.findById(existStore.userId);
             const TheNickname = findUser
-            ? findUser.nickname
-            : '탈퇴한 회원입니다.';
-        const TheUserInfoFaceColor = findUser
-            ? findUser.faceColor
-            : '#56D4D4';
-        const TheUserInfoEyes = findUser ? findUser.eyes : 'type1';
+                ? findUser.nickname
+                : '탈퇴한 회원입니다.';
+            const TheUserInfoFaceColor = findUser
+                ? findUser.faceColor
+                : '#56D4D4';
+            const TheUserInfoEyes = findUser ? findUser.eyes : 'type1';
 
             const list = await Matmadi.find({ storeId: storeId });
             let allStarArr = []; // null 값이 들어오면 에러가 나기 때문에 빈 배열 선언
@@ -581,12 +581,12 @@ module.exports = {
             const findUser = await User.findById(existMatmadi.userId);
 
             const TheNickname = findUser
-                    ? findUser.nickname
-                    : '탈퇴한 회원입니다.';
-                const TheUserInfoFaceColor = findUser
-                    ? findUser.faceColor
-                    : '#56D4D4';
-                const TheUserInfoEyes = findUser ? findUser.eyes : 'type1';
+                ? findUser.nickname
+                : '탈퇴한 회원입니다.';
+            const TheUserInfoFaceColor = findUser
+                ? findUser.faceColor
+                : '#56D4D4';
+            const TheUserInfoEyes = findUser ? findUser.eyes : 'type1';
 
             const likes = await Like.find({ madiId });
             const existStore = await Store.findById(existMatmadi.storeId);
@@ -919,16 +919,16 @@ module.exports = {
 
             const storeMap = [];
             for (i = 0; i < allStore.length; i++) {
-                findUser = await User.findById(allStore[i].userId);
+                let findUser = await User.findById(allStore[i].userId);
                 const TheNickname = findUser
-                ? findUser.nickname
-                : '탈퇴한 회원입니다.';
-            const TheUserInfoFaceColor = findUser
-                ? findUser.faceColor
-                : '#56D4D4';
-            const TheUserInfoEyes = findUser ? findUser.eyes : 'type1';
+                    ? findUser.nickname
+                    : '탈퇴한 회원입니다.';
+                const TheUserInfoFaceColor = findUser
+                    ? findUser.faceColor
+                    : '#56D4D4';
+                const TheUserInfoEyes = findUser ? findUser.eyes : 'type1';
 
-               if ((lat, lon)) {
+                if ((lat, lon)) {
                     storeMap.push({
                         storeId: allStore[i].storeId,
                         storeName: allStore[i].storeName,
