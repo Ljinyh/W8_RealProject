@@ -29,7 +29,7 @@ function getDistance(lat1, lng1, lat2, lng2) {
 }
 
 // 지도에 보여지는 맛집 개수를 제한하는 변수
-const limitValue = 150;
+const limitValue = 50;
 
 module.exports = {
     // 지도에 맛집 보여주기 (현재 위치기반 검색)
@@ -83,31 +83,49 @@ module.exports = {
             const storeMap = [];
             for (i = 0; i < allStore.length; i++) {
                 let findUser = await User.findById(allStore[i].userId);
-                
-                 const TheNickname = findUser ? findUser.nickname : '탈퇴한 회원입니다.';
-                 const TheUserInfoFaceColor = findUser ? findUser.faceColor : '#56D4D4';
-                 const TheUserInfoEyes = findUser ? findUser.eyes : 'type1';
 
-                storeMap.push({
-                    storeId: allStore[i].storeId,
-                    storeName: allStore[i].storeName,
-                    address: allStore[i].address,
-                    lon: allStore[i].location.coordinates[0],
-                    lat: allStore[i].location.coordinates[1],
-                    distance: getDistance(
-                        lat,
-                        lon,
-                        allStore[i].location.coordinates[1],
-                        allStore[i].location.coordinates[0]
-                    ),
-                    tag: allStore[i].mainTag,
-                    nickname: TheNickname,
-                    faceColor: TheUserInfoFaceColor,
-                    eyes: TheUserInfoEyes,
-                    comment: allStore[i].mainComment,
-                });
+                const TheNickname = findUser
+                    ? findUser.nickname
+                    : '탈퇴한 회원입니다.';
+                const TheUserInfoFaceColor = findUser
+                    ? findUser.faceColor
+                    : '#56D4D4';
+                const TheUserInfoEyes = findUser ? findUser.eyes : 'type1';
 
-                console.log(storeMap)
+                if ((lat, lon)) {
+                    storeMap.push({
+                        storeId: allStore[i].storeId,
+                        storeName: allStore[i].storeName,
+                        address: allStore[i].address,
+                        lon: allStore[i].location.coordinates[0],
+                        lat: allStore[i].location.coordinates[1],
+                        distance: getDistance(
+                            lat,
+                            lon,
+                            allStore[i].location.coordinates[1],
+                            allStore[i].location.coordinates[0]
+                        ),
+                        tag: allStore[i].mainTag,
+                        nickname: TheNickname,
+                        faceColor: TheUserInfoFaceColor,
+                        eyes: TheUserInfoEyes,
+                        comment: allStore[i].mainComment,
+                    });
+                } else {
+                    storeMap.push({
+                        storeId: allStore[i].storeId,
+                        storeName: allStore[i].storeName,
+                        address: allStore[i].address,
+                        lon: allStore[i].location.coordinates[0],
+                        lat: allStore[i].location.coordinates[1],
+                        distance: 0,
+                        tag: allStore[i].mainTag,
+                        nickname: TheNickname,
+                        faceColor: TheUserInfoFaceColor,
+                        eyes: TheUserInfoEyes,
+                        comment: allStore[i].mainComment,
+                    });
+                }
             }
             res.status(200).send({
                 result: true,
