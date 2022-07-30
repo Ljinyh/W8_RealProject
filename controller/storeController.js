@@ -6,7 +6,6 @@ const UsersRoom = require('../models/usersRoom');
 const Matmadi = require('../models/matmadi');
 const Like = require('../models/like');
 const Tag = require('../models/tag');
-const { findUser } = require('./roomController');
 
 // 두개의 좌표 거리 계산 함수
 function getDistance(lat1, lng1, lat2, lng2) {
@@ -35,33 +34,10 @@ module.exports = {
     // 지도에 맛집 보여주기 (현재 위치기반 검색)
     mapViewer: async (req, res) => {
         const { lon, lat } = req.query;
-        const { tag } = req.body;
         try {
             //사용자의 현재위치 2km반경 내의 맛집 전체 검색
             const allStore = [];
-            if (lat !== undefined && lon !== undefined && tag !== undefined) {
-                for (i = 0; i < tag.length; i++) {
-                    allStore.push(
-                        ...(await Store.find({
-                            mainTag: tag[i],
-                            location: {
-                                $near: {
-                                    //해당하는 포인트로부터 최대 범위. 1000 = 1km, 2000 = 2km
-                                    $maxDistance: 20000, //distance를 받아서 사용자가 고르게 해도 좋을듯
-                                    $geometry: {
-                                        type: 'Point',
-                                        coordinates: [lon, lat],
-                                    },
-                                },
-                            },
-                        }).limit(limitValue))
-                    );
-                }
-            } else if (
-                lat !== undefined &&
-                lon !== undefined &&
-                tag === undefined
-            ) {
+            if (lat !== undefined && lon !== undefined) {
                 allStore.push(
                     ...(await Store.find({
                         location: {
@@ -92,40 +68,31 @@ module.exports = {
                     : '#56D4D4';
                 const TheUserInfoEyes = findUser ? findUser.eyes : 'type1';
 
+                let distance = '';
                 if ((lat, lon)) {
-                    storeMap.push({
-                        storeId: allStore[i].storeId,
-                        storeName: allStore[i].storeName,
-                        address: allStore[i].address,
-                        lon: allStore[i].location.coordinates[0],
-                        lat: allStore[i].location.coordinates[1],
-                        distance: getDistance(
-                            lat,
-                            lon,
-                            allStore[i].location.coordinates[1],
-                            allStore[i].location.coordinates[0]
-                        ),
-                        tag: allStore[i].mainTag,
-                        nickname: TheNickname,
-                        faceColor: TheUserInfoFaceColor,
-                        eyes: TheUserInfoEyes,
-                        comment: allStore[i].mainComment,
-                    });
+                    distance = getDistance(
+                        lat,
+                        lon,
+                        allStore[i].location.coordinates[1],
+                        allStore[i].location.coordinates[0]
+                    );
                 } else {
-                    storeMap.push({
-                        storeId: allStore[i].storeId,
-                        storeName: allStore[i].storeName,
-                        address: allStore[i].address,
-                        lon: allStore[i].location.coordinates[0],
-                        lat: allStore[i].location.coordinates[1],
-                        distance: 0,
-                        tag: allStore[i].mainTag,
-                        nickname: TheNickname,
-                        faceColor: TheUserInfoFaceColor,
-                        eyes: TheUserInfoEyes,
-                        comment: allStore[i].mainComment,
-                    });
+                    distance: 0;
                 }
+
+                storeMap.push({
+                    storeId: allStore[i].storeId,
+                    storeName: allStore[i].storeName,
+                    address: allStore[i].address,
+                    lon: allStore[i].location.coordinates[0],
+                    lat: allStore[i].location.coordinates[1],
+                    distance: distance,
+                    tag: allStore[i].mainTag,
+                    nickname: TheNickname,
+                    faceColor: TheUserInfoFaceColor,
+                    eyes: TheUserInfoEyes,
+                    comment: allStore[i].mainComment,
+                });
             }
             res.status(200).send({
                 result: true,
@@ -447,7 +414,7 @@ module.exports = {
                 if (!findTagMenu) {
                     await Tag.create({
                         storeId,
-                        tagMenu: tagMenu[i],
+                        tagMenu: tagMenu[i].trim(), //앞뒤 공백제거,
                         category: 'menu',
                     });
                 }
@@ -460,7 +427,7 @@ module.exports = {
                 if (!findTagTasty) {
                     await Tag.create({
                         storeId,
-                        tagTasty: tagTasty[i],
+                        tagTasty: tagTasty[i].trim(),
                         category: 'tasty',
                     });
                 }
@@ -473,7 +440,7 @@ module.exports = {
                 if (!findTagPoint) {
                     await Tag.create({
                         storeId,
-                        tagPoint: tagPoint[i],
+                        tagPoint: tagPoint[i].trim(),
                         category: 'point',
                     });
                 }
@@ -685,39 +652,39 @@ module.exports = {
             // 태그 DB에 해당 태그 데이터가 있는지 확인하고 없으면 create
             for (i = 0; i < tagMenu.length; i++) {
                 let findTagMenu = await Tag.findOne({
-                    tagMenu: tagMenu[i],
-                    storeId: storeId,
+                    tagMenu: tagMenu[i].trim(),
+                    storeId: existMatmadi.storeId,
                 });
                 if (!findTagMenu) {
                     await Tag.create({
                         storeId,
-                        tagMenu: tagMenu[i],
+                        tagMenu: tagMenu[i].trim(),
                         category: 'menu',
                     });
                 }
             }
             for (i = 0; i < tagTasty.length; i++) {
                 let findTagTasty = await Tag.findOne({
-                    tagTasty: tagTasty[i],
-                    storeId: storeId,
+                    tagTasty: tagTasty[i].trim(),
+                    storeId: existMatmadi.storeId,
                 });
                 if (!findTagTasty) {
                     await Tag.create({
                         storeId,
-                        tagTasty: tagTasty[i],
+                        tagTasty: tagTasty[i].trim(),
                         category: 'tasty',
                     });
                 }
             }
             for (i = 0; i < tagPoint.length; i++) {
                 let findTagPoint = await Tag.findOne({
-                    tagPoint: tagPoint[i],
-                    storeId: storeId,
+                    tagPoint: tagPoint[i].trim(),
+                    storeId: existMatmadi.storeId,
                 });
                 if (!findTagPoint) {
                     await Tag.create({
                         storeId,
-                        tagPoint: tagPoint[i],
+                        tagPoint: tagPoint[i].trim(),
                         category: 'point',
                     });
                 }
@@ -747,11 +714,11 @@ module.exports = {
             // 사용자의 태그 삭제가 태그 DB의 마지막 데이터일 때, 태그 DB의 데이터 삭제
             for (i = 0; i < existMatmadi.tagMenu.length; i++) {
                 data = await Matmadi.find({
-                    tagMenu: existMatmadi.tagMenu[i],
+                    tagMenu: existMatmadi.tagMenu[i].trim(),
                 });
                 if (data.length === 1) {
                     await Tag.findOneAndDelete({
-                        tagMenu: existMatmadi.tagMenu[i],
+                        tagMenu: existMatmadi.tagMenu[i].trim(),
                         storeId: existMatmadi.storeId,
                     });
                 }
@@ -759,11 +726,11 @@ module.exports = {
 
             for (i = 0; i < existMatmadi.tagTasty.length; i++) {
                 data = await Matmadi.find({
-                    tagTasty: existMatmadi.tagTasty[i],
+                    tagTasty: existMatmadi.tagTasty[i].trim(),
                 });
                 if (data.length === 1) {
                     await Tag.findOneAndDelete({
-                        tagTasty: existMatmadi.tagTasty[i],
+                        tagTasty: existMatmadi.tagTasty[i].trim(),
                         storeId: existMatmadi.storeId,
                     });
                 }
@@ -771,11 +738,11 @@ module.exports = {
 
             for (i = 0; i < existMatmadi.tagPoint.length; i++) {
                 data = await Matmadi.find({
-                    tagPoint: existMatmadi.tagPoint[i],
+                    tagPoint: existMatmadi.tagPoint[i].trim(),
                 });
                 if (data.length === 1) {
                     await Tag.findOneAndDelete({
-                        tagPoint: existMatmadi.tagPoint[i],
+                        tagPoint: existMatmadi.tagPoint[i].trim(),
                         storeId: existMatmadi.storeId,
                     });
                 }
@@ -920,6 +887,7 @@ module.exports = {
             const storeMap = [];
             for (i = 0; i < allStore.length; i++) {
                 let findUser = await User.findById(allStore[i].userId);
+
                 const TheNickname = findUser
                     ? findUser.nickname
                     : '탈퇴한 회원입니다.';
@@ -928,42 +896,32 @@ module.exports = {
                     : '#56D4D4';
                 const TheUserInfoEyes = findUser ? findUser.eyes : 'type1';
 
+                let distance = '';
                 if ((lat, lon)) {
-                    storeMap.push({
-                        storeId: allStore[i].storeId,
-                        storeName: allStore[i].storeName,
-                        address: allStore[i].address,
-                        lon: allStore[i].location.coordinates[0],
-                        lat: allStore[i].location.coordinates[1],
-                        distance: getDistance(
-                            lat,
-                            lon,
-                            allStore[i].location.coordinates[1],
-                            allStore[i].location.coordinates[0]
-                        ),
-                        tag: allStore[i].mainTag,
-                        nickname: TheNickname,
-                        faceColor: TheUserInfoFaceColor,
-                        eyes: TheUserInfoEyes,
-                        comment: allStore[i].mainComment,
-                    });
+                    distance = getDistance(
+                        lat,
+                        lon,
+                        allStore[i].location.coordinates[1],
+                        allStore[i].location.coordinates[0]
+                    );
                 } else {
-                    storeMap.push({
-                        storeId: allStore[i].storeId,
-                        storeName: allStore[i].storeName,
-                        address: allStore[i].address,
-                        lon: allStore[i].location.coordinates[0],
-                        lat: allStore[i].location.coordinates[1],
-                        distance: 0,
-                        tag: allStore[i].mainTag,
-                        nickname: TheNickname,
-                        faceColor: TheUserInfoFaceColor,
-                        eyes: TheUserInfoEyes,
-                        comment: allStore[i].mainComment,
-                    });
+                    distance: 0;
                 }
-            }
 
+                storeMap.push({
+                    storeId: allStore[i].storeId,
+                    storeName: allStore[i].storeName,
+                    address: allStore[i].address,
+                    lon: allStore[i].location.coordinates[0],
+                    lat: allStore[i].location.coordinates[1],
+                    distance: distance,
+                    tag: allStore[i].mainTag,
+                    nickname: TheNickname,
+                    faceColor: TheUserInfoFaceColor,
+                    eyes: TheUserInfoEyes,
+                    comment: allStore[i].mainComment,
+                });
+            }
             res.status(200).send({
                 result: true,
                 message: '지도에 맛집 보여주기 성공',
