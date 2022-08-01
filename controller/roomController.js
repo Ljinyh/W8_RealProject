@@ -26,14 +26,12 @@ module.exports = {
                 });
             }
 
-            //const arrTheRoom = [];
             let status = '';
             let TheRooms = [];
             if (existRoomSeq.length !== 0) {
                 for (i = 0; i < existRoomSeq.length; i++) {
                     let roomInfo = await Room.findById(existRoomSeq[i]);
-                    // arrTheRoom.push(roomInfo);
-                    // 방 목록 배열에, 조건에 해당하는 status 키값 집어넣기
+                    // 방 목록 배열에, 조건에 해당하는 status 값 집어넣기
                     const name = roomInfo;
                     const ownerCheck = name.ownerId === userId;
                     const guestCheck = name.guestId.includes(userId);
@@ -63,6 +61,7 @@ module.exports = {
                         myRooms: TheRooms,
                     });
                 } else {
+                    // 중복 값 제거
                     TheRooms = _.uniqBy(TheRooms, 'id');
                     return res.status(200).send({
                         result: true,
