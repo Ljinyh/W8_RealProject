@@ -28,7 +28,7 @@ module.exports = {
 
             //const arrTheRoom = [];
             let status = '';
-            const result = [];
+            let TheRooms = [];
             if (existRoomSeq.length !== 0) {
                 for (i = 0; i < existRoomSeq.length; i++) {
                     let roomInfo = await Room.findById(existRoomSeq[i]);
@@ -47,7 +47,7 @@ module.exports = {
                         status = 'publicOwner';
                     }
 
-                    result.push({
+                    TheRooms.push({
                         roomId: name.roomId,
                         roomName: name.roomName,
                         emoji: name.emoji,
@@ -56,11 +56,20 @@ module.exports = {
                         roomCode: name.roomCode,
                     });
                 }
-                return res.status(200).send({
-                    result: true,
-                    total: existRoomSeq.length,
-                    myRooms: result,
-                });
+                if (TheRooms.length === existRoomSeq.length) {
+                    return res.status(200).send({
+                        result: true,
+                        total: existRoomSeq.length,
+                        myRooms: TheRooms,
+                    });
+                } else {
+                    TheRooms = _.uniqBy(TheRooms, 'id');
+                    return res.status(200).send({
+                        result: true,
+                        total: existRoomSeq.length,
+                        myRooms: TheRooms,
+                    });
+                }
             }
         } catch (err) {
             console.log(err);
