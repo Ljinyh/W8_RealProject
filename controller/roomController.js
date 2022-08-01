@@ -39,7 +39,6 @@ module.exports = {
                     arrTheRoom.push(roomInfo);
                 }
             }
-            console.log(arrTheRoom);
 
             // 방 목록 배열에, 조건에 해당하는 status 키값 집어넣기
             if (arrTheRoom.length !== 0) {
@@ -47,17 +46,15 @@ module.exports = {
                 const result = [];
                 for (let i = 0; i < arrTheRoom.length; i++) {
                     const name = arrTheRoom[i];
+                    const ownerCheck = name.ownerId === userId;
+                    const guestCheck = name.guestId.includes(userId);
+                    const guestNumCheck = name.guestId.length;
 
-                    if (name.ownerId === userId && name.guestId.length === 0) {
+                    if (ownerCheck && guestNumCheck === 0) {
                         status = 'private';
-                    } else if (!name.ownerId === userId &&
-                        name.guestId.includes(userId)
-                    ) {
+                    } else if (!ownerCheck && guestCheck) {
                         status = 'publicGuest';
-                    } else if (
-                        name.ownerId === userId &&
-                        !name.guestId.includes(userId)
-                    ) {
+                    } else if (ownerCheck && !guestCheck) {
                         status = 'publicOwner';
                     }
 
@@ -65,7 +62,7 @@ module.exports = {
                         roomId: name.roomId,
                         roomName: name.roomName,
                         emoji: name.emoji,
-                        memberNum: name.guestId.length + 1,
+                        memberNum: guestNumCheck + 1,
                         status: status,
                         roomCode: name.roomCode,
                     });
