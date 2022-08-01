@@ -10,16 +10,16 @@ module.exports = {
     //===================================================================================
     // 사용자 맛방 전체조회
     allRoom: async(req, res) => {
-        const { userId } = res.locals.user; // JWT 인증 정보
+        const { userId } = res.locals.user;
         try {
             //userRoom 데이터 테이블에서 찾기
-            const existRoom = await UsersRoom.findOne({
+            const existRoom = await UsersRoom.find({
                 userId: userId,
             }).exec();
 
             console.log(existRoom);
 
-            const existRoomSeq = existRoom.roomSeq;
+            const existRoomSeq = existRoom[0].roomSeq;
 
             console.log(existRoomSeq);
 
