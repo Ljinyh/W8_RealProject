@@ -12,16 +12,11 @@ module.exports = {
     allRoom: async(req, res) => {
         const { userId } = res.locals.user;
         try {
-            //userRoom 데이터 테이블에서 찾기
-            const existRoom = await UsersRoom.find({
+            const existRoom = await UsersRoom.findOne({
                 userId: userId,
             }).exec();
 
-            console.log(existRoom);
-
-            const existRoomSeq = existRoom[0].roomSeq;
-
-            console.log(existRoomSeq);
+            const existRoomSeq = existRoom.roomSeq;
 
             if (!existRoom || existRoomSeq.length === 0) {
                 return res.status(200).send({
@@ -31,21 +26,15 @@ module.exports = {
                 });
             }
 
-            // roomSeq로 RoomDB에서 정보찾기. 배열로 생성
-            const arrTheRoom = [];
+            //const arrTheRoom = [];
+            let status = '';
+            const result = [];
             if (existRoomSeq.length !== 0) {
                 for (i = 0; i < existRoomSeq.length; i++) {
                     let roomInfo = await Room.findById(existRoomSeq[i]);
-                    arrTheRoom.push(roomInfo);
-                }
-            }
-
-            // 방 목록 배열에, 조건에 해당하는 status 키값 집어넣기
-            if (arrTheRoom.length !== 0) {
-                let status = '';
-                const result = [];
-                for (let i = 0; i < arrTheRoom.length; i++) {
-                    const name = arrTheRoom[i];
+                    // arrTheRoom.push(roomInfo);
+                    // 방 목록 배열에, 조건에 해당하는 status 키값 집어넣기
+                    const name = roomInfo;
                     const ownerCheck = name.ownerId === userId;
                     const guestCheck = name.guestId.includes(userId);
                     const guestNumCheck = name.guestId.length;
@@ -67,16 +56,6 @@ module.exports = {
                         roomCode: name.roomCode,
                     });
                 }
-
-                // const result = arrTheRoom.map((room, idx) => ({
-                //     roomId: room.roomId,
-                //     roomName: room.roomName,
-                //     emoji: room.emoji,
-                //     memberNum: room.guestId.length + 1,
-                //     status: myroom[idx],
-                //     roomCode: room.roomCode,
-                // }));
-
                 return res.status(200).send({
                     result: true,
                     total: existRoomSeq.length,
