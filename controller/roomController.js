@@ -47,15 +47,17 @@ module.exports = {
                 const result = [];
                 for (let i = 0; i < arrTheRoom.length; i++) {
                     const name = arrTheRoom[i];
-                    const ownerCheck = name.ownerId === userId;
-                    const guestCheck = name.guestId.includes(userId);
-                    const guestNumCheck = name.guestId.length;
 
-                    if (ownerCheck && guestNumCheck === 0) {
+                    if (name.ownerId === userId && name.guestId.length === 0) {
                         status = 'private';
-                    } else if (!ownerCheck && guestCheck) {
+                    } else if (!name.ownerId === userId &&
+                        name.guestId.includes(userId)
+                    ) {
                         status = 'publicGuest';
-                    } else if (ownerCheck && !guestCheck) {
+                    } else if (
+                        name.ownerId === userId &&
+                        !name.guestId.includes(userId)
+                    ) {
                         status = 'publicOwner';
                     }
 
@@ -63,7 +65,7 @@ module.exports = {
                         roomId: name.roomId,
                         roomName: name.roomName,
                         emoji: name.emoji,
-                        memberNum: guestNumCheck + 1,
+                        memberNum: name.guestId.length + 1,
                         status: status,
                         roomCode: name.roomCode,
                     });
