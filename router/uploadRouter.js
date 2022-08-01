@@ -5,11 +5,11 @@ const upload = require('../middlewares/multerS3');
 
 // 멀티파트 폼데이터 변수 선언. 두개의 폼필드 안에 필드 네임으로 나눔.
 const multiImg = upload.image.fields([
-    { name: 'img1', maxCount: 1 },
-    { name: 'img2', maxCount: 1 },
-    { name: 'img3', maxCount: 1 },
-    { name: 'img4', maxCount: 1 },
-    { name: 'img5', maxCount: 1 },
+    { name: 'image1', maxCount: 1 },
+    { name: 'image2', maxCount: 1 },
+    { name: 'image3', maxCount: 1 },
+    { name: 'image4', maxCount: 1 },
+    { name: 'image5', maxCount: 1 },
 ]);
 
 // 이미지 업로더
