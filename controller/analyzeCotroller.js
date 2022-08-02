@@ -236,12 +236,21 @@ module.exports = {
 
                 const TheTags = [].concat(TheTasty, THePoint);
                 const tagArray = TheTags.reduce((acc, cur) => acc.concat(cur));
+                
                 const Tags = tagArray.reduce((accu, curr) => {
                     accu[curr] = (accu[curr] || 0) + 1;
                     return accu;
                 }, {});
 
-                return res.status(200).send({ result: true, Tag: Tags });
+                const TheKeys = Object.keys(Tags);
+                const TheValues = Object.values(Tags);
+
+                const TheResult = TheKeys.map((tag, idx) => ({
+                    tagName: tag,
+                    tagNum: TheValues[idx]
+                }))
+
+                return res.status(200).send({ result: true, TheResult });
             }
             res.status(400).send({ result: false });
         } catch (err) {
