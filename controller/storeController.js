@@ -6,6 +6,7 @@ const UsersRoom = require('../models/usersRoom');
 const Matmadi = require('../models/matmadi');
 const Like = require('../models/like');
 const Tag = require('../models/tag');
+const { findByIdAndDelete } = require('../models/room');
 
 // 두개의 좌표 거리 계산 함수
 function getDistance(lat1, lng1, lat2, lng2) {
@@ -69,7 +70,7 @@ module.exports = {
                 const TheUserInfoEyes = findUser ? findUser.eyes : 'type1';
 
                 let distance = 0;
-                if (lon&&lat) {
+                if (lon && lat) {
                     distance = getDistance(
                         lat,
                         lon,
@@ -183,7 +184,7 @@ module.exports = {
                 placeURL,
                 address,
                 location: { type: 'Point', coordinates: [lon, lat] },
-                mainTag : mainTag,
+                mainTag: mainTag,
                 createdAt: new Date(),
             });
 
@@ -528,7 +529,7 @@ module.exports = {
 
             // 좋아요 순으로 정렬
             const result = output.sort(
-                (a, b) => parseFloat(a.likeNum) - parseFloat(b.likeNum)
+                (a, b) => parseFloat(b.likeNum) - parseFloat(a.likeNum)
             );
 
             return res.status(200).send({
@@ -559,7 +560,7 @@ module.exports = {
                 : '#56D4D4';
             const TheUserInfoEyes = findUser ? findUser.eyes : 'type1';
 
-            const likes = await Like.find({ madiId });
+            const likes = await Like.find({ madiId: madiId });
             const existStore = await Store.findById(existMatmadi.storeId);
 
             // 사용자가 좋아요 했는지 확인. 좋아요 눌렀으면 1==true || 0==false
@@ -584,6 +585,9 @@ module.exports = {
                 '.' +
                 ('0' + existMatmadi.createdAt.getDate()).slice(-2);
 
+            const likeNum = likes.length;
+            const likeDone = !!userlike.length;
+
             const result = {
                 plag,
                 imgURL: existMatmadi.imgURL,
@@ -593,8 +597,8 @@ module.exports = {
                 ratingPrice: existMatmadi.ratingPrice,
                 ratingTasty: existMatmadi.ratingTasty,
                 ratingService: existMatmadi.ratingService,
-                likeNum: likes.length,
-                likeDone: !!userlike.length, //느낌표 두개는 숫자 1과 0을 boolean으로 변환한다.
+                likeNum: likeNum,
+                likeDone: likeDone,
                 nickname: TheNickname,
                 faceColor: TheUserInfoFaceColor,
                 eyes: TheUserInfoEyes,
@@ -715,42 +719,12 @@ module.exports = {
                 });
             }
 
-            // 사용자의 태그 삭제가 태그 DB의 마지막 데이터일 때, 태그 DB의 데이터 삭제
-            for (i = 0; i < existMatmadi.tagMenu.length; i++) {
-                data = await Matmadi.find({
-                    tagMenu: existMatmadi.tagMenu[i].trim(),
-                });
-                if (data.length === 1) {
-                    await Tag.findOneAndDelete({
-                        tagMenu: existMatmadi.tagMenu[i].trim(),
-                        storeId: existMatmadi.storeId,
-                    });
-                }
+            // 맛마디의 좋아요 데이터 삭제
+            const existLike = await Like.find({madiId});
+            for (let i = 0; i < existLike.length; i++) {
+                await Like.findByIdAndDelete(existLike[i]._id)
             }
 
-            for (i = 0; i < existMatmadi.tagTasty.length; i++) {
-                data = await Matmadi.find({
-                    tagTasty: existMatmadi.tagTasty[i].trim(),
-                });
-                if (data.length === 1) {
-                    await Tag.findOneAndDelete({
-                        tagTasty: existMatmadi.tagTasty[i].trim(),
-                        storeId: existMatmadi.storeId,
-                    });
-                }
-            }
-
-            for (i = 0; i < existMatmadi.tagPoint.length; i++) {
-                data = await Matmadi.find({
-                    tagPoint: existMatmadi.tagPoint[i].trim(),
-                });
-                if (data.length === 1) {
-                    await Tag.findOneAndDelete({
-                        tagPoint: existMatmadi.tagPoint[i].trim(),
-                        storeId: existMatmadi.storeId,
-                    });
-                }
-            }
             // 마지막으로 맛마디(리뷰) 삭제
             await Matmadi.findByIdAndDelete({ _id: madiId });
 
@@ -851,7 +825,11 @@ module.exports = {
             // request에 tag가 들어왔는지 확인하고 배열 포함하는지 검사.
             if (Array.isArray(tag) && tag.length > 0) {
                 for (i = 0; i < findStore.length; i++) {
-                    if (findStore[i].mainTag.some((r) => tag.indexOf(r.trim()) >= 0)) {
+                    if (
+                        findStore[i].mainTag.some(
+                            (r) => tag.indexOf(r.trim()) >= 0
+                        )
+                    ) {
                         allStore.push(findStore[i]);
                     }
                 }
@@ -874,7 +852,7 @@ module.exports = {
 
                 // 사용자의 위치정보가 있으면 거리계산, 없으면 0으로 표시
                 let distance = '';
-                if (lon&&lat) {
+                if (lon && lat) {
                     distance = getDistance(
                         lat,
                         lon,
@@ -890,7 +868,7 @@ module.exports = {
                     storeName: allStore[i].storeName,
                     address: allStore[i].address,
                     phone: allStore[i].phone,
-                    placeURL : allStore[i].placeURL,
+                    placeURL: allStore[i].placeURL,
                     lon: allStore[i].location.coordinates[0],
                     lat: allStore[i].location.coordinates[1],
                     distance: distance,
