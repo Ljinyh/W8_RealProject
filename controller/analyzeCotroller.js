@@ -45,10 +45,6 @@ module.exports = {
             //내 리뷰
             const MyReivews = findReviews.filter((e) => e.userId === userId);
 
-            if (MyReivews.length === 0) {
-                return res.status(200).send({ result: [] });
-            }
-
             if (MyReivews.length !== 0) {
                 const MyReivewsStore = MyReivews.map(
                     (review) => review.storeId
@@ -62,18 +58,29 @@ module.exports = {
                 const CheckReivews = UserReviews.filter((review) =>
                     MyReivewsStore.includes(review.storeId)
                 );
-
+                
+                if(CheckReivews.length !== 0) {
                 // 나와 같은 리뷰를 쓴 사용자 정보
                 const TheUsers = CheckReivews.map((user) => user.userId);
 
                 let UserInfo = [];
                 for (let i = 0; i < TheUsers.length; i++) {
                     const TheUserInfo = await User.findById(TheUsers[i]);
+
+                const TheNickname = TheUserInfo.nickname
+                    ? TheUserInfo.nickname
+                    : '탈퇴한 회원입니다.';
+                const TheUserInfoFaceColor = TheUserInfo
+                    ? TheUserInfo.faceColor
+                    : '#56D4D4';
+                const TheUserInfoEyes = TheUserInfo ? TheUserInfo.eyes : 'type1';
+                const TheUserId = TheUserInfo ? TheUserInfo.userId : false;
+
                     UserInfo.push({
-                        userId: TheUserInfo.userId,
-                        nickname: TheUserInfo.nickname,
-                        faceColor: TheUserInfo.faceColor,
-                        eyes: TheUserInfo.eyes,
+                        userId: TheUserId,
+                        nickname: TheNickname,
+                        faceColor: TheUserInfoFaceColor,
+                        eyes: TheUserInfoEyes,
                     });
                 }
 
@@ -96,7 +103,13 @@ module.exports = {
                 }));
                 result.sort((a, b) => a.matchCount - a.matchCount);
                 return res.status(200).send(result);
+            } else {
+                return res.status(200).send({
+                    User : [],
+                    msg : '겹치는 사람이 없습니다.'
+                })
             }
+        }
             res.status(400).send({ result: false });
         } catch (err) {
             consol.log(err);
