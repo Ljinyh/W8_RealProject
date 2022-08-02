@@ -56,23 +56,11 @@ module.exports = {
                         roomCode: name.roomCode,
                     });
                 }
-                
-                //if (TheRooms.length === existRoomSeq.length) {
                     return res.status(200).send({
                         result: true,
                         total: existRoomSeq.length,
                         myRooms: TheRooms,
                     });
-                //} 
-                // else {
-                //     // 중복 값 제거
-                //     TheRooms = _.uniqBy(TheRooms, 'id');
-                //     return res.status(200).send({
-                //         result: true,
-                //         total: existRoomSeq.length,
-                //         myRooms: TheRooms,
-                //     });
-                // }
             }
         } catch (err) {
             console.log(err);
