@@ -245,12 +245,14 @@ module.exports = {
                 const TheKeys = Object.keys(Tags);
                 const TheValues = Object.values(Tags);
 
-                const TheResult = TheKeys.map((tag, idx) => ({
+                let TheResult = TheKeys.map((tag, idx) => ({
                     tagName: tag,
                     tagNum: TheValues[idx]
                 }))
 
-                return res.status(200).send({ result: true, TheResult });
+                TheResult = TheResult.sort((a,b) => b.tagNum - a.tagNum);
+
+                return res.status(200).send({ result: true, TheResult: TheResult.slice(0,11) });
             }
             res.status(400).send({ result: false });
         } catch (err) {
