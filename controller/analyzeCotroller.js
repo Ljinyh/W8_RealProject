@@ -90,6 +90,8 @@ module.exports = {
                         });
                     }
 
+                    UserInfo = _.uniqBy(UserInfo, 'userId');
+
                     let countArray = [];
                     for (let i = 0; i < UserInfo.length; i++) {
                         let count = 0;
@@ -101,8 +103,6 @@ module.exports = {
                         countArray.push(count);
                     }
 
-                    UserInfo = _.uniqBy(UserInfo, 'userId');
-
                     let result = UserInfo.map((e, idx) => ({
                         nickname: e.nickname,
                         faceColor: e.faceColor,
@@ -110,8 +110,9 @@ module.exports = {
                         matchCount: countArray[idx],
                     }));
 
-                    result.sort((a, b) => a.matchCount - a.matchCount);
-                    result = result.slice(0, 6);
+                    result = result
+                        .sort((a, b) => b.matchCount - a.matchCount)
+                        .slice(0, 6);
                     return res.status(200).send(result);
                 } else {
                     return res.status(200).send({
