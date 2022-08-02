@@ -15,12 +15,9 @@
              }
              await Like.create({ userId: userId, madiId: madiId });
 
-             // 해당 게시글 좋아요 개수 다시 출력해주기 (갱신)
-             const likes = await Like.find({ madiId });
-             const likeNum = likes.length;
              return res
                  .status(200)
-                 .send({ result: true, likeNum, message: '좋아요 완료' });
+                 .send({ result: true, message: '좋아요 완료' });
          } catch (err) {
              console.log(err);
              res.status(400).send({ result: false, message: '좋아요 실패' });
@@ -66,13 +63,10 @@
                  });
              }
              await Like.create({ userId, menuId });
-             // 해당 게시글 좋아요 개수 다시 출력해주기 (갱신)
-             const likes = await Like.find({ menuId });
-             const likeNum = likes.length;
-
+    
              return res
                  .status(200)
-                 .send({ result: true, likeNum, message: '좋아요 완료' });
+                 .send({ result: true, message: '좋아요 완료' });
          } catch (err) {
              console.log(err);
              res.status(400).send({ result: false, message: '좋아요 실패' });
