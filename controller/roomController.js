@@ -31,7 +31,7 @@ module.exports = {
             let TheRooms = [];
             if (existRoomSeq.length !== 0) {
                 for (let i = 0; i < existRoomSeq.length; i++) {
-                    let roomInfo = await Room.findById(existRoomSeq[i]);
+                    const roomInfo = await Room.findById(existRoomSeq[i]);
                     
                     // 방 목록 배열에, 조건에 해당하는 status 값 집어넣기
                     const name = roomInfo;
@@ -56,23 +56,11 @@ module.exports = {
                         roomCode: name.roomCode,
                     });
                 }
-                
-                //if (TheRooms.length === existRoomSeq.length) {
                     return res.status(200).send({
                         result: true,
                         total: existRoomSeq.length,
                         myRooms: TheRooms,
                     });
-                //} 
-                // else {
-                //     // 중복 값 제거
-                //     TheRooms = _.uniqBy(TheRooms, 'id');
-                //     return res.status(200).send({
-                //         result: true,
-                //         total: existRoomSeq.length,
-                //         myRooms: TheRooms,
-                //     });
-                // }
             }
         } catch (err) {
             console.log(err);
