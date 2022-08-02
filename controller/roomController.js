@@ -30,7 +30,7 @@ module.exports = {
             let status = '';
             let TheRooms = [];
             if (existRoomSeq.length !== 0) {
-                for ( i = 0; i < existRoomSeq.length; i++) {
+                for (let i = 0; i < existRoomSeq.length; i++) {
                     let roomInfo = await Room.findById(existRoomSeq[i]);
                     
                     // 방 목록 배열에, 조건에 해당하는 status 값 집어넣기
