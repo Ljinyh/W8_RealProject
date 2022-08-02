@@ -9,15 +9,15 @@ const Joi = require('joi');
 module.exports = {
     //===================================================================================
     // 사용자 맛방 전체조회
-    allRoom: async (req, res) => {
-        const { userId } = res.locals.user; // JWT 인증 정보
+    allRoom: async(req, res) => {
+        const { userId } = res.locals.user;
         try {
-            //userRoom 데이터 테이블에서 찾기
             const existRoom = await UsersRoom.findOne({
                 userId: userId,
             }).exec();
 
-            if (!existRoom || existRoom.roomSeq.length === 0) {
+
+            if (!existRoom ||  existRoom.roomSeq.length === 0 ) {
                 return res.status(200).send({
                     total: 0,
                     myRooms: [],
@@ -25,51 +25,43 @@ module.exports = {
                 });
             }
 
-            // roomSeq로 RoomDB에서 정보찾기. 배열로 생성
-            if(existRoom.roomSeq !== 0) {
-            const arrTheRoom = [];
-            for (let i = 0; i < existRoom.roomSeq.length; i++) {
-                const roomInfo = await Room.findById(existRoom.roomSeq[i]);
-                arrTheRoom.push(roomInfo);
-            }
+            const existRoomSeq = existRoom.roomSeq;
 
-            // 방 목록 배열에, 조건에 해당하는 status 키값 집어넣기
             let status = '';
-            const myroom = [];
-            for (let i = 0; i < arrTheRoom.length; i++) {
-                const name = arrTheRoom[i];
-                
-                const ownerCheck = name.ownerId === userId;
-                const guestCheck = name.guestId.includes(userId);
-                const guestNumCheck = name.guestId.length;
+            let TheRooms = [];
+            if (existRoomSeq.length !== 0) {
+                for (let i = 0; i < existRoomSeq.length; i++) {
+                    const roomInfo = await Room.findById(existRoomSeq[i]);
+                    
+                    // 방 목록 배열에, 조건에 해당하는 status 값 집어넣기
+                    const name = roomInfo;
+                    const ownerCheck = name.ownerId === userId;
+                    const guestCheck = name.guestId.includes(userId);
+                    const guestNumCheck = name.guestId.length;
 
-                if (ownerCheck && guestNumCheck === 0) {
-                    status = 'private';
-                } else if (!ownerCheck && guestCheck) {
-                    status = 'publicGuest';
-                } else if (ownerCheck && !guestCheck) {
-                    status = 'publicOwner';
+                    if (ownerCheck && guestNumCheck === 0) {
+                        status = 'private';
+                    } else if (!ownerCheck && guestCheck) {
+                        status = 'publicGuest';
+                    } else if (ownerCheck && !guestCheck) {
+                        status = 'publicOwner';
+                    }
+
+                    TheRooms.push({
+                        roomId: name.roomId,
+                        roomName: name.roomName,
+                        emoji: name.emoji,
+                        memberNum: guestNumCheck + 1,
+                        status: status,
+                        roomCode: name.roomCode,
+                    });
                 }
-                myroom.push(status);
+                    return res.status(200).send({
+                        result: true,
+                        total: existRoomSeq.length,
+                        myRooms: TheRooms,
+                    });
             }
-
-            const result = arrTheRoom.map((room, idx) => ({
-                roomId: room.roomId,
-                roomName: room.roomName,
-                emoji: room.emoji,
-                //ownerId: room.ownerId,
-                //guestId: room.guestId,
-                memberNum: room.guestId.length + 1,
-                status: myroom[idx],
-                roomCode: room.roomCode,
-            }));
-
-            return res.status(200).send({
-                result: true,
-                total: existRoom.roomSeq.length,
-                myRooms: result,
-            });
-        }
         } catch (err) {
             console.log(err);
             res.status(400).send({
