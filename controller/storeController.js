@@ -720,7 +720,7 @@ module.exports = {
             }
 
             // 맛마디의 좋아요 데이터 삭제
-            const existLike = await Like.find({madiId});
+            const existLike = await Like.find({madiId, userId});
             for (let i = 0; i < existLike.length; i++) {
                 await Like.findByIdAndDelete(existLike[i]._id)
             }
@@ -782,19 +782,24 @@ module.exports = {
             // 메뉴의 좋아요 수 찾아서 배열 생성
             const menuLikeNum = [];
             const likeDone = [];
-            for (i = 0; i < existTag.length; i++) {
+            if(existTag){
+            for (let i = 0; i < existTag.length; i++) {
                 // 좋아요 갯수 찾기
                 let likes = await Like.find({ menuId: existTag[i]._id });
                 menuLikeNum.push(likes.length);
 
                 // 현재 사용자가 추천메뉴에 좋아요를 눌렀는지 확인. {likeDone : true || false}
-                userlike = await Like.find({
+                const userlike = await Like.find({
                     menuId: existTag[i]._id,
                     userId: userId,
                 });
                 likeDone.push(!!userlike.length); //느낌표 두개는 Number를 Boolean으로 변환한다.
             }
-
+        }else if (existTag.length===0){
+            return res
+                .status(200)
+                .send({ result: [], message: '추천메뉴 목록이 없습니다.' });
+        }
             // map 함수로 필요한 부분 정리해서 출력
             const result = existTag.map((a, idx) => ({
                 menuId: a.id,
