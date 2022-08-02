@@ -16,15 +16,16 @@ module.exports = {
                 userId: userId,
             }).exec();
 
-            const existRoomSeq = existRoom.roomSeq;
 
-            if (!existRoom || existRoomSeq.length === 0) {
+            if (!existRoom ||  existRoom.roomSeq === 0 ) {
                 return res.status(200).send({
                     total: 0,
                     myRooms: [],
                     Message: '사용자의 방이 존재하지 않습니다',
                 });
             }
+
+            const existRoomSeq = existRoom.roomSeq;
 
             let status = '';
             let TheRooms = [];
