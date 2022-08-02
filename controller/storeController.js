@@ -58,7 +58,7 @@ module.exports = {
             }
 
             const storeMap = [];
-            for (i = 0; i < allStore.length; i++) {
+            for (let i = 0; i < allStore.length; i++) {
                 let findUser = await User.findById(allStore[i].userId);
 
                 const TheNickname = findUser
@@ -122,7 +122,7 @@ module.exports = {
                 });
             }
             // 사용자가 선택한 맛방이 존재하는 맛방인지 확인
-            for (i = 0; i < selectedRooms.length; i++) {
+            for (let i = 0; i < selectedRooms.length; i++) {
                 existRoom = await Room.findById(selectedRooms[i]);
                 if (!existRoom) {
                     return res.status(400).send({
@@ -132,11 +132,11 @@ module.exports = {
             }
             // 사용자의 Savelist에서 해당 가게를 저장한 데이터 전체 찾아서 지우기
             const findRoomSavelist = await Savelist.find({ storeId, userId });
-            for (i = 0; i < findRoomSavelist.length; i++) {
+            for (let i = 0; i < findRoomSavelist.length; i++) {
                 await Savelist.findByIdAndDelete(findRoomSavelist[i].id);
             }
             // 사용자가 선택한 roomId로 Savelist 다시 생성
-            for (i = 0; i < selectedRooms.length; i++) {
+            for (let i = 0; i < selectedRooms.length; i++) {
                 await Savelist.create({
                     userId,
                     roomId: selectedRooms[i],
@@ -173,7 +173,7 @@ module.exports = {
                     .send({ errorMessage: '이미 저장된 맛집입니다.' });
             }
             const mainTag = [];
-            for (i = 0; i < tag.length; i++) {
+            for (let i = 0; i < tag.length; i++) {
                 mainTag.push(tag[i].trim());
             }
             // 정보를 가게 DB에 저장
@@ -267,7 +267,7 @@ module.exports = {
             // roomSeq로 RoomDB에서 정보찾기. 배열로 생성
             const arrTheRoom = [];
             const storeNum = [];
-            for (i = 0; i < existRoom.roomSeq.length; i++) {
+            for (let i = 0; i < existRoom.roomSeq.length; i++) {
                 roomInfo = await Room.findById(existRoom.roomSeq[i]);
                 allStorelist = await Savelist.find({
                     roomId: existRoom.roomSeq[i],
@@ -658,8 +658,8 @@ module.exports = {
                 }
             );
             // 태그 DB에 해당 태그 데이터가 있는지 확인하고 없으면 create
-            for (i = 0; i < tagMenu.length; i++) {
-                let findTagMenu = await Tag.findOne({
+            for (let i = 0; i < tagMenu.length; i++) {
+                const findTagMenu = await Tag.findOne({
                     tagMenu: tagMenu[i].trim(),
                     storeId: existMatmadi.storeId,
                 });
@@ -671,8 +671,8 @@ module.exports = {
                     });
                 }
             }
-            for (i = 0; i < tagTasty.length; i++) {
-                let findTagTasty = await Tag.findOne({
+            for (let i = 0; i < tagTasty.length; i++) {
+                const findTagTasty = await Tag.findOne({
                     tagTasty: tagTasty[i].trim(),
                     storeId: existMatmadi.storeId,
                 });
@@ -684,8 +684,8 @@ module.exports = {
                     });
                 }
             }
-            for (i = 0; i < tagPoint.length; i++) {
-                let findTagPoint = await Tag.findOne({
+            for (let i = 0; i < tagPoint.length; i++) {
+                const findTagPoint = await Tag.findOne({
                     tagPoint: tagPoint[i].trim(),
                     storeId: existMatmadi.storeId,
                 });
@@ -749,7 +749,7 @@ module.exports = {
 
             // existTag 배열을 3가지 태그의 배열로 분리하기!
             // 배열의 요소를 하나씩 비교해서 조건문에 해당하는 3가지 태그 배열에 Push한다.
-            for (i = 0; i < existTag.length; i++) {
+            for (let i = 0; i < existTag.length; i++) {
                 if (existTag[i].tagMenu) {
                     tagMenu.push(existTag[i].tagMenu);
                 } else if (existTag[i].tagTasty) {
@@ -829,7 +829,7 @@ module.exports = {
 
             // request에 tag가 들어왔는지 확인하고 배열 포함하는지 검사.
             if (Array.isArray(tag) && tag.length > 0) {
-                for (i = 0; i < findStore.length; i++) {
+                for (let i = 0; i < findStore.length; i++) {
                     if (
                         findStore[i].mainTag.some(
                             (r) => tag.indexOf(r.trim()) >= 0
@@ -844,7 +844,7 @@ module.exports = {
 
             // 맛집을 처음 저장한 유저 정보 찾기
             const storeMap = [];
-            for (i = 0; i < allStore.length; i++) {
+            for (let i = 0; i < allStore.length; i++) {
                 let findUser = await User.findById(allStore[i].userId);
 
                 const TheNickname = findUser
@@ -920,7 +920,7 @@ module.exports = {
             const arrTheRoom = [];
             const storeNum = [];
             const saveDone = [];
-            for (i = 0; i < existRoom.roomSeq.length; i++) {
+            for (let i = 0; i < existRoom.roomSeq.length; i++) {
                 roomInfo = await Room.findById(existRoom.roomSeq[i]);
                 allStorelist = await Savelist.find({
                     roomId: existRoom.roomSeq[i],

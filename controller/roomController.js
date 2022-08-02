@@ -338,7 +338,7 @@ module.exports = {
 
             // 게스트들의 UsersRoom DB에 userId에 해당하는 목록 수정, 없으면 생성
             if (!!guestId) {
-                for (i = 0; i < guestId.length; i++) {
+                for (let i = 0; i < guestId.length; i++) {
                     await UsersRoom.findOneAndUpdate({ userId: guestId[i] }, { $push: { roomSeq: createdRoom.roomId } }, { upsert: true });
                 }
             }
