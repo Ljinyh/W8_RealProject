@@ -388,8 +388,8 @@ module.exports = {
     // 리뷰 남기기 (맛마디 작성)
     writeMatmadi: async (req, res) => {
         const { userId } = res.locals.user;
-        const { storeId } = req.body;
         const {
+            storeId,
             comment,
             star,
             imgURL,
@@ -400,6 +400,7 @@ module.exports = {
             ratingPrice,
             ratingService,
         } = req.body;
+        
         try {
             // 이미 리뷰를 작성했는지 확인. 리뷰 작성이 방문 횟수를 의미한다면 리뷰는 중복작성 가능해야 한다.
             const existMatmadi = await Matmadi.findOne({ userId, storeId });
@@ -416,7 +417,7 @@ module.exports = {
                     tagMenu: tagMenu[i],
                     storeId: storeId,
                 });
-                if (findTagMenu.length === 0) {
+                if (!findTagMenu) {
                     await Tag.create({
                         storeId,
                         tagMenu: tagMenu[i].trim(),
@@ -429,7 +430,7 @@ module.exports = {
                     tagTasty: tagTasty[i],
                     storeId: storeId,
                 });
-                if (findTagTasty.length === 0) {
+                if (!findTagTasty) {
                     await Tag.create({
                         storeId,
                         tagTasty: tagTasty[i].trim(),
@@ -442,7 +443,7 @@ module.exports = {
                     tagPoint: tagPoint[i],
                     storeId: storeId,
                 });
-                if (findTagPoint.length === 0) {
+                if (!findTagPoint) {
                     await Tag.create({
                         storeId,
                         tagPoint: tagPoint[i].trim(),
