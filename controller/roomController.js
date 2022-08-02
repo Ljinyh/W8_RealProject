@@ -17,7 +17,7 @@ module.exports = {
             }).exec();
 
 
-            if (!existRoom ||  existRoom.roomSeq === 0 ) {
+            if (!existRoom ||  existRoom.roomSeq.length === 0 ) {
                 return res.status(200).send({
                     total: 0,
                     myRooms: [],
