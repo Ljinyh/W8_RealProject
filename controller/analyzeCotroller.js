@@ -112,7 +112,7 @@ module.exports = {
 
                     result = result
                         .sort((a, b) => b.matchCount - a.matchCount)
-                        .slice(0, 6);
+                        .slice(0, 5);
                     return res.status(200).send(result);
                 } else {
                     return res.status(200).send({
