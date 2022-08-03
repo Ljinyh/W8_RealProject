@@ -119,10 +119,7 @@ module.exports = {
                         .slice(0, 5);
                     return res.status(200).send(result);
                 } else {
-                    return res.status(200).send({
-                        User: [],
-                        msg: '겹치는 사람이 없습니다.',
-                    });
+                    return res.status(200).send(null);
                 }
             }
             res.status(400).send({ result: false });
