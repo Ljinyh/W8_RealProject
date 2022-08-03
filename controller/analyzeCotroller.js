@@ -16,6 +16,7 @@ module.exports = {
                 userId: userId,
             });
 
+            if(MyReivews.lenght !== 0 && TheMonthDate.length !== 0) {
             const saveDate = TheMonthDate.map(
                 (date) => date.createdAt.getMonth() + 1
             );
@@ -24,13 +25,16 @@ module.exports = {
 
             for (let i = 0; i < saveDate.length; i++) {
                 saveDate[i] === value ? count++ : 0;
-            }
+            };
 
             return res.status(200).send({
                 result: true,
                 monthPost: count,
                 MyReivewsNum: MyReivews.length,
             });
+        } else {
+            return res.status(400).send({result : false})
+        };
         } catch (err) {
             console.log(err);
             res.status(400).send({ errorMessage: 'error!' });
