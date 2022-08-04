@@ -71,12 +71,13 @@
 - 초대 및 맛집게시물의 실시간 알림
 - 먹기록👑
 
+<img src="https://xoxokss.s3.ap-northeast-2.amazonaws.com/images/origin/%E1%84%89%E1%85%B3%E1%84%8F%E1%85%B3%E1%84%85%E1%85%B5%E1%86%AB%E1%84%89%E1%85%A3%E1%86%BA+2022-08-05+%E1%84%8B%E1%85%A9%E1%84%8C%E1%85%A5%E1%86%AB+1.10.41.png">
+
+
 <br>
 
 ## 🛠 아키텍쳐 | Architecture
-![아키텍쳐 drawio](https://user-images.githubusercontent.com/105095093/182834501-d552321d-27fb-48b3-aafe-a7f974719612.png)
-
-<br>
+<img src="https://user-images.githubusercontent.com/105095093/182834501-d552321d-27fb-48b3-aafe-a7f974719612.png" width="750">
 
 
 ## ERD
