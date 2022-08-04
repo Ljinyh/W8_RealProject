@@ -160,7 +160,9 @@
 - Lambda 함수의 가용메모리 증설(128MB -> 256MB), 지연시간 설정(30sec)을 적용해보았으나 에러를 수리하지 못함.
 
 #### 🚥 solution 
-- Lambda@edge라는 기능을 활용한다는 것을 서칭하였으며, 서버를 프로비저닝하고, 코드(Node.js)를 AWS Lambda에 업로드하고 요청에 대한 응답으로 함수가 사용자에게 좀 더 가까운 위치(리전)에서 트리거 되도록 구성할 수 있다는 것을 확인.
+- Lambda@edge라는 기능을 활용한다는 것을 서칭하였으며, 서버를 프로비저닝하고, 요청에 대한 응답으로 함수가 사용자에게 좀 더 가까운 위치(리전)에서 트리거 되도록 구성할 수 있다는 것을 확인.
+- 최종 제출일에 맞춰 해결하지 못했지만 추후 적용하고자 함.
+
 <br>
 
 ## 🤸🏻‍♀️백엔드 팀원 | BE TEAM
@@ -171,19 +173,20 @@
     <td align="center" width="20%"><b>name</b></td>
     <td align="center"width="10%"><b>postion</b></td>
     <td align="center"width="40%"><b>work</b></td>
-    <td align="center"width="30%"><b>contact</b></td>
+    <td align="center"width="40%"><b>Github</b></td>
   </tr>
   <tr>
     <td align="center"><a href="https://github.com/hyeonjun4460"><b>이진희</b></a></td>
-    <td align="center">leader</td>
-    <td align="center">카카오, 구글 소셜로그인 / 이메일 인증 / 유저 프로필 정보 관리 / JWT토큰 인증관리 / 먹기록(사용자 기록 데이터 분석) / ec2 t3 https 서버 배포 / CICD </td>
-    <td align="center">hyeonjun4460@gmail.com</td>
+    <td align="center">Leader</td>
+    <td align="center">카카오, 구글 소셜로그인 / 이메일 인증 / 유저 프로필 정보 관리 / JWT토큰 인증관리 / 사용자 기록 데이터 분석(먹기록)/ 맛방 detail CRUD / 알림 기능(socket.io) / EC2 t3 HTTPS 서버 배포 / CICD </td>
+    <td align="center">https://github.com/Ljinyh</td>
+
   </tr>
     <tr>
     <td align="center"><a href="https://github.com/inmyblue"><b>김상선</b></a></td>
-    <td align="center">member</td>
-    <td align="center">방 생성 CRUD / 맛집 생성 CRUD / DB 설계 / 위도 경도 데이터 가공 / 맛집 태그 검색 필터 / S3-Lambda 이미지리사이징 / </td>
-    <td align="center">inmyblue0930@naver.com</td>
+    <td align="center">Member</td>
+    <td align="center">방 생성 CRUD / 맛집 생성 CRUD / 좋아요 기능 / DB 설계 / 위도경도 데이터 가공 / 맛집 태그 검색 필터링 / S3-Lambda 이미지 리사이징 / 회의록 및 README 작성 </td>
+   <td align="center">https://github.com/xoxokss</td>
   </tr>
 </table>
 <br/>
@@ -191,5 +194,4 @@
 ## 🍕More Info 
 [🌿 프로젝트 소개 문서](https://www.notion.so/WEat-617066c95d3f422fb10dda696d8f1b43)  
 [💾 와이어프레임 Figma](https://www.figma.com/file/W4Yr7Umu4AvKSsI19LVouG/WEat?node-id=187%3A1238)  
-[🔐 Front-End Github Repo](https://github.com/jeelly/weat/)  
-
+[🔐 Front-End Github Repo](https://github.com/jeelly/weat/) 
