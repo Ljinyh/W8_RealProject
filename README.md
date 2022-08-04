@@ -12,7 +12,7 @@
 ![AWS](https://img.shields.io/badge/AWS-%23FF9900.svg?style=for-the-badge&logo=amazon-aws&logoColor=white)
 #### DB
 ![MongoDB](https://img.shields.io/badge/MongoDB-47A248.svg?&style=for-the-badge&logo=MongoDB&logoColor=white)
-![mongoose](https://img.shields.io/badge/Mogoose-52B0E7?style=for-the-badge&logo=Mongoose&logoColor=white)
+![mongoose](https://img.shields.io/badge/Mongoose-52B0E7?style=for-the-badge&logo=Mongoose&logoColor=white)
 <img alt="s3" src ="https://img.shields.io/badge/Amazon S3-569A31.svg?&style=for-the-badge&logo=Amazon S3&logoColor=white"/>
 <img alt="Lambda" src ="https://img.shields.io/badge/Lambda-FF4F8B.svg?&style=for-the-badge&logo=AWS Lambda&logoColor=white"/>
 #### Dev tools
