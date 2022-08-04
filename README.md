@@ -1,64 +1,5 @@
 # 🍚 맛집 공유 히스토리 플랫폼, 위잇 (WEat) 🍔
 
-## 목차 | Contents
-1. [위잇 소개 | About WEat](#위잇-소개--About-WEat)
-2. [웹사이트 | Webstie](#웹사이트--Website)
-3. [개발기간 | Project Period](#개발기간--Project-Period)
-4. [주요 API 기능 | Main API](#주요-API-기능--Main-API)
-5. [ERD](#ERD)
-6. [개발환경 | Development Enviornment](#개발환경--Development-Enviornmentt)
-7. [라이브러리 | Library](#라이브러리--Library)
-8. [기술적 챌린지 | Trouble shooting](#기술적-챌린지--Trouble-shooting)
-9. [백엔드 팀원 | BE TEAM](#백엔드-팀원--BE-TEAM)
-10. [More Info](#More-Info)
-<br>
-<hr>
-
-## 위잇 소개 | About WEat
-![로고](https://xoxokss.s3.ap-northeast-2.amazonaws.com/%E1%84%8A%E1%85%A5%E1%86%B7%E1%84%82%E1%85%A6%E1%84%8B%E1%85%B5%E1%86%AF.jpeg)
-<br>
-
-### 가고 싶은 맛집! 다시 가고 싶은 맛집을 저장하고 공유할 땐?
-
-👉 나만 알고 있던 맛집을 저장하거나 다른 사람들과 공유하고 싶으신 분 </br>
-👉 지도를 통해 맛집 위치를 쉽게 저장하고 싶으신 분 </br>
-👉 지인들과 같이 작성하는 진짜 맛집 리뷰를 공유하고 싶으신 분 </br>
-
-- 위잇(WEat)은 지인들과 공유하는 맛집 히스토리 플랫폼입니다.
-
-<br>
-
-## 🌎웹사이트 | Website
-- [위잇(WEat) http://weat.site](https://weat.site/)
-
-<br>
-
-## ⌚개발기간 | Project Period
-
-- 2022.06.24 ~ 2022.08.05 (6주간)
-
-<br>
-
-## ⚔주요 API 기능 | Main API 
-- 지인들을 초대해서 맛집 정보를 공유하는 방 or 나만의 맛집 리스트를 저장
-- 맛집 지도 (검색, 필터)
-- 초대 및 맛집게시물의 실시간 알림
-- 먹기록👑
-
-<br>
-
-## 🛠 아키텍쳐 | Architecture
-![서비스아키텍처](https://xoxokss.s3.ap-northeast-2.amazonaws.com/%E1%84%8B%E1%85%A1%E1%84%8F%E1%85%B5%E1%84%90%E1%85%A6%E1%86%A8%E1%84%8E%E1%85%A7.png)
-
-<br>
-
-
-## ERD
-
-![erd](https://xoxokss.s3.ap-northeast-2.amazonaws.com/_WEat+(2).png)
-
-<br>
-
 ## ⛏개발환경 | Development Enviornment
 
 #### Language
@@ -85,6 +26,64 @@
 
 <br>
 
+## 🌎웹사이트 | Website
+- [위잇(WEat) http://weat.site](https://weat.site/)
+
+<br>
+
+## ⌚개발기간 | Project Period
+
+- 2022.06.24 ~ 2022.08.05 (6주간)
+
+<br>
+
+## 목차 | Contents
+1. [위잇 소개 | About WEat](#위잇-소개--About-WEat)
+2. [웹사이트 | Webstie](#웹사이트--Website)
+3. [주요 API 기능 | Main API](#주요-API-기능--Main-API)
+4. [ERD](#ERD)
+5. [개발환경 | Development Enviornment](#개발환경--Development-Enviornmentt)
+6. [라이브러리 | Library](#라이브러리--Library)
+7. [기술적 챌린지 | Trouble shooting](#기술적-챌린지--Trouble-shooting)
+8. [백엔드 팀원 | BE TEAM](#백엔드-팀원--BE-TEAM)
+9. [More Info](#More-Info)
+<br>
+<hr>
+
+## 위잇 소개 | About WEat
+![로고](https://xoxokss.s3.ap-northeast-2.amazonaws.com/%E1%84%8A%E1%85%A5%E1%86%B7%E1%84%82%E1%85%A6%E1%84%8B%E1%85%B5%E1%86%AF.jpeg)
+<br>
+
+### 가고 싶은 맛집! 다시 가고 싶은 맛집을 저장하고 공유할 땐?
+
+👉 나만 알고 있던 맛집을 저장하거나 다른 사람들과 공유하고 싶으신 분 </br>
+👉 지도를 통해 맛집 위치를 쉽게 저장하고 싶으신 분 </br>
+👉 지인들과 같이 작성하는 진짜 맛집 리뷰를 공유하고 싶으신 분 </br>
+
+- 위잇(WEat)은 지인들과 공유하는 맛집 히스토리 플랫폼입니다.
+
+<br>
+
+## ⚔주요 API 기능 | Main API 
+- 지인들을 초대해서 맛집 정보를 공유하는 방 or 나만의 맛집 리스트를 저장
+- 맛집 지도 (검색, 필터)
+- 초대 및 맛집게시물의 실시간 알림
+- 먹기록👑
+
+<br>
+
+## 🛠 아키텍쳐 | Architecture
+![아키텍쳐 drawio](https://user-images.githubusercontent.com/105095093/182834501-d552321d-27fb-48b3-aafe-a7f974719612.png)
+
+<br>
+
+
+## ERD
+
+![erd](https://xoxokss.s3.ap-northeast-2.amazonaws.com/_WEat+(2).png)
+
+<br>
+
 ## 🎨라이브러리 | Library
 
 | Name                | Appliance               | Version  |
@@ -94,7 +93,6 @@
 | cors                | CORS 핸들링             |2.8.5|
 | dotenv              | 환경변수 설정           |16.0.1|
 | helmet              | HTTP header 보안        |5.1.0|
-| jest                |  테스트코드             |28.1.0|
 | jsonwebtoken        | JWT토큰 발급            |8.5.1|
 | lodash               | 모듈성 javascript 유틸리티   |4.17.21|
 | morgan              | HTTP 요청 로그 관리     |1.10.0|
@@ -113,10 +111,10 @@
 
 ## 🏊🏻‍♂️기술적 챌린지 | Trouble shooting
 
-### issue1: 사용자마다 다른 상태를 보여주는 방(Room)의 DB 설계
+### issue1: 사용자마다 다른 상태를 보여주는 맛방의 DB 설계
 
 #### 🙁 situation
-- 처음에는 맛방(Room)의 컬렉션에 상태(status) 필드를 만들어 저장하고 표시하려 했지만 사용자마다 다른 status를 갖는다는 것을 간과함.
+- 처음에는 맛방(Room)의 컬렉션에 상태(status) 필드를 만들어 저장하고 표시하려 했지만 사용자마다 다른 상태를 갖는다는 것을 간과함.
 - 또한 사용자마다 방 목록의 순서를 커스터마이징해서 저장할 수 있어야 함.
 - 방의 상태를 사용자의 상황에 따라 3가지로 분류하여 표시하기 위한 DB 설계 필요.
 1. 사용자만 "혼자"있는 비밀방
@@ -125,12 +123,12 @@
 
 #### 🚥 solution 
 - 사용자 개인의 방 목록 순서를 지정하는 컬렉션을 별도로 만들었고, 방이 삭제되면 방 목록의 순서 컬렉션에서도 도큐먼트가 수정, 삭제되도록 구현.
-- 방마다 status는 저장하지 않지만 방(Room) 컬렉션에는 방장과 게스트 명단을 저장하는 필드 존재. 
-- 조건문을 통해 사용자가 방장인지, 게스트인지, 혼자인지 분류하여 사용자마다 각기 다른 status를 출력할 수 있도록 구현.
+- 방마다 status는 저장하지 않지만 맛방 컬렉션에는 방장과 게스트 명단을 저장하는 필드 존재. 
+- 조건문을 통해 사용자가 방장인지, 게스트인지, 혼자인지 분류하여 사용자마다 각기 다른 상태를 출력할 수 있도록 구현.
 
 ---
 
-### issue2: 사용자의 위도경도에 따라 주변 반경 2km의 맛집을 찾아서 출력하는 기능 구현
+### issue2: 사용자의 위도경도에 따라 주변 반경 20km의 맛집을 찾아서 출력하는 기능 구현
 #### 🙁 situation
 - 1차 스코프(1~3주차) : 맛집의 위도와 경도를 DB에 저장하기만 함.
 - 2차 스코프(3주차~) : 저장된 맛집의 위도 경도를 클라이언트의 kakao API에 보여주기 위해 MongoDB를 어떻게 가공해야할지 구상 및 정보 검색.
