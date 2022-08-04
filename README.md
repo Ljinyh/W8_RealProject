@@ -183,7 +183,7 @@
     <tr>
     <td align="center"><a href="https://github.com/inmyblue"><b>김상선</b></a></td>
     <td align="center">Member</td>
-    <td align="center">방 생성 CRUD / 맛집 생성 CRUD / 좋아요 기능 / DB 설계 / 위도경도 데이터 가공 / 맛집 태그 검색 필터링 / S3-Lambda 이미지 리사이징 / 회의록 및 README 작성 </td>
+    <td align="center">맛방(Room) 생성 CRUD / 맛집 CRUD / 좋아요 기능 / 맛집 태그 검색 필터링 / NoSQL DB 설계 / 위도경도 데이터(GeoJson) 가공 /  AWS S3-Lambda 이미지 업로드 및 리사이징</td>
    <td align="center">https://github.com/xoxokss</td>
   </tr>
 </table>
