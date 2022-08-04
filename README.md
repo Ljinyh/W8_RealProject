@@ -88,23 +88,22 @@
 
 | Name                | Appliance               | Version  |
 | :-----------------: | :---------------------: | :------: |
-| aws-sdk             |	아마존              |2.1166.0|
-| bcrypt              |	비밀번호 암호화        |5.0.1|
-| cors                | CORS 핸들링             |2.8.5|
-| dotenv              | 환경변수 설정           |16.0.1|
-| helmet              | HTTP header 보안        |5.1.0|
-| jsonwebtoken        | JWT토큰 발급            |8.5.1|
-| lodash               | 모듈성 javascript 유틸리티   |4.17.21|
-| morgan              | HTTP 요청 로그 관리     |1.10.0|
-| multer              | 파일 업로드             |1.4.5|
-| multer-s3           | AWS S3 파일 업로드      |2.10.0|
+| aws-sdk             |	AWS 서비스 호출             |2.1166.0|
+| bcrypt              |	비밀번호 암호화              |5.0.1|
+| cors                | CORS 핸들링                |2.8.5|
+| dotenv              | 환경변수 설정                |16.0.1|
+| helmet              | HTTP header 보안          |5.1.0|
+| jsonwebtoken        | JWT토큰 발급               |8.5.1|
+| lodash              | 모듈성 javascript 유틸리티  |4.17.21|
 | nomailer            | 인증 메일 발송             |6.7.5|
-| multer-s3           | AWS S3 파일 업로드      |2.10.0|
+| morgan              | HTTP 요청 로그 관리        |1.10.0|
+| multer              | 파일 업로드 미들웨어         |1.4.5|
+| multer-s3           | AWS S3용 multer 엔진      |2.10.0|
 | passport            | node.js authentication  |0.5.2|
-| passport-kakao      | 카카오 소셜 로그인 모듈      |1.0.1|
-| passport-google-oauth20      | 구글 로그인 모듈      |2.0.0|
-| prettier      | 코드 서식      |2.7.1|
-| socket.io      | socket.io 연결      |4.5.1|
+| passport-kakao      | 카카오 소셜 로그인 모듈       |1.0.1|
+| passport-google-oauth20      | 구글 로그인 모듈   |2.0.0|
+| prettier            | 코드 서식                 |2.7.1|
+| socket.io           | socket.io 연결           |4.5.1|
 
 <br>
 
@@ -198,7 +197,7 @@
     - 좋아요 기능<br> 
     - 맛집 태그 검색 필터링 <br> 
     - DB 설계(NoSQL) <br> 
-    - 위도경도 데이터(GeoJson) CRUD <br> 
+    - 위도경도(GeoJson) CRUD <br> 
     - AWS S3 Lambda 이미지 업로드 & 리사이징</td>
    <td align="center">https://github.com/xoxokss</td>
   </tr>
