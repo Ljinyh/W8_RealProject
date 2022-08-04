@@ -4,12 +4,14 @@
 
 #### Language
 ![JavaScript](https://img.shields.io/badge/javascript-%23323330.svg?style=for-the-badge&logo=javascript&logoColor=%23F7DF1E)
+#### Runtime Platform
 ![NodeJS](https://img.shields.io/badge/node.js-6DA55F?style=for-the-badge&logo=node.js&logoColor=white)
-#### Framework
 ![NPM](https://img.shields.io/badge/NPM-%23000000.svg?style=for-the-badge&logo=npm&logoColor=white)
+#### Framework
 ![Express.js](https://img.shields.io/badge/express.js-%23404d59.svg?style=for-the-badge&logo=express&logoColor=%2361DAFB)
 #### Infrastructure
-![AWS](https://img.shields.io/badge/AWS-%23FF9900.svg?style=for-the-badge&logo=amazon-aws&logoColor=white)
+![AWS](https://img.shields.io/badge/AWS-%23232F3E.svg?style=for-the-badge&logo=amazon-aws&logoColor=white)
+![Amazon EC2](https://img.shields.io/badge/EC2-%23FF9900.svg?style=for-the-badge&logo=AmazonEC2&logoColor=white)
 #### DB
 ![MongoDB](https://img.shields.io/badge/MongoDB-47A248.svg?&style=for-the-badge&logo=MongoDB&logoColor=white)
 ![mongoose](https://img.shields.io/badge/Mongoose-52B0E7?style=for-the-badge&logo=Mongoose&logoColor=white)
@@ -24,7 +26,7 @@
 
 ## 🌎 웹사이트 | Website
 - [위잇(WEat) http://weat.site](https://weat.site/)
-- [발표영상](https://youtu.be/1oy_svsfoH0)
+- [발표 영상](https://youtu.be/1oy_svsfoH0)
 
 <br>
 
@@ -63,10 +65,10 @@
 <br>
 
 ## ⚔ 주요 API 기능 | Main API 
-- 지인들을 초대해서 맛집 정보를 공유하는 방 or 나만의 맛집 리스트를 저장
-- 맛집 지도 (검색, 필터)
-- 초대 및 맛집게시물의 실시간 알림
-- 먹기록👑
+- 지인들과 함께 맛집 정보를 공유하는 방 or 나만의 맛집 리스트 비공개방 생성
+- 맛집 지도 (맛집 검색, 태그 필터)
+- 맛방 초대 및 게시물 등록의 실시간 알림
+- 먹기록 (사용자 기록 인포그래프)
 
 <img src="https://xoxokss.s3.ap-northeast-2.amazonaws.com/images/origin/%E1%84%89%E1%85%B3%E1%84%8F%E1%85%B3%E1%84%85%E1%85%B5%E1%86%AB%E1%84%89%E1%85%A3%E1%86%BA+2022-08-05+%E1%84%8B%E1%85%A9%E1%84%8C%E1%85%A5%E1%86%AB+1.10.41.png">
 
@@ -96,6 +98,7 @@
 | jsonwebtoken        | JWT토큰 발급               |8.5.1|
 | lodash              | 모듈성 javascript 유틸리티  |4.17.21|
 | nomailer            | 인증 메일 발송             |6.7.5|
+| mongoose            | MongoDB ODM             |6.4.0|
 | morgan              | HTTP 요청 로그 관리        |1.10.0|
 | multer              | 파일 업로드 미들웨어         |1.4.5|
 | multer-s3           | AWS S3용 multer 엔진      |2.10.0|
@@ -133,7 +136,7 @@
 - 2차 스코프(3주차~) : 저장된 맛집의 위도 경도를 클라이언트의 kakao API에 보여주기 위해 MongoDB를 어떻게 가공해야할지 구상 및 정보 검색.
 
 #### 🚥 solution 
-- MongoDB는 지오메트리를 위한 GeoJson 데이터형식을 지원한다는 것을 알았고, ODM인 Moogoose를 통해 데이터를 쉽게 가공할 수 있었음.
+- MongoDB는 지오메트리를 위한 GeoJson 데이터형식을 지원한다는 것을 알았고, ODM인 Mongoose를 통해 데이터를 쉽게 가공할 수 있었음.
 - 쿼리를 사용하여 일정 반경 내의 맛집들을 선별 출력할 수 있을 뿐 아니라, 2dsphere 인덱스를 정의하여 속도를 높일 수 있었음.
 - 사용자의 2km 반경을 기준으로 출력하는 게 첫 기획이었으나, 초기 맛집 데이터의 빈약 때문에 20km 반경 범위로 확대 적용함. 
 - 특정 지역에 맛집 데이터가 몰리거나, 부족할 수 있기 때문에 효율적인 반경 출력 알고리즘이 필요해 보임.
@@ -154,7 +157,7 @@
 #### 2) Lambda 에러 발생
 #### 🙁 situation
 - 큰 용량이나 다수의 이미지를 첨부하여 게시글 등록하면 리사이징 함수가 에러나는 현상 발생.
-- Lambda 함수의 가용메모리 증설(128MB -> 256MB), 지연시간 설정(30sec)을 적용해보았으나 에러를 수리하지 못함.
+- Lambda 함수의 가용메모리 증설(128MB -> 256MB), 지연시간 설정을 적용해보았으나 에러를 수리하지 못함.
 
 #### 🚥 solution 
 - Lambda@edge라는 기능을 활용한다는 것을 서칭하였으며, 서버를 프로비저닝하고, 요청에 대한 응답으로 함수가 사용자에게 좀 더 가까운 위치(리전)에서 트리거 되도록 구성할 수 있다는 것을 확인.
