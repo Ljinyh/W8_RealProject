@@ -28,6 +28,7 @@
 
 ## 🌎웹사이트 | Website
 - [위잇(WEat) http://weat.site](https://weat.site/)
+- [발표영상](https://youtu.be/1oy_svsfoH0)
 
 <br>
 
@@ -174,14 +175,14 @@
     <td align="center"width="40%"><b>Github</b></td>
   </tr>
   <tr>
-    <td align="center"><a href="https://github.com/hyeonjun4460"><b>이진희</b></a></td>
+    <td align="center"><b>이진희</b></a></td>
     <td align="center">Leader</td>
     <td align="center">카카오, 구글 소셜로그인 / 이메일 인증 / 유저 프로필 정보 관리 / JWT토큰 인증관리 / 사용자 기록 데이터 분석(먹기록)/ 맛방 detail CRUD / 알림 기능(socket.io) / EC2 t3 HTTPS 서버 배포 / CICD </td>
     <td align="center">https://github.com/Ljinyh</td>
 
   </tr>
     <tr>
-    <td align="center"><a href="https://github.com/inmyblue"><b>김상선</b></a></td>
+    <td align="center"><b>김상선</b></a></td>
     <td align="center">Member</td>
     <td align="center">맛방(Room) 생성 CRUD / 맛집 CRUD / 좋아요 기능 / 맛집 태그 검색 필터링 / NoSQL DB 설계 / 위도경도 데이터(GeoJson) 가공 /  AWS S3-Lambda 이미지 업로드 및 리사이징</td>
    <td align="center">https://github.com/xoxokss</td>
