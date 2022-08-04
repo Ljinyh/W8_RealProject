@@ -23,7 +23,7 @@ module.exports = {
             key: function (req, file, cb) {
                 cb(
                     null,
-                    `images/origin/` + `${Date.now().toString()}_${file.originalname}`
+                    `image/` + `${Date.now().toString()}_${file.originalname}`
                 ); //저장되는 파일명
             },
         }),

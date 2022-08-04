@@ -1,12 +1,4 @@
 // upload controller
-function getFileName() {
-    var sPathName = decodeURIComponent(window.location.pathname), 
-          iStrLen = sPathName.length, 
-          iLastShash = sPathName.lastIndexOf('/') + 1, 
-          sFileName = sPathName.substring(iLastShash, iStrLen); 
-  
-    return sFileName;
-  }
 
 module.exports = {
     Get: async (req, res) => {
@@ -17,10 +9,7 @@ module.exports = {
     imageUploader: async (req, res) => {
         try {
             const image = req.files;
-        
-            // map 함수 사용. 업로드 파일 URL을 배열로 출력. 원본URL의 파일명을 분리해서 압축파일의 URL 경로로 변환.
-            const path = image.map((img) => "https://xoxokss.s3.ap-northeast-2.amazonaws.com/images/w_400/"+ img.location.replace(/^.*\//, '')) 
-            
+            const path = image.map((img) => img.location); // map 함수 사용. 여러개의 업로드 파일 URL을 배열로 출력.
             if (image === undefined) {
                 return res
                     .status(400)
