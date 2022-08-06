@@ -74,7 +74,7 @@ const emailValidation = Joi.object({
 
 //================================================================================
 //회원가입
-exports.signUp = async(req, res) => {
+exports.signUp = async (req, res) => {
     try {
         let {
             customerId,
@@ -120,12 +120,12 @@ exports.signUp = async(req, res) => {
 
 //================================================================================
 //아이디 중복확인API
-exports.check = async(req, res) => {
+exports.check = async (req, res) => {
     try {
         const { customerId } = await checkUser.validateAsync(req.body);
 
         const existUsers = await userDB.findOne({ customerId: customerId });
-        console.log(existUsers)
+        console.log(existUsers);
 
         if (existUsers) {
             return res
@@ -144,7 +144,7 @@ exports.check = async(req, res) => {
 
 //================================================================================
 //비밀번호 중복확인API
-exports.PassCehck = async(req, res) => {
+exports.PassCehck = async (req, res) => {
     try {
         const { password, confirmPassword } = await checkUserPass.validateAsync(
             req.body
@@ -152,7 +152,8 @@ exports.PassCehck = async(req, res) => {
 
         if (password !== confirmPassword) {
             return res.status(400).send({
-                errorMessage: '비밀번호와 비밀번호 확인의 내용이 일치하지 않습니다.',
+                errorMessage:
+                    '비밀번호와 비밀번호 확인의 내용이 일치하지 않습니다.',
             });
         }
         res.status(200).send({ result: 'success' });
@@ -164,7 +165,7 @@ exports.PassCehck = async(req, res) => {
 
 //================================================================================
 // 이메일 중복확인 및 인증번호 메일로 보내기
-exports.sendMail = async(req, res) => {
+exports.sendMail = async (req, res) => {
     const { email } = await emailValidation.validateAsync(req.body);
 
     const authNum = Math.random().toString().substring(2, 6); //랜덤한 숫자 4자리 생성
@@ -206,7 +207,7 @@ exports.sendMail = async(req, res) => {
 
 //================================================================================
 //로그인
-exports.login = async(req, res) => {
+exports.login = async (req, res) => {
     const { customerId, password } = req.body;
     const user = await userDB.findOne({ customerId: customerId });
     try {
@@ -230,9 +231,13 @@ exports.login = async(req, res) => {
         }
 
         //비밀번호까지 맞다면 토큰을 생성하기.
-        const token = jwt.sign({ userId: user.userId }, process.env.SECRET_KEY, {
-            expiresIn: '3d',
-        });
+        const token = jwt.sign(
+            { userId: user.userId },
+            process.env.SECRET_KEY,
+            {
+                expiresIn: '3d',
+            }
+        );
         res.status(200).send({
             message: `${customerId}님이 로그인하셨습니다.`,
             token,
@@ -247,7 +252,7 @@ exports.login = async(req, res) => {
 
 //================================================================================
 //아이디 찾기 시 인증번호 이메일로 보내기
-exports.mailSending = async(req, res) => {
+exports.mailSending = async (req, res) => {
     const { email } = req.body;
 
     const authNum = Math.random().toString().substring(2, 6); //랜덤한 숫자 4자리 생성
@@ -286,7 +291,7 @@ exports.mailSending = async(req, res) => {
 
 //================================================================================
 //아이디 찾기
-exports.findUserId = async(req, res) => {
+exports.findUserId = async (req, res) => {
     const { email } = req.body;
 
     const existUsersEmail = await userDB.findOne({ email: email });
@@ -309,7 +314,7 @@ exports.findUserId = async(req, res) => {
 
 //================================================================================
 //비밀번호 찾기
-exports.findPass = async(req, res) => {
+exports.findPass = async (req, res) => {
     const { email, customerId } = req.body;
 
     //랜덤으로 36진수의 값 만들기(소숫점 뒤부터)
@@ -319,7 +324,8 @@ exports.findPass = async(req, res) => {
 
     if (!existUserPass || existUserPass === null) {
         return res.status(400).send({
-            errorMessage: '작성란이 비어있거나 회원등록이 되어있지 않는 사용자입니다.',
+            errorMessage:
+                '작성란이 비어있거나 회원등록이 되어있지 않는 사용자입니다.',
         });
     }
 
@@ -378,7 +384,7 @@ exports.findPass = async(req, res) => {
                     */
 //================================================================================
 //유저 정보 수정
-exports.userinfoEdit = async(req, res) => {
+exports.userinfoEdit = async (req, res) => {
     const { userId } = res.locals.user;
     const { nickname, name, birthDay, faceColor, eyes } = req.body;
 
@@ -395,15 +401,18 @@ exports.userinfoEdit = async(req, res) => {
         }
 
         if (users) {
-            await userDB.findByIdAndUpdate({ _id: users._id }, {
-                $set: {
-                    nickname: nickname,
-                    name: name,
-                    birthDay: birthDay,
-                    faceColor: faceColor,
-                    eyes: eyes,
-                },
-            });
+            await userDB.findByIdAndUpdate(
+                { _id: users._id },
+                {
+                    $set: {
+                        nickname: nickname,
+                        name: name,
+                        birthDay: birthDay,
+                        faceColor: faceColor,
+                        eyes: eyes,
+                    },
+                }
+            );
             return res.status(201).json({
                 msg: '회원정보가 수정되었습니다.',
             });
@@ -418,42 +427,50 @@ exports.userinfoEdit = async(req, res) => {
 
 //================================================================================
 // 비밀번호 수정
-exports.passSet = async(req, res) => {
+exports.passSet = async (req, res) => {
     const { user } = res.locals;
-    let { customerId, thePassword, password } = await checkUserPass.validateAsync(
-        req.body
-    );
+    let { customerId, thePassword, password } =
+        await checkUserPass.validateAsync(req.body);
 
     try {
         const theUser = await User.findById(user.userId);
-        const userCompared = await bcrypt.compare(thePassword, theUser.password);
+        const userCompared = await bcrypt.compare(
+            thePassword,
+            theUser.password
+        );
 
         if (!theUser || !userCompared || customerId !== theUser.customerId) {
-            return res.status(400).send({ errorMessage: '비밀번호나 아이디가 맞지 않거나 회원이 존재하지 않습니다!' });
+            return res
+                .status(400)
+                .send({
+                    errorMessage:
+                        '비밀번호나 아이디가 맞지 않거나 회원이 존재하지 않습니다!',
+                });
         }
 
         if (theUser && userCompared) {
             await User.findByIdAndUpdate(user.userId, {
-                $set: { password: bcrypt.hashSync(password, 10) }
+                $set: { password: bcrypt.hashSync(password, 10) },
             });
 
-            return res.status(200).send({ msg: '비밀번호 바꾸기 성공!' })
+            return res.status(200).send({ msg: '비밀번호 바꾸기 성공!' });
         }
 
-        res.status(400).send({ errorMessage: '비밀번호 바꾸기 실패!' })
-
+        res.status(400).send({ errorMessage: '비밀번호 바꾸기 실패!' });
     } catch (err) {
-        console.log(err)
-        res.status(400).send({ errorMessage: 'ERROR!' })
+        console.log(err);
+        res.status(400).send({ errorMessage: 'ERROR!' });
     }
 };
 
 //================================================================================
 //회원 탈퇴
-exports.deleteUser = async(req, res) => {
+exports.deleteUser = async (req, res) => {
     const { userId } = res.locals.user;
     const findUser = await User.findById(userId);
-    const theRoom = await Room.find({ $or: [{ ownerId: userId }, { guestId: userId }] });
+    const theRoom = await Room.find({
+        $or: [{ ownerId: userId }, { guestId: userId }],
+    });
     const existAlert = await Alert.find({ userId: userId });
     const existUsersRoom = await UsersRoom.findOne({ userId: userId });
     const existConnect = await Connect.findOne({ userId: userId });
@@ -461,7 +478,9 @@ exports.deleteUser = async(req, res) => {
 
     try {
         if (!findUser) {
-            return res.status(400).send({ errorMessage: '회원이 존재하지 않습니다!' });
+            return res
+                .status(400)
+                .send({ errorMessage: '회원이 존재하지 않습니다!' });
         }
 
         if (findUser) {
@@ -472,47 +491,60 @@ exports.deleteUser = async(req, res) => {
                 await Alert.deleteMany({ userId: userId });
             }
 
-            if(!theRoom && !existUsersRoom || existUsersRoom.roomSeq.length === 0 && !existLike){
-                await UsersRoom.deleteOne({ userId: userId })
-                await User.deleteOne({_id: userId});
-                return res.status(200).send({errorMessage: '회원탈퇴 성공!'});
+            if (
+                (!theRoom && !existUsersRoom) ||
+                (existUsersRoom.roomSeq.length === 0 && !existLike)
+            ) {
+                await UsersRoom.deleteOne({ userId: userId });
+                await User.deleteOne({ _id: userId });
+                return res.status(200).send({ errorMessage: '회원탈퇴 성공!' });
             }
 
-            if(!theRoom && !existUsersRoom && existLike.length !== 0 && existLike) {
-                
+            if (
+                !theRoom &&
+                !existUsersRoom &&
+                existLike.length !== 0 &&
+                existLike
+            ) {
                 await Like.deleteMany({ userId: userId });
-                await User.deleteOne({_id: userId});
-                return res.status(200).send({errorMessage: '회원탈퇴 성공!'});
+                await User.deleteOne({ _id: userId });
+                return res.status(200).send({ errorMessage: '회원탈퇴 성공!' });
             }
 
             if (theRoom) {
                 const ownerRoom = theRoom.filter((e) => e.ownerId === userId);
-                const guestRoom = theRoom.filter((e) => e.guestId.includes(userId));
+                const guestRoom = theRoom.filter((e) =>
+                    e.guestId.includes(userId)
+                );
 
                 if (guestRoom !== 0 || ownerRoom !== 0) {
                     for (let i = 0; i < guestRoom.length; i++) {
-                        await UsersRoom.findOneAndUpdate({ roomSeq: guestRoom[i]._id }, {
-                            $pull: { roomSeq: guestRoom[i]._id }
-                        })
+                        await UsersRoom.findOneAndUpdate(
+                            { roomSeq: guestRoom[i]._id },
+                            {
+                                $pull: { roomSeq: guestRoom[i]._id },
+                            }
+                        );
 
                         await Room.findByIdAndUpdate(guestRoom[i]._id, {
-                            $pull: { guestId: userId }
-                        })
-                    };
-
-                    for (let i = 0; i < ownerRoom.length; i++) {
-                        await UsersRoom.findOneAndUpdate({ roomSeq: ownerRoom[i]._id }, {
-                            $pull: { roomSeq: ownerRoom[i]._id }
-                        })
-                        await Room.findByIdAndDelete(ownerRoom[i]._id);
+                            $pull: { guestId: userId },
+                        });
                     }
 
+                    for (let i = 0; i < ownerRoom.length; i++) {
+                        await UsersRoom.findOneAndUpdate(
+                            { roomSeq: ownerRoom[i]._id },
+                            {
+                                $pull: { roomSeq: ownerRoom[i]._id },
+                            }
+                        );
+                        await Room.findByIdAndDelete(ownerRoom[i]._id);
+                    }
                 }
 
                 if (existLike) {
                     await Like.deleteMany({ userId: userId });
                 }
-
             }
 
             await User.findByIdAndDelete(userId);
@@ -528,7 +560,7 @@ exports.deleteUser = async(req, res) => {
 
 //================================================================================
 //사용자 인증
-exports.userInfo = async(req, res) => {
+exports.userInfo = async (req, res) => {
     const { user } = res.locals;
     try {
         return res.status(200).send({

@@ -1,17 +1,18 @@
 const passport = require('passport');
 const naverStrategy = require('passport-naver').Strategy;
 const User = require('../models/user');
-require("dotenv").config();
+require('dotenv').config();
 
 module.exports = () => {
     passport.use(
-        new naverStrategy({
+        new naverStrategy(
+            {
                 clientID: process.env.NAVER_ID,
                 clientSecret: process.env.NAVER_PASS,
                 callbackURL: process.env.NAVER_CALLBACK_URL,
             },
 
-            async(accessToken, refreshToken, profile, done) => {
+            async (accessToken, refreshToken, profile, done) => {
                 try {
                     const exUser = await User.findOne(
                         // 카카오 플랫폼에서 로그인 했고 & snsId필드에 카카오 아이디가 일치할경우

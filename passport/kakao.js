@@ -1,16 +1,17 @@
 const passport = require('passport');
 const KakaoStrategy = require('passport-kakao').Strategy;
 const User = require('../models/user');
-require("dotenv").config()
+require('dotenv').config();
 
 module.exports = () => {
     passport.use(
-        new KakaoStrategy({
+        new KakaoStrategy(
+            {
                 clientID: process.env.KAKAO_ID,
                 callbackURL: process.env.KAKAO_CALLBACK_URL,
             },
 
-            async(accessToken, refreshToken, profile, done) => {
+            async (accessToken, refreshToken, profile, done) => {
                 try {
                     const exUser = await User.findOne(
                         // 카카오 플랫폼에서 로그인 했고 & snsId필드에 카카오 아이디가 일치할경우

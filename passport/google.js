@@ -5,12 +5,13 @@ require('dotenv').config();
 
 module.exports = () => {
     passport.use(
-        new GoogleStrategy({
+        new GoogleStrategy(
+            {
                 clientID: process.env.GOOGLE_ID,
                 clientSecret: process.env.GOOGLE_PASS,
                 callbackURL: process.env.GOOGLE_CALLBACK_URL,
             },
-            async(accessToken, refreshToken, profile, done) => {
+            async (accessToken, refreshToken, profile, done) => {
                 try {
                     const exUser = await User.findOne({
                         snsId: profile.id,

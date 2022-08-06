@@ -6,7 +6,7 @@ const SaveListSchema = new mongoose.Schema({
     storeId: String,
     createdAt: Date,
 });
-SaveListSchema.virtual('saveId').get(function() {
+SaveListSchema.virtual('saveId').get(function () {
     return this._id.toHexString();
 });
 SaveListSchema.set('toJSON', { virtuals: true });

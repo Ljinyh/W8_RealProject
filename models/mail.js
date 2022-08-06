@@ -1,8 +1,8 @@
 const nodemailer = require('nodemailer');
-require("dotenv").config();
+require('dotenv').config();
 
 const mailSender = {
-    sendEmail: function(param) {
+    sendEmail: function (param) {
         const transporter = nodemailer.createTransport({
             service: 'gmail', // 메일 보내는 곳
             port: 465,
@@ -23,7 +23,7 @@ const mailSender = {
         };
 
         // 메일 발송
-        transporter.sendMail(mailOptions, function(error, info) {
+        transporter.sendMail(mailOptions, function (error, info) {
             if (error) {
                 console.log(error);
             } else {

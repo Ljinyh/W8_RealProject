@@ -5,7 +5,7 @@ const _ = require('lodash');
 
 module.exports = {
     //달 기록 횟수 && 나의 리뷰 총 갯수
-    getAnalyze: async(req, res) => {
+    getAnalyze: async (req, res) => {
         const { userId } = res.locals.user;
         try {
             const MyReivews = await Review.find({ userId: userId });
@@ -16,25 +16,25 @@ module.exports = {
                 userId: userId,
             });
 
-            if(MyReivews.lenght !== 0 && TheMonthDate.length !== 0) {
-            const saveDate = TheMonthDate.map(
-                (date) => date.createdAt.getMonth() + 1
-            );
+            if (MyReivews.lenght !== 0 && TheMonthDate.length !== 0) {
+                const saveDate = TheMonthDate.map(
+                    (date) => date.createdAt.getMonth() + 1
+                );
 
-            let count = 0;
+                let count = 0;
 
-            for (let i = 0; i < saveDate.length; i++) {
-                saveDate[i] === value ? count++ : 0;
-            };
+                for (let i = 0; i < saveDate.length; i++) {
+                    saveDate[i] === value ? count++ : 0;
+                }
 
-            return res.status(200).send({
-                result: true,
-                monthPost: count,
-                MyReivewsNum: MyReivews.length,
-            });
-        } else {
-            return res.status(400).send({result : false})
-        };
+                return res.status(200).send({
+                    result: true,
+                    monthPost: count,
+                    MyReivewsNum: MyReivews.length,
+                });
+            } else {
+                return res.status(400).send({ result: false });
+            }
         } catch (err) {
             console.log(err);
             res.status(400).send({ errorMessage: 'error!' });
@@ -42,7 +42,7 @@ module.exports = {
     },
 
     // 먹 매치포인트
-    ReviewMatch: async(req, res) => {
+    ReviewMatch: async (req, res) => {
         const { userId } = res.locals.user;
 
         try {
@@ -73,18 +73,18 @@ module.exports = {
                     for (let i = 0; i < TheUsers.length; i++) {
                         const TheUserInfo = await User.findById(TheUsers[i]);
 
-                        const TheNickname = TheUserInfo.nickname ?
-                            TheUserInfo.nickname :
-                            '탈퇴한 회원입니다.';
-                        const TheUserInfoFaceColor = TheUserInfo ?
-                            TheUserInfo.faceColor :
-                            '#56D4D4';
-                        const TheUserInfoEyes = TheUserInfo ?
-                            TheUserInfo.eyes :
-                            'type1';
-                        const TheUserId = TheUserInfo ?
-                            TheUserInfo.userId :
-                            false;
+                        const TheNickname = TheUserInfo.nickname
+                            ? TheUserInfo.nickname
+                            : '탈퇴한 회원입니다.';
+                        const TheUserInfoFaceColor = TheUserInfo
+                            ? TheUserInfo.faceColor
+                            : '#56D4D4';
+                        const TheUserInfoEyes = TheUserInfo
+                            ? TheUserInfo.eyes
+                            : 'type1';
+                        const TheUserId = TheUserInfo
+                            ? TheUserInfo.userId
+                            : false;
 
                         UserInfo.push({
                             userId: TheUserId,
@@ -130,7 +130,7 @@ module.exports = {
     },
 
     // 리뷰왕
-    ReviewKing: async(req, res) => {
+    ReviewKing: async (req, res) => {
         try {
             const existReivews = await Review.find();
 
@@ -157,7 +157,7 @@ module.exports = {
     },
 
     // 발견왕
-    PostKing: async(req, res) => {
+    PostKing: async (req, res) => {
         try {
             const existPost = await Store.find();
 
@@ -184,7 +184,7 @@ module.exports = {
     },
 
     // 특정 맛집 맛태그 조회
-    tagRank: async(req, res) => {
+    tagRank: async (req, res) => {
         const { storeId } = req.params;
         try {
             const findStoreReview = await Review.find({ storeId: storeId });
@@ -221,7 +221,7 @@ module.exports = {
     },
 
     // 나의 최애 음식
-    MyFavorite: async(req, res) => {
+    MyFavorite: async (req, res) => {
         const { userId } = res.locals.user;
 
         try {
@@ -237,7 +237,7 @@ module.exports = {
 
                 const TheTags = [].concat(TheTasty, THePoint);
                 const tagArray = TheTags.reduce((acc, cur) => acc.concat(cur));
-                
+
                 const Tags = tagArray.reduce((accu, curr) => {
                     accu[curr] = (accu[curr] || 0) + 1;
                     return accu;
@@ -248,12 +248,14 @@ module.exports = {
 
                 let TheResult = TheKeys.map((tag, idx) => ({
                     tagName: tag,
-                    tagNum: TheValues[idx]
-                }))
+                    tagNum: TheValues[idx],
+                }));
 
-                TheResult = TheResult.sort((a,b) => b.tagNum - a.tagNum);
+                TheResult = TheResult.sort((a, b) => b.tagNum - a.tagNum);
 
-                return res.status(200).send({ result: true, TheResult: TheResult.slice(0,11) });
+                return res
+                    .status(200)
+                    .send({ result: true, TheResult: TheResult.slice(0, 11) });
             }
             res.status(400).send({ result: false });
         } catch (err) {

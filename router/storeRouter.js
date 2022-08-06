@@ -25,7 +25,11 @@ router.get('/matmadi/:madiId', authMiddleware, storeController.detailMatmadi);
 router.put('/matmadi/:madiId', authMiddleware, storeController.updateMatmadi);
 
 // 맛마디 삭제
-router.delete('/matmadi/:madiId', authMiddleware, storeController.deleteMatmadi);
+router.delete(
+    '/matmadi/:madiId',
+    authMiddleware,
+    storeController.deleteMatmadi
+);
 
 // 특정 맛집의 맛태그 조회
 router.get('/:storeId/tag', authMiddleware, storeController.tag);
