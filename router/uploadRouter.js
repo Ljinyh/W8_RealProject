@@ -13,13 +13,20 @@ const multiImg = upload.image.fields([
 ]);
 
 // 이미지 업로더
-router.post('/image', upload.image.array('image', 5), UploadController.imageUploader)
+router.post(
+    '/image',
+    upload.image.array('image', 5),
+    UploadController.imageUploader
+);
 
 // 단일 이미지 업로드
-router.post('/single', upload.image.single('image'), UploadController.singleImage);
+router.post(
+    '/single',
+    upload.image.single('image'),
+    UploadController.singleImage
+);
 
 // 멀티파트폼 업로드
 router.post('/multi', multiImg, UploadController.multiImages);
-
 
 module.exports = router;

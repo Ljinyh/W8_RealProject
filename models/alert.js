@@ -10,7 +10,7 @@ const alertSchema = mongoose.Schema({
     createdAt: String,
 });
 
-alertSchema.virtual('alertId').get(function() {
+alertSchema.virtual('alertId').get(function () {
     return this._id.toHexString();
 });
 

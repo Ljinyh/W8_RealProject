@@ -400,7 +400,7 @@ module.exports = {
             ratingPrice,
             ratingService,
         } = req.body;
-        
+
         try {
             // 이미 리뷰를 작성했는지 확인. 리뷰 작성이 방문 횟수를 의미한다면 리뷰는 중복작성 가능해야 한다.
             const existMatmadi = await Matmadi.findOne({ userId, storeId });

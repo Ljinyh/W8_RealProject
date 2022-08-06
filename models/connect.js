@@ -25,7 +25,7 @@ const connectSchema = mongoose.Schema({
     },
 });
 
-connectSchema.virtual('connectId').get(function() {
+connectSchema.virtual('connectId').get(function () {
     return this._id.toHexString();
 });
 

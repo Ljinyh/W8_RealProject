@@ -14,7 +14,7 @@ const MatmadiSchema = new mongoose.Schema({
     ratingPrice: Number,
     ratingService: Number,
 });
-MatmadiSchema.virtual('madiId').get(function() {
+MatmadiSchema.virtual('madiId').get(function () {
     return this._id.toHexString();
 });
 MatmadiSchema.set('toJSON', { virtuals: true });

@@ -15,5 +15,4 @@ router.post('/:madiId', authMiddleware, likeController.likeMatmadi);
 // 맛마디 좋아요 취소
 router.delete('/:madiId', authMiddleware, likeController.unlikeMatmadi);
 
-
 module.exports = router;

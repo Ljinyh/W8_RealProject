@@ -2,12 +2,13 @@ const jwt = require('jsonwebtoken');
 const passport = require('passport');
 //const KEY = require('../config/secret.json');
 const User = require('../models/user');
-require("dotenv").config();
+require('dotenv').config();
 
 //Kakao callback Controller
 exports.kakaoLogin = (req, res, next) => {
     passport.authenticate(
-        'kakao', { failureRedirect: '/' },
+        'kakao',
+        { failureRedirect: '/' },
         (err, user, info) => {
             if (err) return next(err);
             const { userId } = user;
@@ -23,7 +24,8 @@ exports.kakaoLogin = (req, res, next) => {
 // Google callback Controller
 exports.googleLogin = (req, res, next) => {
     passport.authenticate(
-        'google', { failureRedirect: '/' },
+        'google',
+        { failureRedirect: '/' },
         (err, user, info) => {
             if (err) return next(err);
             const { userId } = user;
@@ -39,7 +41,8 @@ exports.googleLogin = (req, res, next) => {
 // Naver callback Controller
 exports.naverLogin = (req, res, next) => {
     passport.authenticate(
-        'naver', { failureRedirect: '/' },
+        'naver',
+        { failureRedirect: '/' },
         (err, user, info) => {
             if (err) return next(err);
             const { userId } = user;

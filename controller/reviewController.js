@@ -4,7 +4,7 @@ const Like = require('../models/like');
 
 module.exports = {
     // 유저가 작성한 맛마디 전체 불러오기
-    getReviews: async(req, res) => {
+    getReviews: async (req, res) => {
         const { userId } = res.locals.user;
         const existReviews = await Reviews.find({ userId: userId });
 
@@ -27,18 +27,21 @@ module.exports = {
                 let existStoreName = [];
                 let MyLikes = [];
                 for (let i = 0; i < TheReviews.length; i++) {
-                    const existLike = await Like.find({ userId: userId, madiId: TheReviews[i].madiId });
-                    const TheMyLike = existLike.find((e) => (e.madiId === TheReviews[i].madiId))
+                    const existLike = await Like.find({
+                        userId: userId,
+                        madiId: TheReviews[i].madiId,
+                    });
+                    const TheMyLike = existLike.find(
+                        (e) => e.madiId === TheReviews[i].madiId
+                    );
                     const TheStoreName = await Store.findById(
                         TheReviews[i].storeId
                     );
 
                     existStoreName.push(TheStoreName.storeName);
                     theMadi.push(existLike.length);
-                    MyLikes.push(TheMyLike  ? true : false);
+                    MyLikes.push(TheMyLike ? true : false);
                 }
-
-
 
                 const TheReview = TheReviews.map((review, idx) => ({
                     madiId: review.madiId,
@@ -51,11 +54,11 @@ module.exports = {
                     LikeDone: MyLikes[idx],
                 }));
 
-                return res.status(200).send({ result: true, TheReview })
+                return res.status(200).send({ result: true, TheReview });
             }
         } catch (err) {
             console.log(err);
-            res.status(400).send('error!')
+            res.status(400).send('error!');
         }
     },
 };

@@ -28,7 +28,6 @@ module.exports = {
         }
     },
 
-
     // 단일 이미지 /image/single
     singleImage: async (req, res) => {
         const image = req.file;
@@ -44,12 +43,22 @@ module.exports = {
     // multipart-form data /image/multi
     multiImages: async (req, res) => {
         const image = req.files;
-        const imgArray = []
-        if(image.img1){imgArray.push(image.img1[0].location)}
-        if(image.img2){imgArray.push(image.img2[0].location)}
-        if(image.img3){imgArray.push(image.img3[0].location)}
-        if(image.img4){imgArray.push(image.img4[0].location)}
-        if(image.img5){imgArray.push(image.img5[0].location)}
+        const imgArray = [];
+        if (image.img1) {
+            imgArray.push(image.img1[0].location);
+        }
+        if (image.img2) {
+            imgArray.push(image.img2[0].location);
+        }
+        if (image.img3) {
+            imgArray.push(image.img3[0].location);
+        }
+        if (image.img4) {
+            imgArray.push(image.img4[0].location);
+        }
+        if (image.img5) {
+            imgArray.push(image.img5[0].location);
+        }
 
         if (image === undefined) {
             return res
