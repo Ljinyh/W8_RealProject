@@ -157,15 +157,15 @@
     <td align="center"><b>이진희</b></a></td>
     <td align="center">Leader</td>
     <td align="left"> 
-    - 카카오, 구글 소셜 로그인 <br>
-    - 이메일 인증 <br>
-    - 유저 프로필 정보 관리 <br> 
-    - JWT토큰 인증관리 <br> 
-    - 사용자 기록 데이터 분석(먹기록)<br> 
-    - 맛방 detail CRUD <br> 
-    - 알림 기능(socket.io) <br> 
-    - EC2 t3 HTTPS 서버 배포 <br> 
-    - CICD </td>
+    - 카카오, 구글 소셜 로그인 및 일반 로그인, 회원가입 API<br>
+    - 이메일 인증 - 회원가입 시 인증 및 비밀번호 찾기 API에 활용 <br>
+    - 유저 프로필 정보 관리 API (유저개인정보수정 및 회원탈퇴) <br> 
+    - 인증미들웨어를 통한 JWT 인증관리 <br> 
+    - 사용자 기록 데이터 분석(먹기록)API <br> 
+    - 맛방 상세내용을 볼 수 있는 API <br> 
+    - Socket.io를 통한 알림 기능 <br> 
+    - AWS Load Balancer 와 AWS EC2를 이용한 HTTPS 서버 배포 <br> 
+    - Github Action을 이용해 빠른 배포를 위한 CI/CD 환경 구축 </td>
     <td align="center">https://github.com/Ljinyh</td>
 
   </tr>
