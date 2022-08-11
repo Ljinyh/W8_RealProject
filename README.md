@@ -148,10 +148,10 @@
 <br/>
 <table>
    <tr>
-    <td align="center" width="20%"><b>name</b></td>
+    <td align="center" width="10%"><b>name</b></td>
     <td align="center"width="10%"><b>postion</b></td>
-    <td align="center"width="40%"><b>work</b></td>
-    <td align="center"width="40%"><b>Github</b></td>
+    <td align="center"width= "60%"><b>work</b></td>
+    <td align="center"width="20%"><b>Github</b></td>
   </tr>
   <tr>
     <td align="center"><b>이진희</b></a></td>
@@ -178,10 +178,10 @@
     - 좋아요 기능<br> 
     - 맛집 태그 검색 필터링 기능 구현 <br> 
     - ERD 설계 (MongoDB) <br> 
-    - 위치기반 서비스를 위한 GeoJson DB 쿼리 <br> 
-    - AWS S3 이미지 업로드 기능 구현 
-    - AWS Lambda를 이용한 리사이징, 로딩시간 단축
-    - Google Analytics를 이용한 사용자 유입 분석</td>
+    - 위치기반 서비스 GeoJson DB 쿼리<br> 
+    - AWS S3 이미지 업로드 기능 구현 <br>
+    - AWS Lambda를 이용한 리사이징<br>
+    - Google Analytics 사용자 유입 분석</td>
    <td align="center">https://github.com/xoxokss</td>
   </tr>
 </table>
