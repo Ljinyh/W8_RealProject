@@ -1,17 +1,17 @@
 # 🍚 맛집 공유 히스토리 플랫폼, 위잇 (WEat) 🍔
 
 ## 🔭목차 | Contents
-1. [위잇 소개 | About WEat](#위잇-소개--About-WEat)
-2. [웹사이트 | Website](#웹사이트--Website)
-3. [개발기간 | Project Period](#개발기간--Project-Period)
-4. [주요 API 기능 | Main API](#주요-API-기능--Main-API)
-5. [아키텍쳐 | Architecture](#아키텍쳐--Architecture)
-6. [개발환경 | Development Enviornment](#개발환경--Development-Enviornmentt)
-7. [ERD](#ERD)
-8. [라이브러리 | Library](#라이브러리--Library)
-9. [기술적 챌린지 | Trouble shooting](#기술적-챌린지--Trouble-shooting)
-10. [백엔드 팀원 | BE TEAM](#백엔드-팀원--BE-TEAM)
-11. [More Info](#More-Info)
+1. [위잇 소개 | About WEat](#위잇-소개--about-weat)
+2. [웹사이트 | Website](#웹사이트--website)
+3. [개발기간 | Project Period](#개발기간--project-period)
+4. [주요 API 기능 | Main API](#주요-api-기능--main-api)
+5. [아키텍쳐 | Architecture](#아키텍쳐--architecture)
+6. [개발환경 | Development Enviornment](#개발환경--development-enviornmentt)
+7. [ERD](#erd)
+8. [라이브러리 | Library](#라이브러리--library)
+9. [기술적 챌린지 | Trouble shooting](#기술적-챌린지--trouble-shooting)
+10. [백엔드 팀원 | BE TEAM](#백엔드-팀원--be-team)
+11. [More Info](#more-info)
 <br>
 <hr>
 
