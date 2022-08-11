@@ -1,6 +1,59 @@
 # 🍚 맛집 공유 히스토리 플랫폼, 위잇 (WEat) 🍔
 
-## ⛏ 개발환경 | Development Enviornment
+## 🔭목차 | Contents
+1. [위잇 소개 | About WEat](#-위잇-소개--about-weat)
+2. [웹사이트 | Website](#-웹사이트--website)
+3. [개발기간 | Project Period](#-개발기간--project-period)
+4. [주요 API 기능 | Main API](#-주요-api-기능--main-api)
+5. [아키텍쳐 | Architecture](#-아키텍쳐--architecture)
+6. [개발환경 | Development Enviornment](#-개발환경--development-environment)
+7. [ERD](#-erd)
+8. [라이브러리 | Library](#-라이브러리--library)
+9. [기술적 챌린지 | Trouble shooting](#-기술적-챌린지--trouble-shooting)
+10. [백엔드 팀원 | BE TEAM](#-백엔드-팀원--be-team)
+11. [More Info](#-more-info)
+<br>
+
+## 🎉 위잇 소개 | About WEat
+<img src="https://xoxokss.s3.ap-northeast-2.amazonaws.com/%E1%84%8A%E1%85%A5%E1%86%B7%E1%84%82%E1%85%A6%E1%84%8B%E1%85%B5%E1%86%AF.jpeg" width="750">
+
+### 가고 싶은 맛집! 다시 가고 싶은 맛집을 저장하고 공유할 땐?
+
+👉 나만 알고 있던 맛집을 저장하거나 다른 사람들과 공유하고 싶으신 분 </br>
+👉 지도를 통해 맛집 위치를 쉽게 저장하고 싶으신 분 </br>
+👉 지인들과 같이 작성하는 진짜 맛집 리뷰를 공유하고 싶으신 분 </br>
+
+- 위잇(WEat)은 지인들과 공유하는 맛집 히스토리 플랫폼입니다.
+
+<br>
+
+## 🌎 웹사이트 | Website
+- [위잇(WEat) http://weat.site](https://weat.site/)
+- [발표 영상](https://youtu.be/1oy_svsfoH0)
+
+<br>
+
+## ⌚ 개발기간 | Project Period
+
+- 2022.06.24 ~ 2022.08.05 (6주간)
+
+<br>
+
+## ⚔ 주요 API 기능 | Main API 
+- 지인들과 함께 맛집 정보를 공유하는 방 or 나만의 맛집 리스트 비공개방 생성
+- 맛집 지도 (맛집 검색, 태그 필터)
+- 맛방 초대 및 게시물 등록의 실시간 알림
+- 먹기록 (사용자 기록 인포그래프)
+
+<img src="https://xoxokss.s3.ap-northeast-2.amazonaws.com/images/origin/%E1%84%89%E1%85%B3%E1%84%8F%E1%85%B3%E1%84%85%E1%85%B5%E1%86%AB%E1%84%89%E1%85%A3%E1%86%BA+2022-08-05+%E1%84%8B%E1%85%A9%E1%84%8C%E1%85%A5%E1%86%AB+1.10.41.png">
+
+
+<br>
+
+## 🛠 아키텍쳐 | Architecture
+<img src="https://user-images.githubusercontent.com/105095093/182834501-d552321d-27fb-48b3-aafe-a7f974719612.png" width="750">
+
+## ⛏ 개발환경 | Development Environment
 
 #### Language
 ![JavaScript](https://img.shields.io/badge/javascript-%23323330.svg?style=for-the-badge&logo=javascript&logoColor=%23F7DF1E)
@@ -24,67 +77,7 @@
 
 <br>
 
-## 🌎 웹사이트 | Website
-- [위잇(WEat) http://weat.site](https://weat.site/)
-- [발표 영상](https://youtu.be/1oy_svsfoH0)
 
-<br>
-
-## ⌚ 개발기간 | Project Period
-
-- 2022.06.24 ~ 2022.08.05 (6주간)
-
-<br>
-
-
-## 🔭목차 | Contents
-1. [위잇 소개 | About WEat](#위잇-소개--About-WEat)
-2. [웹사이트 | Webstie](#웹사이트--Website)
-3. [주요 API 기능 | Main API](#주요-API-기능--Main-API)
-4. [ERD](#ERD)
-5. [개발환경 | Development Enviornment](#개발환경--Development-Enviornmentt)
-6. [라이브러리 | Library](#라이브러리--Library)
-7. [기술적 챌린지 | Trouble shooting](#기술적-챌린지--Trouble-shooting)
-8. [백엔드 팀원 | BE TEAM](#백엔드-팀원--BE-TEAM)
-9. [More Info](#More-Info)
-<br>
-<hr>
-
-## 🎉 위잇 소개 | About WEat
-<img src="https://xoxokss.s3.ap-northeast-2.amazonaws.com/%E1%84%8A%E1%85%A5%E1%86%B7%E1%84%82%E1%85%A6%E1%84%8B%E1%85%B5%E1%86%AF.jpeg" width="750">
-<br>
-
-### 가고 싶은 맛집! 다시 가고 싶은 맛집을 저장하고 공유할 땐?
-
-👉 나만 알고 있던 맛집을 저장하거나 다른 사람들과 공유하고 싶으신 분 </br>
-👉 지도를 통해 맛집 위치를 쉽게 저장하고 싶으신 분 </br>
-👉 지인들과 같이 작성하는 진짜 맛집 리뷰를 공유하고 싶으신 분 </br>
-
-- 위잇(WEat)은 지인들과 공유하는 맛집 히스토리 플랫폼입니다.
-
-<br>
-
-## ⚔ 주요 API 기능 | Main API 
-- 지인들과 함께 맛집 정보를 공유하는 방 or 나만의 맛집 리스트 비공개방 생성
-- 맛집 지도 (맛집 검색, 태그 필터)
-- 맛방 초대 및 게시물 등록의 실시간 알림
-- 먹기록 (사용자 기록 인포그래프)
-
-<img src="https://xoxokss.s3.ap-northeast-2.amazonaws.com/images/origin/%E1%84%89%E1%85%B3%E1%84%8F%E1%85%B3%E1%84%85%E1%85%B5%E1%86%AB%E1%84%89%E1%85%A3%E1%86%BA+2022-08-05+%E1%84%8B%E1%85%A9%E1%84%8C%E1%85%A5%E1%86%AB+1.10.41.png">
-
-
-<br>
-
-## 🛠 아키텍쳐 | Architecture
-<img src="https://user-images.githubusercontent.com/105095093/182834501-d552321d-27fb-48b3-aafe-a7f974719612.png" width="750">
-
-
-## 🔑 ERD 
-
-
-![erd](https://xoxokss.s3.ap-northeast-2.amazonaws.com/_WEat+(2).png)
-
-<br>
 
 ## 🎨 라이브러리 | Library
 
@@ -110,8 +103,15 @@
 
 <br>
 
+## 🔑 ERD 
 
-## 🏊🏻‍♂️ 기술적 챌린지 | Trouble shooting
+![erd](https://xoxokss.s3.ap-northeast-2.amazonaws.com/_WEat+(2).png)
+
+
+<br>
+
+
+## 🛠 기술적 챌린지 | Trouble shooting
 
 ### issue1: 사용자마다 다른 상태를 보여주는 맛방의 DB 설계
 
@@ -143,7 +143,7 @@
 
 <br>
 
-## 🤸🏻‍♀️백엔드 팀원 | BE TEAM
+## 🤸🏻‍ 백엔드 팀원 | BE TEAM
 
 <br/>
 <table>
@@ -173,13 +173,15 @@
     <td align="center"><b>김상선</b></a></td>
     <td align="center">Member</td>
     <td align="left">
-    - 맛방(Room) CRUD<br> 
+    - 맛방 CRUD<br> 
     - 맛집 CRUD<br> 
     - 좋아요 기능<br> 
-    - 맛집 태그 검색 필터링 <br> 
-    - DB 설계(NoSQL) <br> 
-    - 위도경도(GeoJson) CRUD <br> 
-    - AWS S3 이미지 업로드</td>
+    - 맛집 태그 검색 필터링 기능 구현 <br> 
+    - ERD 설계 (MongoDB) <br> 
+    - 위치기반 서비스를 위한 GeoJson DB 쿼리 <br> 
+    - AWS S3 이미지 업로드 기능 구현 
+    - AWS Lambda를 이용한 리사이징, 로딩시간 단축
+    - Google Analytics를 이용한 사용자 유입 분석</td>
    <td align="center">https://github.com/xoxokss</td>
   </tr>
 </table>
