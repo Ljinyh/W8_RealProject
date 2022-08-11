@@ -1,23 +1,21 @@
 # 🍚 맛집 공유 히스토리 플랫폼, 위잇 (WEat) 🍔
 
 ## 🔭목차 | Contents
-1. [위잇 소개 | About WEat](#위잇-소개--about-weat)
-2. [웹사이트 | Website](#웹사이트--website)
-3. [개발기간 | Project Period](#개발기간--project-period)
-4. [주요 API 기능 | Main API](#주요-api-기능--main-api)
-5. [아키텍쳐 | Architecture](#아키텍쳐--architecture)
-6. [개발환경 | Development Enviornment](#개발환경--development-enviornmentt)
-7. [ERD](#erd)
-8. [라이브러리 | Library](#라이브러리--library)
-9. [기술적 챌린지 | Trouble shooting](#기술적-챌린지--trouble-shooting)
-10. [백엔드 팀원 | BE TEAM](#백엔드-팀원--be-team)
-11. [More Info](#more-info)
+1. [위잇 소개 | About WEat](#-위잇-소개--about-weat)
+2. [웹사이트 | Website](#-웹사이트--website)
+3. [개발기간 | Project Period](#-개발기간--project-period)
+4. [주요 API 기능 | Main API](#-주요-api-기능--main-api)
+5. [아키텍쳐 | Architecture](#-아키텍쳐--architecture)
+6. [개발환경 | Development Enviornment](#-개발환경--development-environment)
+7. [ERD](#-erd)
+8. [라이브러리 | Library](#-라이브러리--library)
+9. [기술적 챌린지 | Trouble shooting](#-기술적-챌린지--trouble-shooting)
+10. [백엔드 팀원 | BE TEAM](#-백엔드-팀원--be-team)
+11. [More Info](#-more-info)
 <br>
-<hr>
 
 ## 🎉 위잇 소개 | About WEat
 <img src="https://xoxokss.s3.ap-northeast-2.amazonaws.com/%E1%84%8A%E1%85%A5%E1%86%B7%E1%84%82%E1%85%A6%E1%84%8B%E1%85%B5%E1%86%AF.jpeg" width="750">
-<br>
 
 ### 가고 싶은 맛집! 다시 가고 싶은 맛집을 저장하고 공유할 땐?
 
@@ -55,7 +53,7 @@
 ## 🛠 아키텍쳐 | Architecture
 <img src="https://user-images.githubusercontent.com/105095093/182834501-d552321d-27fb-48b3-aafe-a7f974719612.png" width="750">
 
-## ⛏ 개발환경 | Development Enviornment
+## ⛏ 개발환경 | Development Environment
 
 #### Language
 ![JavaScript](https://img.shields.io/badge/javascript-%23323330.svg?style=for-the-badge&logo=javascript&logoColor=%23F7DF1E)
@@ -113,7 +111,7 @@
 <br>
 
 
-## 🏊🏻‍♂️ 기술적 챌린지 | Trouble shooting
+## 🛠 기술적 챌린지 | Trouble shooting
 
 ### issue1: 사용자마다 다른 상태를 보여주는 맛방의 DB 설계
 
@@ -145,7 +143,7 @@
 
 <br>
 
-## 🤸🏻‍♀️백엔드 팀원 | BE TEAM
+## 🤸🏻‍ 백엔드 팀원 | BE TEAM
 
 <br/>
 <table>
